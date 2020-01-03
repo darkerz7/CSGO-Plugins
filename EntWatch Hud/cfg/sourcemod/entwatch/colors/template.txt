@@ -1,0 +1,16 @@
+"colors"
+{
+	"color_tag"			""
+	"color_name"		""
+	"color_steamid"		""
+	"color_use"			""
+	"color_pickup"		""
+	"color_drop"		""
+	"color_disconnect"	""
+	"color_death"		""
+	"color_warning"		""
+	"color_glow_red"	""
+	"color_glow_green"	""
+	"color_glow_blue"	""
+	"color_glow_alpha"	""
+}

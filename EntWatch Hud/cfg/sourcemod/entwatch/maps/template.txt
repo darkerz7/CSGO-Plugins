@@ -1,0 +1,22 @@
+"entities"
+{
+	"0"
+	{
+		"name"				""
+		"shortname"			""
+		"color"				""
+		"buttonclass"		""
+		"filtername"		""
+		"hasfiltername"		"false"
+		"blockpickup"		"false"
+		"allowtransfer"		"false"
+		"forcedrop"			"false"
+		"chat"				"false"
+		"hud"				"false"
+		"hammerid"			"0"
+		"mode"				"0"
+		"maxuses"			"0"
+		"cooldown"			"0"
+		"maxamount"			"0"
+	}
+}

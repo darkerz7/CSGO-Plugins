@@ -1,0 +1,51 @@
+"Phrases"
+{
+	"welcome"
+	{
+		"en" 	"The current map is supported by this plugin."
+	}
+	"use"
+	{
+		"en" 	"used"
+	}
+	"pickup"
+	{
+		"en" 	"has picked up"
+	}
+	"drop"
+	{
+		"en" 	"has dropped"
+	}
+	"death"
+	{
+		"en" 	"has died with"
+	}
+	"disconnect"
+	{
+		"en" 	"disconnected with"
+	}
+	"cookies loading"
+	{
+		"en" 	"Please wait. Your settings are still loading."
+	}
+	"status restricted"
+	{
+		"en" 	"You are currently restricted."
+	}
+	"status unrestricted"
+	{
+		"en" 	"You are currently unrestricted."
+	}
+	"display enabled"
+	{
+		"en" 	"The hud is now enabled."
+	}
+	"display disabled"
+	{
+		"en" 	"The hud is now disabled."
+	}
+	"hudpos"
+	{
+		"en" 	"hud position is saved."
+	}
+}

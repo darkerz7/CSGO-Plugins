@@ -1,0 +1,45 @@
+"Games"
+{
+	"cstrike"
+	{
+		"Offsets"
+		{
+			"GetSlot"
+			{
+				"windows"	"320"
+				"linux"		"321"
+			}
+			"BumpWeapon"
+			{
+				"windows"	"397"
+				"linux"		"398"
+			}
+			"OnPickedUp"
+			{
+				"windows"	"300"
+				"linux"		"301"
+			}
+		}
+	}
+	"csgo"
+	{
+		"Offsets"
+		{
+			"GetSlot"
+			{
+				"windows"	"356"
+				"linux"		"362"
+			}
+			"BumpWeapon"
+			{
+				"windows"	"444"
+				"linux"		"445"
+			}
+			"OnPickedUp"
+			{
+				"windows"	"336"
+				"linux"		"342"
+			}
+		}
+	}
+}
