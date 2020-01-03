@@ -1,0 +1,68 @@
+"Phrases"
+{
+	"CDN4A Top Defenders"
+	{
+		"en"			"{darkred}------------{default}TOP Defenders{darkred}------------"
+		"ru"			"{darkred}------------{default}ТОП Дефующих{darkred}------------"
+	}
+	"CDN4A none"
+	{
+		"en"			"{blue}%i. {lightblue} none"
+		"ru"			"{blue}%i. {lightblue} пусто"
+	}
+	"CDN4A Top First"
+	{
+		"en"			"{green}%i. {darkred}%N{green};{pink} Damage {green} - {purple}%i"
+		"ru"			"{green}%i. {darkred}%N{green};{pink} Нанесённый урон {green} - {purple}%i"
+	}
+	"CDN4A Top Second"
+	{
+		"en"			"{red}%i. {blue}%N{green};{pink} Damage {green} - {purple}%i"
+		"ru"			"{red}%i. {blue}%N{green};{pink} Нанесённый урон {green} - {purple}%i"
+	}
+	"CDN4A Top Third"
+	{
+		"en"			"{blue}%i. {green}%N{green};{pink} Damage {green} - {purple}%i"
+		"ru"			"{blue}%i. {green}%N{green};{pink} Нанесённый урон {green} - {purple}%i"
+	}
+	"CDN4A Top Other"
+	{
+		"en"			"{grey}%i. {lime}%N{green};{pink} Damage {green} - {purple}%i"
+		"ru"			"{grey}%i. {lime}%N{green};{pink} Нанесённый урон {green} - {purple}%i"
+	}
+	"CDN4A Trail Delete"
+	{
+		"en"			"{green}[{red}TOP Defenders{green}]{pink}:{lightblue}You have removed the sprite and the color of the skin"
+		"ru"			"{green}[{red}TOP Defenders{green}]{pink}:{lightblue}У вас удалён спрайт и цвет скина"
+	}
+	"CDN4A No Trail"
+	{
+		"en"			"{green}[{red}TOP Defenders{green}]{pink}:{lime}You do not have a sprite"
+		"ru"			"{green}[{red}TOP Defenders{green}]{pink}:{lime}У вас нету спрайта"
+	}
+	"CDN4A Refresh CVAR"
+	{
+		"en"			"{green}[{red}Cash Damage{green}]{pink}: {orange}All CVAR's have been updated"
+		"ru"			"{green}[{red}Cash Damage{green}]{pink}: {orange}Все CVARы были обновлены"
+	}
+	"CDN4A Top Defenders HUD"
+	{
+		"en"			"~~~~~~~~~~~~~~TOP Defenders~~~~~~~~~~~~~~"
+		"ru"			"~~~~~~~~~~~~~~TOP Defenders~~~~~~~~~~~~~~"
+	}
+	"CDN4A none HUD"
+	{
+		"en"			"%i. none"
+		"ru"			"%i. none"
+	}
+	"CDN4A Top Name HUD"
+	{
+		"en"			"%i. %N; Damage - %i"
+		"ru"			"%i. %N; Damage - %i"
+	}
+	"CDN4A lastline HUD"
+	{
+		"en"			"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+		"ru"			"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	}
+}
