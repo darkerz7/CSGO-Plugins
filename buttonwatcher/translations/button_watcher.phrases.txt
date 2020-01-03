@@ -1,0 +1,85 @@
+"Phrases"
+{
+	"Chat Prefix"
+	{
+		"en"			"{lightblue}[{red}EYE{lightblue}]"
+		"ru"			"{lightblue}[{red}ГЛАЗ{lightblue}]"
+	}
+	"Button Press"
+	{
+		"#format"		"{1:N},{2:s},{3:i}"
+		"en"			"{green}{1} {default}pressed the button {lightblue}{2} {default}[{lime}ID:{3}{default}]"
+		"ru"			"{green}{1} {default}нажал на кнопку {lightblue}{2} {default}[{lime}ID:{3}{default}]"
+	}
+	"BBan Temp"
+	{
+		"#format"		"{1:N},{2:N}"
+		"en"			"{lightblue}{1} {default}banned button presses {green}{2} {lime}temporarily"
+		"ru"			"{lightblue}{1} {default}забанил нажатие на кнопки {green}{2} {lime}временно"
+	}
+	"BBan Perm"
+	{
+		"#format"		"{1:N},{2:N}"
+		"en"			"{lightblue}{1} {default}banned button presses {green}{2} {red}permanently"
+		"ru"			"{lightblue}{1} {default}забанил нажатие на кнопки {green}{2} {red}навсегда"
+	}
+	"BBan Time"
+	{
+		"#format"		"{1:N},{2:N},{3:s}"
+		"en"			"{lightblue}{1} {default}banned button presses {green}{2} {default}for {lime}{3}"
+		"ru"			"{lightblue}{1} {default}забанил нажатие на кнопки {green}{2} {default}на {lime}{3}"
+	}
+	"BBan Unban"
+	{
+		"#format"		"{1:N},{2:N}"
+		"en"			"{lightblue}{1} {default}unbanned button presses {green}{2}"
+		"ru"			"{lightblue}{1} {default}разбанил нажатие на кнопки {green}"
+	}
+	"BBan Unban TimeLeft"
+	{
+		"en"			"{default}Your BBan time is up. You are again {green}Allowed {default}to button presses"
+		"ru"			"{default}Время вашего BBan истекло. Вам снова {green}Разрешено {default}нажимать на кнопки"
+	}
+	"BBan You Unbanned"
+	{
+		"en"			"{default}You are {green}Allowed {default}to button presses"
+		"ru"			"{default}Вам {green}Разрешено {default}нажимать на кнопки"
+	}
+	"BBan You Banned Temp"
+	{
+		"en"			"{default}You are {red}Disallow {default}to button presses {lightblue}Temporarily"
+		"ru"			"{default}Вам {red}Запрещено {default}нажимать на кнопки {lightblue}Временно"
+	}
+	"BBan You Banned Perm"
+	{
+		"en"			"{default}You are {red}Disallow {default}to button presses {lightblue}Permanently"
+		"ru"			"{default}Вам {red}Запрещено {default}нажимать на кнопки {lightblue}Навсегда"
+	}
+	"BBan You Banned Time"
+	{
+		"#format"		"{1:s}"
+		"en"			"{default}You are {red}Disallow {default}to button presses for another{lightblue}{1}"
+		"ru"			"{default}Вам {red}Запрещено {default}нажимать на кнопки ещё {lightblue}{1}"
+	}
+	"BBan You Banned Admin"
+	{
+		"#format"		"{1:s}"
+		"en"			"{default}Admin: {lightblue}{1} {default}banned button presses You"
+		"ru"			"{default}Админ: {lightblue}{1} {default}запретил нажимать вам на кнопки"
+	}
+	"BBan No Available"
+	{
+		"en"			"{default}Player No Longer Available"
+		"ru"			"{default}Игрок больше не доступен"
+	}
+	"Buttons View Disabled"
+	{
+		"en"			"{default}You have {red}Disabled {default}button tracking"
+		"ru"			"{default}Вы {red}Oтключили {default}слежение за нажатием кнопок"
+	}
+	"Buttons View Enabled"
+	{
+		"en"			"{default}You have {green}Enabled {default}button tracking"
+		"ru"			"{default}Вы {green}Включили {default}слежение за нажатием кнопок"
+	}
+}
