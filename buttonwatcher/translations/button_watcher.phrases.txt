@@ -33,7 +33,7 @@
 	{
 		"#format"		"{1:N},{2:N}"
 		"en"			"{lightblue}{1} {default}unbanned button presses {green}{2}"
-		"ru"			"{lightblue}{1} {default}разбанил нажатие на кнопки {green}"
+		"ru"			"{lightblue}{1} {default}разбанил нажатие на кнопки {green}{2}"
 	}
 	"BBan Unban TimeLeft"
 	{
