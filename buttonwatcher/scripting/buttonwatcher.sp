@@ -38,7 +38,7 @@ public Plugin:myinfo =
 	name = "Button Watcher with BBans",
 	author = "DarkerZ [RUS]",
 	description = "Generates an output when a button is pressed and Bans Clients",
-	version = "1.7",
+	version = "1.8",
 	url = ""
 };
 
@@ -548,7 +548,7 @@ public Action Event_RoundEnd(Event hEvent, const char[] sName, bool bDontBroadca
 
 public Action OnButtonUse(int iButton, int iActivator)
 {
-	if(IsValidEdict(iButton))
+	if((IsValidEdict(iButton))&&(IsValidClient(iActivator)))
 	{	
 		if(entWatch_IsSpecialItem(iButton)) return Plugin_Continue;
 	
@@ -559,7 +559,7 @@ public Action OnButtonUse(int iButton, int iActivator)
 
 public Action OnButtonDamage(int iButton, int &iActivator)
 {
-	if(IsValidEdict(iButton))
+	if((IsValidEdict(iButton))&&(IsValidClient(iActivator)))
 	{	
 		if(entWatch_IsSpecialItem(iButton)) return Plugin_Continue;
 	
