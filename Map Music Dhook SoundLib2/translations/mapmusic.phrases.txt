@@ -1,0 +1,68 @@
+"Phrases"
+{
+	"Cookie_Menu"
+	{
+		"en"	"Map Music"
+		"ru"	"Музыка на карте"
+	}
+
+	"Text_MapMusicEnable"
+	{
+		"en"	"Map music is {lightgreen}Enabled{default}."
+		"ru"	"Музыка на карте {lightgreen}Включена{default}."
+	}
+
+	"Text_MapMusicDisable"
+	{
+		"en"	"Map music is {red}Disabled{default}."
+		"ru"	"Музыка на карте {red}Отключена{default}."
+	}
+
+	"Text_MapMusicVolume"
+	{
+		"#format"	"{1:d}"
+
+		"en"	"Map music is {lightgreen}Enabled{default}. Volume: {lightgreen}{1}"
+		"ru"	"Музыка на карте {lightgreen}Включена{default}. Громкость: {lightgreen}{1}"
+	}
+
+	"Enabled"
+	{
+		"en"	"Enabled"
+		"ru"	"Включена"
+	}
+
+	"Disabled"
+	{
+		"en"	"Disabled"
+		"ru"	"Отключена"
+	}
+
+	"Menu_Title"
+	{
+		"en"	"[MapMusic] Sound Control Menu"
+		"ru"	"[MapMusic] Меню управления музыкой"
+	}
+
+	"Menu_AdjustDesc"
+	{
+		"en"	"You can use volume control instead of fully stopping\nFor adjust volume is \"!music <0-100>\""
+		"ru"	"Вы можете приглушить или выключить музыку на карте\nИспользуйте \"!music <0-100>\""
+	}
+
+	"Menu_Music"
+	{
+		"#format"	"{1:T}"
+
+		"en"	"Music: {1}"
+		"ru"	"Музыка: {1}"
+	}
+
+	"Menu_Vol"
+	{
+		"#format"	"{1:d}"
+
+		"en"	"Volume: {1}"
+		"ru"	"Громкость: {1}"
+	}
+}

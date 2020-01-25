@@ -1,0 +1,27 @@
+"Games"
+{
+	"cstrike"
+	{
+		"Offsets"
+		{
+			"AcceptInput"
+			{
+				"windows"	"36"
+				"linux"		"37"
+				"mac"		"37"
+			}
+		}
+	}
+	"csgo"
+	{
+		"Offsets"
+		{
+			"AcceptInput"
+			{
+				"windows"	"40"
+				"linux"		"41"
+				"mac"		"41"
+			}
+		}
+	}
+}
