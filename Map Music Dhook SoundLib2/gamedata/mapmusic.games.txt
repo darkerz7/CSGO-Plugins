@@ -18,9 +18,9 @@
 		{
 			"AcceptInput"
 			{
-				"windows"	"40"
-				"linux"		"41"
-				"mac"		"41"
+				"windows"	"41"
+				"linux"		"42"
+				"mac"		"42"
 			}
 		}
 	}
