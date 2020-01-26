@@ -9,7 +9,7 @@
 #include <soundlib2_windows>
 
 #define PLUGIN_NAME 	"Map Music Control with Dynamic Volume Control"
-#define PLUGIN_VERSION 	"4.3a_win"
+#define PLUGIN_VERSION 	"4.3b_win"
 
 //#define Debug
 
@@ -303,6 +303,7 @@ public MRESReturn AcceptInput(int pThis, Handle hReturn, Handle hParams) {
 		if(sample[0]=='#') strcopy(sPath, sizeof(sPath), sample[1]); else FormatEx(sPath, sizeof sPath, "%s", sample);
 		FormatEx(sPathFull, sizeof sPathFull, "sound/%s", sPath);
 		Handle hFile = OpenSoundFile(sPathFull, true);
+		if(hFile == INVALID_HANDLE) return MRES_Ignored;
 		fSoundLen = float(GetSoundLength(hFile));
 		delete hFile;
 
@@ -396,6 +397,7 @@ public Action SoundHook(char sample[PLATFORM_MAX_PATH], int &entity, float &volu
 	if(sample[0]=='#') strcopy(sPath, sizeof(sPath), sample[1]); else FormatEx(sPath, sizeof sPath, "%s", sample);
 	FormatEx(sPathFull, sizeof sPathFull, "sound/%s", sPath);
 	Handle hFile = OpenSoundFile(sPathFull, true);
+	if(hFile == INVALID_HANDLE) return Plugin_Continue;
 	fSoundLen = float(GetSoundLength(hFile));
 	delete hFile;
 
@@ -652,6 +654,7 @@ stock void Client_UpdateMusics(int client) {
 		if(sample[0]=='#') strcopy(sPath, sizeof(sPath), sample[1]); else FormatEx(sPath, sizeof sPath, "%s", sample);
 		FormatEx(sPathFull, sizeof sPathFull, "sound/%s", sPath);
 		Handle hFile = OpenSoundFile(sPathFull, true);
+		if(hFile == INVALID_HANDLE) continue;
 		fSoundLen = float(GetSoundLength(hFile));
 		delete hFile;
 
