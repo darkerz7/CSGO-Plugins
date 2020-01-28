@@ -12,10 +12,10 @@
 #include <clientprefs>
 #include <adminmenu>
 #tryinclude <entWatch>
-#tryinclude <colors_csgo>
+#tryinclude <csgocolors_fix>
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.8.135"
+#define PLUGIN_VERSION "3.8.140"
 
 //----------------------------------------------------------------------------------------------------
 // Purpose: Entity data
@@ -56,15 +56,15 @@ int entArray[512][entities],
 //----------------------------------------------------------------------------------------------------
 // Purpose: Color settings
 //----------------------------------------------------------------------------------------------------
-char color_tag[16]         = "{GREEN}",
-	color_name[16]        = "{GREEN}",
-	color_steamid[16]     = "{GREEN}",
-	color_use[16]         = "{GREEN}",
-	color_pickup[16]      = "{GREEN}",
-	color_drop[16]        = "{GREEN}",
-	color_disconnect[16]  = "{GREEN}",
-	color_death[16]       = "{GREEN}",
-	color_warning[16]     = "{GREEN}";
+char color_tag[16]        = "{green}",
+	color_name[16]        = "{default}",
+	color_steamid[16]     = "{grey}",
+	color_use[16]         = "{lightblue}",
+	color_pickup[16]      = "{lime}",
+	color_drop[16]        = "{pink}",
+	color_disconnect[16]  = "{orange}",
+	color_death[16]       = "{orange}",
+	color_warning[16]     = "{orange}";
 
 //----------------------------------------------------------------------------------------------------
 // Purpose: Client settings
@@ -100,10 +100,6 @@ bool g_bRoundTransition  = false,
 	
 bool isMapRunning;
 
-Handle g_hGetSlot,
-	g_hBumpWeapon,
-	g_hOnPickedUp;
-
 ConVar     G_hCvar_DefaultHudPos;
 bool G_bDisplay[MAXPLAYERS + 1]     = false;
 bool G_bDisplay2[MAXPLAYERS + 1]     = false;
@@ -124,7 +120,7 @@ public Plugin myinfo =
 	author       = "Prometheum & zaCade. Edits: George & Obus & BotoX & Hikka & DarkerZ[RUS]",
 	description  = "Notify players about entity interactions.",
 	version      = PLUGIN_VERSION,
-	url          = "https://github.com/Locomotivers/entWatch-CSGO/" // Current CSS version here: "https://github.com/Obuss/entWatch" Original here: "https://github.com/zaCade/entWatch"
+	url          = "https://github.com/darkerz7/CSGO-Plugins/tree/master/EntWatch%20Hud"
 };
 
 public APLRes AskPluginLoad2(Handle hThis, bool bLate, char[] sError, int iErr_max)
@@ -202,77 +198,6 @@ public void OnPluginStart()
 			OnClientCookiesCached(i);
 		}
 	}
-
-	Handle hGameConf = LoadGameConfigFile("plugin.entWatch");
-	switch (hGameConf) {
-		case INVALID_HANDLE: {
-			SetFailState("Couldn't load plugin.entWatch game config!");
-			delete hGameConf;
-		}
-	}
-	if (GameConfGetOffset(hGameConf, "GetSlot") == -1) {
-		SetFailState("Couldn't get GetSlot offset from game config!");
-		delete hGameConf;
-	}
-	else if (GameConfGetOffset(hGameConf, "BumpWeapon") == -1) {
-		SetFailState("Couldn't get BumpWeapon offset from game config!");
-		delete hGameConf;
-	}
-	else if (GameConfGetOffset(hGameConf, "OnPickedUp") == -1) {
-		SetFailState("Couldn't get OnPickedUp offset from game config!");
-		delete hGameConf;
-	}
-
-	// 320	CBaseCombatWeapon::GetSlot(void)const
-	StartPrepSDKCall(SDKCall_Entity);
-	if (!PrepSDKCall_SetFromConf(hGameConf, SDKConf_Virtual, "GetSlot"))
-	{
-		SetFailState("PrepSDKCall_SetFromConf(hGameConf, SDKConf_Virtual, \"GetSlot\" failed!");
-		delete hGameConf;
-	}
-	PrepSDKCall_SetReturnInfo(SDKType_PlainOldData, SDKPass_Plain);
-	g_hGetSlot = EndPrepSDKCall();
-
-	// 397	CCSPlayer::BumpWeapon(CBaseCombatWeapon *)
-	StartPrepSDKCall(SDKCall_Player);
-	if (!PrepSDKCall_SetFromConf(hGameConf, SDKConf_Virtual, "BumpWeapon"))
-	{
-		SetFailState("PrepSDKCall_SetFromConf(hGameConf, SDKConf_Virtual, \"BumpWeapon\" failed!");
-		delete hGameConf;
-	}
-	PrepSDKCall_SetReturnInfo(SDKType_Bool, SDKPass_Plain);
-	PrepSDKCall_AddParameter(SDKType_CBaseEntity, SDKPass_Pointer);
-	g_hBumpWeapon = EndPrepSDKCall();
-
-	// 300	CBaseCombatWeapon::OnPickedUp(CBaseCombatCharacter *)
-	StartPrepSDKCall(SDKCall_Entity);
-	if (!PrepSDKCall_SetFromConf(hGameConf, SDKConf_Virtual, "OnPickedUp"))
-	{
-		SetFailState("PrepSDKCall_SetFromConf(hGameConf, SDKConf_Virtual, \"OnPickedUp\" failed!");
-		delete hGameConf;
-	}
-	PrepSDKCall_AddParameter(SDKType_CBaseEntity, SDKPass_Pointer);
-	g_hOnPickedUp = EndPrepSDKCall();
-
-	delete hGameConf;
-	switch (g_hGetSlot) {
-		case INVALID_HANDLE: {
-			SetFailState("Couldn't prepare GetSlot SDKCall!");
-			delete g_hGetSlot;
-		}
-	}
-	switch (g_hBumpWeapon) {
-		case INVALID_HANDLE: {
-			SetFailState("Couldn't prepare BumpWeapon SDKCall!");
-			delete g_hBumpWeapon;
-		}
-	}
-	switch (g_hOnPickedUp) {
-		case INVALID_HANDLE: {
-			SetFailState("Couldn't prepare OnPickedUp SDKCall!");
-			delete g_hOnPickedUp;
-		}
-	}
 	
 	GetConVars();
 }
@@ -324,7 +249,7 @@ void EBanClient(int iClient, const char[] sLength, int iAdmin)
 	{
 		g_iRestrictedLength[iClient] = iBanLen;
 		SetClientCookie(iClient, g_hCookie_RestrictedLength, sLength);
-		LogAction(iAdmin, iClient, "\"%L\" restricted \"%L\" for %d iMinutes", iAdmin, iClient, iBanDuration);
+		LogAction(iAdmin, iClient, "\"%L\" restricted \"%L\" for %d Minutes", iAdmin, iClient, iBanDuration);
 	} else {
 		iBanDuration = -1;
 		g_iRestrictedLength[iClient] = 1;
@@ -338,7 +263,7 @@ void EBanClient(int iClient, const char[] sLength, int iAdmin)
 	g_iRestrictedIssued[iClient] = GetTime();
 	SetClientCookie(iClient, g_hCookie_RestrictedIssued, sIssueTime);
 
-	CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%srestricted \x07%s%N", color_tag, color_name, iAdmin, color_warning, color_name, iClient);
+	CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%s%t \x07%s%N", color_tag, color_name, iAdmin, color_warning, "restricted", color_name, iClient);
 
 	Call_StartForward(g_hOnBanForward);
 	Call_PushCell(iAdmin);
@@ -360,7 +285,7 @@ void EUnbanClient(int iClient, int iAdmin)
 	SetClientCookie(iClient, g_hCookie_RestrictedBy, "");
 	SetClientCookie(iClient, g_hCookie_RestrictedIssued, "");
 
-	CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%sunrestricted \x07%s%N", color_tag, color_name, iAdmin, color_warning, color_name, iClient);
+	CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%s%t \x07%s%N", color_tag, color_name, iAdmin, color_warning, "unrestricted", color_name, iClient);
 	LogAction(iAdmin, iClient, "\"%L\" unrestricted \"%L\"", iAdmin, iClient);
 
 	Call_StartForward(g_hOnUnbanForward);
@@ -402,42 +327,42 @@ public void OnAdminMenuReady(Handle hAdminMenu)
 //----------------------------------------------------------------------------------------------------
 public void AdminMenu_Commands_Handler(Handle hMenu, TopMenuAction hAction, TopMenuObject hObjID, int iParam1, char[] sBuffer, int iMaxlen) {
 	switch (hAction) {
-		case TopMenuAction_DisplayOption: FormatEx(sBuffer, iMaxlen, "%s", "entWatch Commands", iParam1);
-		case TopMenuAction_DisplayTitle: FormatEx(sBuffer, iMaxlen, "%s", "entWatch Commands:", iParam1);
+		case TopMenuAction_DisplayOption: FormatEx(sBuffer, iMaxlen, "%T", "entWatch Commands", iParam1);
+		case TopMenuAction_DisplayTitle: FormatEx(sBuffer, iMaxlen, "%T:", "entWatch Commands", iParam1);
 	}
 }
 
 public void Handler_EBanList(Handle hMenu, TopMenuAction hAction, TopMenuObject hObjID, int iParam1, char[] sBuffer, int iMaxlen) {
 	switch (hAction) {
-		case TopMenuAction_DisplayOption: FormatEx(sBuffer, iMaxlen, "%s", "List Banned Clients", iParam1);
+		case TopMenuAction_DisplayOption: FormatEx(sBuffer, iMaxlen, "%T", "List Banned Clients", iParam1);
 		case TopMenuAction_SelectOption: Menu_List(iParam1);
 	}
 }
 
 public void Handler_EBan(Handle hMenu, TopMenuAction hAction, TopMenuObject hObjID, int iParam1, char[] sBuffer, int iMaxlen) {
 	switch (hAction) {
-		case TopMenuAction_DisplayOption: FormatEx(sBuffer, iMaxlen, "%s", "Ban a Client", iParam1);
+		case TopMenuAction_DisplayOption: FormatEx(sBuffer, iMaxlen, "%T", "Ban a Client", iParam1);
 		case TopMenuAction_SelectOption: Menu_EBan(iParam1);
 	}
 }
 
 public void Handler_Transfer(Handle hMenu, TopMenuAction hAction, TopMenuObject hObjID, int iParam1, char[] sBuffer, int iMaxlen) {
 	switch (hAction) {
-		case TopMenuAction_DisplayOption: FormatEx(sBuffer, iMaxlen, "%s", "Transfer an item", iParam1);
+		case TopMenuAction_DisplayOption: FormatEx(sBuffer, iMaxlen, "%T", "Transfer an item", iParam1);
 		case TopMenuAction_SelectOption: Menu_Transfer(iParam1);
 	}
 }
 
 public void Handler_Give(Handle hMenu, TopMenuAction hAction, TopMenuObject hObjID, int iParam1, char[] sBuffer, int iMaxlen) {
 	switch (hAction) {
-		case TopMenuAction_DisplayOption: FormatEx(sBuffer, iMaxlen, "%s", "Give Item", iParam1);
+		case TopMenuAction_DisplayOption: FormatEx(sBuffer, iMaxlen, "%T", "Give an Item", iParam1);
 		case TopMenuAction_SelectOption: Menu_Give(iParam1);
 	}
 }
 
 public void Handler_EUnban(Handle hMenu, TopMenuAction hAction, TopMenuObject hObjID, int iParam1, char[] sBuffer, int iMaxlen) {
 	switch (hAction) {
-		case TopMenuAction_DisplayOption: FormatEx(sBuffer, iMaxlen, "%s", "Unban a Client", iParam1);
+		case TopMenuAction_DisplayOption: FormatEx(sBuffer, iMaxlen, "%T", "Unban a Client", iParam1);
 		case TopMenuAction_SelectOption: Menu_EUnban(iParam1);
 	}
 }
@@ -446,7 +371,9 @@ void Menu_List(int iClient) {
 	int iBannedClients;
 
 	Menu hListMenu = CreateMenu(MenuHandler_Menu_List);
-	hListMenu.SetTitle("[entWatch] Banned Clients:");
+	char sMenuTranslate[128];
+	Format(sMenuTranslate, sizeof(sMenuTranslate), "[entWatch] %T:", "Banned Clients", iClient);
+	hListMenu.SetTitle(sMenuTranslate);
 	hListMenu.ExitBackButton = true;
 
 	for (int i = 1; i < MaxClients + 1; i++)
@@ -470,14 +397,16 @@ void Menu_List(int iClient) {
 		}
 	}
 
-	if (!iBannedClients) hListMenu.AddItem("", "No Banned Clients.", ITEMDRAW_DISABLED);
+	if (!iBannedClients) {char sMenuItem[128];Format(sMenuItem, sizeof(sMenuItem), "%T.", "No Banned Clients", iClient);hListMenu.AddItem("", sMenuItem, ITEMDRAW_DISABLED);}
 
 	hListMenu.Display(iClient, MENU_TIME_FOREVER);
 }
 
 void Menu_EBan(int iClient) {
 	Menu hEBanMenu = CreateMenu(MenuHandler_Menu_EBan);
-	hEBanMenu.SetTitle("[entWatch] Ban a Client:");
+	char sMenuTranslate[128];
+	Format(sMenuTranslate, sizeof(sMenuTranslate), "[entWatch] %T:", "Ban a Client", iClient);
+	hEBanMenu.SetTitle(sMenuTranslate);
 	hEBanMenu.ExitBackButton = true;
 	AddTargetsToMenu2(hEBanMenu, iClient, COMMAND_FILTER_NO_BOTS|COMMAND_FILTER_CONNECTED);
 
@@ -488,7 +417,9 @@ void Menu_Transfer(int iClient) {
 	Menu hTransferMenu = CreateMenu(MenuHandler_Menu_Transfer);
 	char sMenuTemp[64], sIndexTemp[16];
 	int iHeldCount = 0;
-	hTransferMenu.SetTitle("[entWatch] Transfer an item:");
+	char sMenuTranslate[128];
+	Format(sMenuTranslate, sizeof(sMenuTranslate), "[entWatch] %T:", "Transfer an item", iClient);
+	hTransferMenu.SetTitle(sMenuTranslate);
 	hTransferMenu.ExitBackButton = true;
 
 	for (int i = 0; i < entArraySize; i++)
@@ -505,7 +436,7 @@ void Menu_Transfer(int iClient) {
 		}
 	}
 
-	if (!iHeldCount) hTransferMenu.AddItem("", "No transferable items currently held.", ITEMDRAW_DISABLED);
+	if (!iHeldCount) {char sMenuItem[128];Format(sMenuItem, sizeof(sMenuItem), "%T.", "No transferable items currently held", iClient);hTransferMenu.AddItem("", sMenuItem, ITEMDRAW_DISABLED);}
 
 	hTransferMenu.Display(iClient, MENU_TIME_FOREVER);
 }
@@ -514,7 +445,9 @@ void Menu_Give(int iClient) {
 	Menu hTransferMenu = CreateMenu(MenuHandler_Menu_Give);
 	char sMenuTemp[64], sIndexTemp[16];
 	int iHeldCount = 0;
-	hTransferMenu.SetTitle("[entWatch] Give an item:");
+	char sMenuTranslate[128];
+	Format(sMenuTranslate, sizeof(sMenuTranslate), "[entWatch] %T:", "Give an Item", iClient);
+	hTransferMenu.SetTitle(sMenuTranslate);
 	hTransferMenu.ExitBackButton = true;
 
 	for (int i = 0; i < entArraySize; i++)
@@ -534,7 +467,7 @@ void Menu_Give(int iClient) {
 		}
 	}
 
-	if (!iHeldCount) hTransferMenu.AddItem("", "No Give items currently held.", ITEMDRAW_DISABLED);
+	if (!iHeldCount) {char sMenuItem[128];Format(sMenuItem, sizeof(sMenuItem), "%T.", "No Give items currently held", iClient);hTransferMenu.AddItem("", sMenuItem, ITEMDRAW_DISABLED);}
 
 	hTransferMenu.Display(iClient, MENU_TIME_FOREVER);
 }
@@ -544,7 +477,9 @@ void Menu_EUnban(int iClient)
 	int iBannedClients;
 
 	Menu hEUnbanMenu = CreateMenu(MenuHandler_Menu_EUnban);
-	hEUnbanMenu.SetTitle("[entWatch] Unban a Client:");
+	char sMenuTranslate[128];
+	Format(sMenuTranslate, sizeof(sMenuTranslate), "[entWatch] %T:", "Unban a Client", iClient);
+	hEUnbanMenu.SetTitle(sMenuTranslate);
 	hEUnbanMenu.ExitBackButton = true;
 
 	for (int i = 1; i < MaxClients + 1; i++)
@@ -568,7 +503,7 @@ void Menu_EUnban(int iClient)
 		}
 	}
 
-	if (!iBannedClients) hEUnbanMenu.AddItem("", "No Banned Clients.", ITEMDRAW_DISABLED);
+	if (!iBannedClients) {char sMenuItem[128];Format(sMenuItem, sizeof(sMenuItem), "%T.", "No Banned Clients", iClient);hEUnbanMenu.AddItem("", sMenuItem, ITEMDRAW_DISABLED);}
 
 	hEUnbanMenu.Display(iClient, MENU_TIME_FOREVER);
 }
@@ -590,7 +525,7 @@ public int MenuHandler_Menu_List(Menu hMenu, MenuAction hAction, int iParam1, in
 
 			if (iTarget != 0) Menu_ListTarget(iParam1, iTarget);
 			else {
-				CPrintToChat(iParam1, "\x07%s[entWatch]\x07%s Player no longer available", color_tag, color_warning);
+				CPrintToChat(iParam1, "\x07%s[entWatch]\x07%s %t", color_tag, color_warning,"Player no longer available");
 
 				if (g_hAdminMenu != INVALID_HANDLE) DisplayTopMenu(g_hAdminMenu, iParam1, TopMenuPosition_LastCategory);
 				else delete hMenu;
@@ -616,7 +551,7 @@ public int MenuHandler_Menu_EBan(Menu hMenu, MenuAction hAction, int iParam1, in
 
 			if (iTarget != 0) Menu_EBanTime(iParam1, iTarget);
 			else {
-				CPrintToChat(iParam1, "\x07%s[entWatch]\x07%s Player no longer available", color_tag, color_warning);
+				CPrintToChat(iParam1, "\x07%s[entWatch]\x07%s %t", color_tag, color_warning,"Player no longer available");
 
 				if (g_hAdminMenu != INVALID_HANDLE) DisplayTopMenu(g_hAdminMenu, iParam1, TopMenuPosition_LastCategory);
 				else delete hMenu;
@@ -641,7 +576,7 @@ public int MenuHandler_Menu_Transfer(Menu hMenu, MenuAction hAction, int iParam1
 			int iEntityIndex = StringToInt(sOption);
 
 			if (entArray[iEntityIndex][ent_ownerid] != -1) Menu_TransferTarget(iParam1, iEntityIndex);
-			else CPrintToChat(iParam1, "\x07%s[entWatch]\x07%s Item no longer available.", color_tag, color_warning);
+			else CPrintToChat(iParam1, "\x07%s[entWatch]\x07%s %t", color_tag, color_warning, "Item no longer available");
 		}
 	}
 }
@@ -662,7 +597,7 @@ public int MenuHandler_Menu_Give(Menu hMenu, MenuAction hAction, int iParam1, in
 			int iEntityIndex = StringToInt(sOption);
 
 			if (entArray[iEntityIndex][ent_ownerid] == -1) Menu_GiveTarget(iParam1, iEntityIndex);
-			else CPrintToChat(iParam1, "\x07%s[entWatch]\x07%s Item is already picked up.", color_tag, color_warning);
+			else CPrintToChat(iParam1, "\x07%s[entWatch]\x07%s %t", color_tag, color_warning, "Item is already picked up");
 		}
 	}
 }
@@ -684,7 +619,7 @@ public int MenuHandler_Menu_EUnban(Menu hMenu, MenuAction hAction, int iParam1, 
 
 			if (iTarget != 0) EUnbanClient(iTarget, iParam1);
 			else {
-				CPrintToChat(iParam1, "\x07%s[entWatch]\x07%s Player no longer available", color_tag, color_warning);
+				CPrintToChat(iParam1, "\x07%s[entWatch]\x07%s %t", color_tag, color_warning, "Player no longer available");
 
 				if (g_hAdminMenu != INVALID_HANDLE) DisplayTopMenu(g_hAdminMenu, iParam1, TopMenuPosition_LastCategory);
 				else delete hMenu;
@@ -697,7 +632,9 @@ void Menu_TransferTarget(int iClient, int iEntityIndex)
 {
 	Menu hTransferTarget = CreateMenu(MenuHandler_Menu_TransferTarget);
 	char sMenuTemp[64], sIndexTemp[32];
-	hTransferTarget.SetTitle("[entWatch] Transfer iTarget:");
+	char sMenuTranslate[128];
+	Format(sMenuTranslate, sizeof(sMenuTranslate), "[entWatch] %T:", "Transfer iTarget", iClient);
+	hTransferTarget.SetTitle(sMenuTranslate);
 	hTransferTarget.ExitBackButton = true;
 
 	g_iAdminMenuTarget[iClient] = iEntityIndex;
@@ -721,7 +658,9 @@ void Menu_GiveTarget(int iClient, int iEntityIndex)
 {
 	Menu hTransferTarget = CreateMenu(MenuHandler_Menu_GiveTarget);
 	char sMenuTemp[64], sIndexTemp[32];
-	hTransferTarget.SetTitle("[entWatch] Give iTarget:");
+	char sMenuTranslate[128];
+	Format(sMenuTranslate, sizeof(sMenuTranslate), "[entWatch] %T:", "Give iTarget", iClient);
+	hTransferTarget.SetTitle(sMenuTranslate);
 	hTransferTarget.ExitBackButton = true;
 
 
@@ -759,7 +698,7 @@ public int MenuHandler_Menu_TransferTarget(Menu hMenu, MenuAction hAction, int i
 
 			switch(iReceiver) {
 				case 0: {
-					CPrintToChat(iParam1, "\x07%s[entWatch] \x07%sReceiver is not valid anymore.", color_tag, color_warning);
+					CPrintToChat(iParam1, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning,"Receiver is not valid anymore");
 					return;
 				}
 			}
@@ -774,7 +713,7 @@ public int MenuHandler_Menu_TransferTarget(Menu hMenu, MenuAction hAction, int i
 
 						if (GetClientTeam(iReceiver) != GetClientTeam(iCurOwner))
 						{
-							CPrintToChat(iParam1, "\x07%s[entWatch] \x07%sThe receivers team differs from the targets team.", color_tag, color_warning);
+							CPrintToChat(iParam1, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning,"The receivers team differs from the targets team");
 							return;
 						}
 
@@ -792,12 +731,12 @@ public int MenuHandler_Menu_TransferTarget(Menu hMenu, MenuAction hAction, int i
 						}
 						else FixedEquipPlayerWeapon(iReceiver, entArray[iEntityIndex][ent_weaponid]);
 
-						CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%stransfered all items from \x07%s%N \x07%sto \x07%s%N", color_tag, color_name, iParam1, color_warning, color_name, iCurOwner, color_warning, color_name, iReceiver);
+						CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%s%t \x07%s%N \x07%s%t \x07%s%N", color_tag, color_name, iParam1, color_warning, "transfered all items", color_name, iCurOwner, color_warning, "tai to", color_name, iReceiver);
 
 						LogAction(iParam1, iCurOwner, "\"%L\" transfered all items from \"%L\" to \"%L\"", iParam1, iCurOwner, iReceiver);
 					}
 				}
-				else CPrintToChat(iParam1, "\x07%s[entWatch] \x07%sItem is not valid anymore.", color_tag, color_warning);
+				else CPrintToChat(iParam1, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning,"Item is not valid anymore");
 			}
 		}
 	}
@@ -823,7 +762,7 @@ public int MenuHandler_Menu_GiveTarget(Menu hMenu, MenuAction hAction, int iPara
 			
 			switch(iReceiver) {
 				case 0: {
-					CPrintToChat(iParam1, "\x07%s[entWatch] \x07%sReceiver is not valid anymore.", color_tag, color_warning);
+					CPrintToChat(iParam1, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning, "Receiver is not valid anymore");
 					return;
 				}
 			}
@@ -836,25 +775,25 @@ public int MenuHandler_Menu_GiveTarget(Menu hMenu, MenuAction hAction, int iPara
 					{
 						if ((GetClientTeam(iReceiver) != 2)&&(GetClientTeam(iReceiver) != 3))
 						{
-							CPrintToChat(iParam1, "\x07%s[entWatch] \x07%sThe receivers team is not CT or TER.", color_tag, color_warning);
+							CPrintToChat(iParam1, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning,"The receivers team is not CT or TER");
 							return;
 						}
 						
 						if (entArray[iEntityIndex][ent_chat])
 						{
 							entArray[iEntityIndex][ent_chat] = false;
-							EquipPlayerWeapon(iReceiver, entArray[iEntityIndex][ent_weaponid]);
+							FixedEquipPlayerWeapon(iReceiver, entArray[iEntityIndex][ent_weaponid]);
 							entArray[iEntityIndex][ent_chat] = true;
 						}
-						else EquipPlayerWeapon(iReceiver, entArray[iEntityIndex][ent_weaponid]);
+						else FixedEquipPlayerWeapon(iReceiver, entArray[iEntityIndex][ent_weaponid]);
 
-						CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%sgive \x07%s%s \x07%sitem to \x07%s%N", color_tag, color_name, iParam1, color_warning, entArray[iEntityIndex][ent_color], entArray[iEntityIndex][ent_name], color_warning, color_name, iReceiver);
+						CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%s%t \x07%s%s \x07%s%t \x07%s%N", color_tag, color_name, iParam1, color_warning, "give item", entArray[iEntityIndex][ent_color], entArray[iEntityIndex][ent_name], color_warning, "tai to", color_name, iReceiver);
 
 						LogAction(iParam1, iReceiver, "\"%L\" gived %s item to \"%L\"", iParam1,entArray[iEntityIndex][ent_name], iReceiver);
 					}
-					else CPrintToChat(iParam1, "\x07%s[entWatch] \x07%sItem don't pickable.", color_tag, color_warning);
+					else CPrintToChat(iParam1, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning, "Item dont pickable");
 				}
-				else CPrintToChat(iParam1, "\x07%s[entWatch] \x07%sItem is already picked up.", color_tag, color_warning);
+				else CPrintToChat(iParam1, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning, "Item is already picked up");
 			}
 		}
 	}
@@ -863,17 +802,27 @@ public int MenuHandler_Menu_GiveTarget(Menu hMenu, MenuAction hAction, int iPara
 void Menu_EBanTime(int iClient, int iTarget)
 {
 	Menu hEBanMenuTime = CreateMenu(MenuHandler_Menu_EBanTime);
-	hEBanMenuTime.SetTitle("[entWatch] Ban Time for %N:", iTarget);
+	char sMenuTranslate[128];
+	Format(sMenuTranslate, sizeof(sMenuTranslate), "[entWatch] %T %N:", "Ban Time for", iClient, iTarget);
+	hEBanMenuTime.SetTitle(sMenuTranslate);
 	hEBanMenuTime.ExitBackButton = true;
 
 	g_iAdminMenuTarget[iClient] = iTarget;
-	hEBanMenuTime.AddItem("0", "Temporary");
-	hEBanMenuTime.AddItem("10", "10 Minutes");
-	hEBanMenuTime.AddItem("60", "1 Hour");
-	hEBanMenuTime.AddItem("1440", "1 Day");
-	hEBanMenuTime.AddItem("10080", "1 Week");
-	hEBanMenuTime.AddItem("40320", "1 Month");
-	hEBanMenuTime.AddItem("1", "Permanent");
+	char sMenuItem[128];
+	Format(sMenuItem, sizeof(sMenuItem), "%T", "Temporary", iClient);
+	hEBanMenuTime.AddItem("0", sMenuItem);
+	Format(sMenuItem, sizeof(sMenuItem), "10 %T", "Minutes", iClient);
+	hEBanMenuTime.AddItem("10", sMenuItem);
+	Format(sMenuItem, sizeof(sMenuItem), "1 %T", "Hour", iClient);
+	hEBanMenuTime.AddItem("60", sMenuItem);
+	Format(sMenuItem, sizeof(sMenuItem), "1 %T", "Day", iClient);
+	hEBanMenuTime.AddItem("1440", sMenuItem);
+	Format(sMenuItem, sizeof(sMenuItem), "1 %T", "Week", iClient);
+	hEBanMenuTime.AddItem("10080", sMenuItem);
+	Format(sMenuItem, sizeof(sMenuItem), "1 %T", "Month", iClient);
+	hEBanMenuTime.AddItem("40320", sMenuItem);
+	Format(sMenuItem, sizeof(sMenuItem), "%T", "Permanent", iClient);
+	hEBanMenuTime.AddItem("1", sMenuItem);
 
 	hEBanMenuTime.Display(iClient, MENU_TIME_FOREVER);
 }
@@ -907,7 +856,7 @@ public int MenuHandler_Menu_EBanTime(Menu hMenu, MenuAction hAction, int iParam1
 					EBanClient(iTarget, sBanLen, iParam1);
 				}
 			} else {
-				CPrintToChat(iParam1, "\x07%s[entWatch]\x07%s Player no longer available", color_tag, color_warning);
+				CPrintToChat(iParam1, "\x07%s[entWatch]\x07%s %t", color_tag, color_warning, "Player no longer available");
 				Menu_EBan(iParam1);
 			}
 		}
@@ -917,7 +866,9 @@ public int MenuHandler_Menu_EBanTime(Menu hMenu, MenuAction hAction, int iParam1
 void Menu_ListTarget(int iClient, int iTarget)
 {
 	Menu hListTargetMenu = CreateMenu(MenuHandler_Menu_ListTarget);
-	hListTargetMenu.SetTitle("[entWatch] Banned Client: %N", iTarget);
+	char sMenuTranslate[128];
+	Format(sMenuTranslate, sizeof(sMenuTranslate), "[entWatch] %T: %N", "Banned Client", iClient, iTarget);
+	hListTargetMenu.SetTitle(sMenuTranslate);
 	hListTargetMenu.ExitBackButton = true;
 
 	char sBanExpiryDate[64], sBanIssuedDate[64], sBanDuration[64], sBannedBy[64], sUserID[15];
@@ -926,34 +877,37 @@ void Menu_ListTarget(int iClient, int iTarget)
 	int iBanDuration = (iBanExpiryDate - iBanIssuedDate) / 60;
 	int iUserID = GetClientUserId(iTarget);
 
-	FormatTime(sBanExpiryDate, sizeof(sBanExpiryDate), NULL_STRING, iBanExpiryDate);
-	FormatTime(sBanIssuedDate, sizeof(sBanIssuedDate), NULL_STRING, iBanIssuedDate);
+	char sBanExpiryDateBuf[64],sBanIssuedDateBuf[64];
+	FormatTime(sBanExpiryDateBuf, sizeof(sBanExpiryDateBuf), NULL_STRING, iBanExpiryDate);
+	FormatTime(sBanIssuedDateBuf, sizeof(sBanIssuedDateBuf), NULL_STRING, iBanIssuedDate);
 	FormatEx(sUserID, sizeof(sUserID), "%d", iUserID);
 
 	if (!g_bRestricted[iTarget])
 	{
 		if (iBanExpiryDate != 1)
 		{
-			FormatEx(sBanDuration, sizeof(sBanDuration), "Duration: %d %s", iBanDuration, SingularOrMultiple(iBanDuration)?"iMinutes":"Minute");
-			FormatEx(sBanExpiryDate, sizeof(sBanExpiryDate), "Expires: %s", sBanExpiryDate);
+			FormatEx(sBanDuration, sizeof(sBanDuration), "%T: %d %s", "Duration", iClient, iBanDuration, SingularOrMultiple(iBanDuration)?"Minutes":"Minute");
+			FormatEx(sBanExpiryDate, sizeof(sBanExpiryDate), "%T: %s", "Expires", iClient, sBanExpiryDateBuf);
 		} else {
-			FormatEx(sBanDuration, sizeof(sBanDuration), "Duration: Permanent");
-			FormatEx(sBanExpiryDate, sizeof(sBanExpiryDate), "Expires: Never");
+			FormatEx(sBanDuration, sizeof(sBanDuration), "%T: %T", "Duration", iClient, "Permanent", iClient);
+			FormatEx(sBanExpiryDate, sizeof(sBanExpiryDate), "%T: %T", "Expires", iClient, "Never", iClient);
 		}
 	} else {
-		FormatEx(sBanDuration, sizeof(sBanDuration), "Duration: Temporary");
-		FormatEx(sBanExpiryDate, sizeof(sBanExpiryDate), "Expires: On Map Change");
+		FormatEx(sBanDuration, sizeof(sBanDuration), "%T: %T", "Duration", iClient, "Temporary", iClient);
+		FormatEx(sBanExpiryDate, sizeof(sBanExpiryDate), "%T: %T", "Expires", iClient, "On Map Change", iClient);
 	}
 
-	FormatEx(sBanIssuedDate, sizeof(sBanIssuedDate), "Issued on: %s", !(iBanIssuedDate == 0) ? sBanIssuedDate:"Unknown");
-	FormatEx(sBannedBy, sizeof(sBannedBy), "Admin SID: %s", g_sRestrictedBy[iTarget][0] ? g_sRestrictedBy[iTarget]:"Unknown");
+	FormatEx(sBanIssuedDate, sizeof(sBanIssuedDate), "%T: %s", "Issued on", iClient, !(iBanIssuedDate == 0) ? sBanIssuedDateBuf:"Unknown");
+	FormatEx(sBannedBy, sizeof(sBannedBy), "%T: %s", "Admin SID", iClient, g_sRestrictedBy[iTarget][0] ? g_sRestrictedBy[iTarget]:"Unknown");
 
 	hListTargetMenu.AddItem("", sBannedBy, ITEMDRAW_DISABLED);
 	hListTargetMenu.AddItem("", sBanIssuedDate, ITEMDRAW_DISABLED);
 	hListTargetMenu.AddItem("", sBanExpiryDate, ITEMDRAW_DISABLED);
 	hListTargetMenu.AddItem("", sBanDuration, ITEMDRAW_DISABLED);
 	hListTargetMenu.AddItem("", "", ITEMDRAW_SPACER);
-	hListTargetMenu.AddItem(sUserID, "Unban");
+	char sMenuItem[128];
+	Format(sMenuItem, sizeof(sMenuItem), "%T", "Unban", iClient);
+	hListTargetMenu.AddItem(sUserID, sMenuItem);
 
 	hListTargetMenu.Display(iClient, MENU_TIME_FOREVER);
 }
@@ -978,7 +932,7 @@ public int MenuHandler_Menu_ListTarget(Menu hMenu, MenuAction hAction, int iPara
 
 			if (iTarget != 0) EUnbanClient(iTarget, iParam1);
 			else {
-				CPrintToChat(iParam1, "\x07%s[entWatch]\x07%s Player no longer available", color_tag, color_warning);
+				CPrintToChat(iParam1, "\x07%s[entWatch]\x07%s %t", color_tag, color_warning, "Player no longer available");
 				Menu_List(iParam1);
 			}
 		}
@@ -1492,24 +1446,24 @@ public Action Command_Status(int iClient, int iArgs)
 
 			if (g_bRestricted[iTarget])
 			{
-				CReplyToCommand(iClient, "\x07%s[entWatch]\x07%s \x07%s%N\x07%s is temporarily restricted.", color_tag, color_warning, color_name, iTarget, color_warning);
+				CReplyToCommand(iClient, "\x07%s[entWatch]\x07%s \x07%s%N\x07%s %t", color_tag, color_warning, color_name, iTarget, color_warning, "is temporarily restricted");
 				return Plugin_Handled;
 			}
 
 			switch(StringToInt(CStatus)) {
 				case 0: {
-					CReplyToCommand(iClient, "\x07%s[entWatch]\x07%s \x07%s%N\x07%s is not restricted.", color_tag, color_warning, color_name, iTarget, color_warning);
+					CReplyToCommand(iClient, "\x07%s[entWatch]\x07%s \x07%s%N\x07%s %t", color_tag, color_warning, color_name, iTarget, color_warning, "is not restricted");
 					return Plugin_Handled;
 				}
 				
 				case 1: {
-					CReplyToCommand(iClient, "\x07%s[entWatch]\x07%s \x07%s%N\x07%s is permanently restricted.", color_tag, color_warning, color_name, iTarget, color_warning);
+					CReplyToCommand(iClient, "\x07%s[entWatch]\x07%s \x07%s%N\x07%s %t", color_tag, color_warning, color_name, iTarget, color_warning, "is permanently restricted");
 					return Plugin_Handled;
 				}
 			}
 			if (StringToInt(CStatus) <= GetTime())
 			{
-				CReplyToCommand(iClient, "\x07%s[entWatch]\x07%s \x07%s%N\x07%s is not restricted.", color_tag, color_warning, color_name, iTarget, color_warning);
+				CReplyToCommand(iClient, "\x07%s[entWatch]\x07%s \x07%s%N\x07%s %t", color_tag, color_warning, color_name, iTarget, color_warning, "is not restricted");
 				g_iRestrictedLength[iTarget] = 0;
 				SetClientCookie(iTarget, g_hCookie_RestrictedLength, "0");
 
@@ -1527,18 +1481,18 @@ public Action Command_Status(int iClient, int iArgs)
 			int iSeconds = (iTstamp % 60);
 
 			if (iTstamp > 86400)
-				FormatEx(sFRemainingTime, sizeof(sFRemainingTime), "%d %s, %d %s, %d %s, %d %s", iDays, SingularOrMultiple(iDays)?"iDays":"Day", iHours, SingularOrMultiple(iHours)?"iHours":"Hour", iMinutes, SingularOrMultiple(iMinutes)?"iMinutes":"Minute", iSeconds, SingularOrMultiple(iSeconds)?"iSeconds":"Second");
+				FormatEx(sFRemainingTime, sizeof(sFRemainingTime), "%d %s, %d %s, %d %s, %d %s", iDays, SingularOrMultiple(iDays)?"Days":"Day", iHours, SingularOrMultiple(iHours)?"Hours":"Hour", iMinutes, SingularOrMultiple(iMinutes)?"Minutes":"Minute", iSeconds, SingularOrMultiple(iSeconds)?"Seconds":"Second");
 			else if (iTstamp > 3600)
-				FormatEx(sFRemainingTime, sizeof(sFRemainingTime), "%d %s, %d %s, %d %s", iHours, SingularOrMultiple(iHours)?"iHours":"Hour", iMinutes, SingularOrMultiple(iMinutes)?"iMinutes":"Minute", iSeconds, SingularOrMultiple(iSeconds)?"iSeconds":"Second");
+				FormatEx(sFRemainingTime, sizeof(sFRemainingTime), "%d %s, %d %s, %d %s", iHours, SingularOrMultiple(iHours)?"Hours":"Hour", iMinutes, SingularOrMultiple(iMinutes)?"Minutes":"Minute", iSeconds, SingularOrMultiple(iSeconds)?"Seconds":"Second");
 			else if (iTstamp > 60)
-				FormatEx(sFRemainingTime, sizeof(sFRemainingTime), "%d %s, %d %s", iMinutes, SingularOrMultiple(iMinutes)?"iMinutes":"Minute", iSeconds, SingularOrMultiple(iSeconds)?"iSeconds":"Second");
-			else FormatEx(sFRemainingTime, sizeof(sFRemainingTime), "%d %s", iSeconds, SingularOrMultiple(iSeconds)?"iSeconds":"Second");
+				FormatEx(sFRemainingTime, sizeof(sFRemainingTime), "%d %s, %d %s", iMinutes, SingularOrMultiple(iMinutes)?"Minutes":"Minute", iSeconds, SingularOrMultiple(iSeconds)?"Seconds":"Second");
+			else FormatEx(sFRemainingTime, sizeof(sFRemainingTime), "%d %s", iSeconds, SingularOrMultiple(iSeconds)?"Seconds":"Second");
 
-			CReplyToCommand(iClient, "\x07%s[entWatch]\x07%s \x07%s%N\x07%s is restricted for another: \x04%s", color_tag, color_warning, color_name, iTarget, color_warning, sFRemainingTime);
+			CReplyToCommand(iClient, "\x07%s[entWatch]\x07%s \x07%s%N\x07%s %t: \x04%s", color_tag, color_warning, color_name, iTarget, color_warning, "is restricted for another", sFRemainingTime);
 
 			return Plugin_Handled;
 		} else {
-			CReplyToCommand(iClient, "\x07%s[entWatch]\x07%s \x07%s%N\x07%s's cookies haven't loaded yet.", color_tag, color_warning, color_name, iTarget, color_warning);
+			CReplyToCommand(iClient, "\x07%s[entWatch]\x07%s \x07%s%N\x07%s%t", color_tag, color_warning, color_name, iTarget, color_warning, "cookies havent loaded yet");
 			return Plugin_Handled;
 		}
 	}
@@ -1582,13 +1536,13 @@ public Action Command_Status(int iClient, int iArgs)
 				int iSeconds = (iTstamp % 60);
 
 				if (iTstamp > 86400)
-					Format(sFRemainingTime, sizeof(sFRemainingTime), "%d %s, %d %s, %d %s, %d %s", iDays, SingularOrMultiple(iDays)?"iDays":"Day", iHours, SingularOrMultiple(iHours)?"iHours":"Hour", iMinutes, SingularOrMultiple(iMinutes)?"iMinutes":"Minute", iSeconds, SingularOrMultiple(iSeconds)?"iSeconds":"Second");
+					Format(sFRemainingTime, sizeof(sFRemainingTime), "%d %s, %d %s, %d %s, %d %s", iDays, SingularOrMultiple(iDays)?"Days":"Day", iHours, SingularOrMultiple(iHours)?"Hours":"Hour", iMinutes, SingularOrMultiple(iMinutes)?"Minutes":"Minute", iSeconds, SingularOrMultiple(iSeconds)?"Seconds":"Second");
 				else if (iTstamp > 3600)
-					Format(sFRemainingTime, sizeof(sFRemainingTime), "%d %s, %d %s, %d %s", iHours, SingularOrMultiple(iHours)?"iHours":"Hour", iMinutes, SingularOrMultiple(iMinutes)?"iMinutes":"Minute", iSeconds, SingularOrMultiple(iSeconds)?"iSeconds":"Second");
+					Format(sFRemainingTime, sizeof(sFRemainingTime), "%d %s, %d %s, %d %s", iHours, SingularOrMultiple(iHours)?"Hours":"Hour", iMinutes, SingularOrMultiple(iMinutes)?"Minutes":"Minute", iSeconds, SingularOrMultiple(iSeconds)?"Seconds":"Second");
 				else if (iTstamp > 60)
-					Format(sFRemainingTime, sizeof(sFRemainingTime), "%d %s, %d %s", iMinutes, SingularOrMultiple(iMinutes)?"iMinutes":"Minute", iSeconds, SingularOrMultiple(iSeconds)?"iSeconds":"Second");
+					Format(sFRemainingTime, sizeof(sFRemainingTime), "%d %s, %d %s", iMinutes, SingularOrMultiple(iMinutes)?"Minutes":"Minute", iSeconds, SingularOrMultiple(iSeconds)?"Seconds":"Second");
 				else
-					Format(sFRemainingTime, sizeof(sFRemainingTime), "%d %s", iSeconds, SingularOrMultiple(iSeconds)?"iSeconds":"Second");
+					Format(sFRemainingTime, sizeof(sFRemainingTime), "%d %s", iSeconds, SingularOrMultiple(iSeconds)?"Seconds":"Second");
 
 				CReplyToCommand(iClient, "\x07%s[entWatch] \x07%s%t \x04(%s)", color_tag, color_warning, "status restricted", sFRemainingTime);
 
@@ -1644,7 +1598,7 @@ public Action Command_EBanlist(int iClient, int iArgs)
 {
 	char sBuff[1024];
 	bool bFirst = true;
-	Format(sBuff, sizeof(sBuff), "No players found.");
+	Format(sBuff, sizeof(sBuff), "%T", "No players found", iClient);
 
 	for (int i = 1; i < MaxClients + 1; i++)
 	{
@@ -1679,7 +1633,7 @@ public Action Command_EBanlist(int iClient, int iArgs)
 		}
 	}
 
-	CReplyToCommand(iClient, "\x07%s[entWatch]\x07%s Currently e-banned: \x07%s%s", color_tag, color_warning, color_name, sBuff);
+	CReplyToCommand(iClient, "\x07%s[entWatch]\x07%s %t: \x07%s%s", color_tag, color_warning, "Currently e-banned", color_name, sBuff);
 	FormatEx(sBuff, sizeof(sBuff), "");
 	return Plugin_Handled;
 }
@@ -1751,7 +1705,7 @@ public Action Command_Transfer(int iClient, int iArgs)
 			{
 				if (GetClientTeam(iTarget) != GetClientTeam(iReceiver))
 				{
-					CPrintToChat(iClient, "\x07%s[entWatch] \x07%sThe receivers team differs from the targets team.", color_tag, color_warning);
+					CPrintToChat(iClient, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning, "The receivers team differs from the targets team");
 					return Plugin_Handled;
 				}
 
@@ -1775,7 +1729,7 @@ public Action Command_Transfer(int iClient, int iArgs)
 							entArray[index][ent_chat] = true;
 						} else FixedEquipPlayerWeapon(iReceiver, entArray[index][ent_weaponid]);
 
-						CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%stransfered all items from \x07%s%N \x07%sto \x07%s%N", color_tag, color_name, iClient, color_warning, color_name, iTarget, color_warning, color_name, iReceiver);
+						CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%s%t \x07%s%N \x07%s%t \x07%s%N", color_tag, color_name, iClient, color_warning, "transfered all items", color_name, iTarget, color_warning, "tai to", color_name, iReceiver);
 						LogAction(iClient, iTarget, "\"%L\" transfered all items from \"%L\" to \"%L\"", iClient, iTarget, iReceiver);
 						return Plugin_Handled;
 					}
@@ -1789,7 +1743,9 @@ public Action Command_Transfer(int iClient, int iArgs)
 		Menu hEdictMenu = CreateMenu(EdictMenu_Handler);
 		char sMenuTemp[64], sIndexTemp[16];
 		int iHeldCount = 0;
-		hEdictMenu.SetTitle("[entWatch] Edict targets:");
+		char sMenuTranslate[128];
+		Format(sMenuTranslate, sizeof(sMenuTranslate), "[entWatch] %T:", "Edict targets", iClient);
+		hEdictMenu.SetTitle(sMenuTranslate);
 
 		for (int i = 0; i < entArraySize; i++)
 		{
@@ -1819,7 +1775,7 @@ public Action Command_Transfer(int iClient, int iArgs)
 	
 							if (GetClientTeam(iReceiver) != GetClientTeam(iCurOwner))
 							{
-								CPrintToChat(iClient, "\x07%s[entWatch] \x07%sThe receivers team differs from the targets team.", color_tag, color_warning);
+								CPrintToChat(iClient, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning, "The receivers team differs from the targets team");
 								delete hEdictMenu;
 								return Plugin_Handled;
 							}
@@ -1837,11 +1793,11 @@ public Action Command_Transfer(int iClient, int iArgs)
 								entArray[iEntityIndex][ent_chat] = true;
 							} else FixedEquipPlayerWeapon(iReceiver, entArray[iEntityIndex][ent_weaponid]);
 	
-							CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%stransfered all items from \x07%s%N \x07%sto \x07%s%N", color_tag, color_name, iClient, color_warning, color_name, iCurOwner, color_warning, color_name, iReceiver);
+							CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%s%t \x07%s%N \x07%s%t \x07%s%N", color_tag, color_name, iClient, color_warning, "transfered all items", color_name, iCurOwner, color_warning, "tai to", color_name, iReceiver);
 	
 							LogAction(iClient, iCurOwner, "\"%L\" transfered all items from \"%L\" to \"%L\"", iClient, iCurOwner, iReceiver);
 						}
-					} else CPrintToChat(iClient, "\x07%s[entWatch] \x07%sTarget is not valid.", color_tag, color_warning);
+					} else CPrintToChat(iClient, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning, "Target is not valid");
 				}
 	
 				delete(hEdictMenu);
@@ -1852,7 +1808,7 @@ public Action Command_Transfer(int iClient, int iArgs)
 			g_iAdminMenuTarget[iClient] = iReceiver;
 			hEdictMenu.Display(iClient, MENU_TIME_FOREVER);
 		} else {
-			CPrintToChat(iClient, "\x07%s[entWatch] \x07%sNo one is currently holding that item.", color_tag, color_warning);
+			CPrintToChat(iClient, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning, "No one is currently holding that item");
 			delete hEdictMenu;
 		}
 	}
@@ -1880,7 +1836,7 @@ public Action Command_Transfer(int iClient, int iArgs)
 					} else FixedEquipPlayerWeapon(iReceiver, entArray[iEntityIndex][ent_weaponid]);
 
 					bFoundWeapon = true;
-					CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%stransfered all items from \x07%s%N \x07%sto \x07%s%N", color_tag, color_name, iClient, color_warning, color_name, iCurOwner, color_warning, color_name, iReceiver);
+					CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%s%t \x07%s%N \x07%s%t \x07%s%N", color_tag, color_name, iClient, color_warning, "transfered all items", color_name, iCurOwner, color_warning, "tai to", color_name, iReceiver);
 					LogAction(iClient, iCurOwner, "\"%L\" transfered all items from \"%L\" to \"%L\"", iClient, iCurOwner, iReceiver);
 				}
 			}
@@ -1896,12 +1852,12 @@ public Action Command_Transfer(int iClient, int iArgs)
 				} else FixedEquipPlayerWeapon(iReceiver, iEntity);
 
 				bFoundWeapon = true;
-				CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%stransfered \x07%s%s \x07%sto \x07%s%N", color_tag, color_name, iClient, color_warning, entArray[iEntityIndex][ent_color], entArray[iEntityIndex][ent_name], color_warning, color_name, iReceiver);
+				CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%s%t \x07%s%s \x07%s%t \x07%s%N", color_tag, color_name, iClient, color_warning, "transfered", entArray[iEntityIndex][ent_color], entArray[iEntityIndex][ent_name], color_warning, "tai to", color_name, iReceiver);
 				LogAction(iClient, -1, "\"%L\" transfered \"%s\" to \"%L\"", iClient, entArray[iEntityIndex][ent_name], iReceiver);
 			}
 		}
 	}
-	if (!bFoundWeapon) CPrintToChat(iClient, "\x07%s[entWatch] \x07%sInvalid item name.", color_tag, color_warning);
+	if (!bFoundWeapon) CPrintToChat(iClient, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning, "Invalid item name");
 	return Plugin_Handled;
 }
 
@@ -1919,7 +1875,7 @@ public int EdictMenu_Handler(Menu hEdictMenu, MenuAction hAction, int iParam1, i
 
 			switch(iReceiver){
 				case 0: {
-					CPrintToChat(iParam1, "\x07%s[entWatch] \x07%sReceiver is not valid anymore.", color_tag, color_warning);
+					CPrintToChat(iParam1, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning, "Receiver is not valid anymore");
 					return;
 				}
 			}
@@ -1934,7 +1890,7 @@ public int EdictMenu_Handler(Menu hEdictMenu, MenuAction hAction, int iParam1, i
 
 						if (GetClientTeam(iReceiver) != GetClientTeam(iCurOwner))
 						{
-							CPrintToChat(iParam1, "\x07%s[entWatch] \x07%sThe receivers team differs from the targets team.", color_tag, color_warning);
+							CPrintToChat(iParam1, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning, "The receivers team differs from the targets team");
 							return;
 						}
 
@@ -1951,10 +1907,10 @@ public int EdictMenu_Handler(Menu hEdictMenu, MenuAction hAction, int iParam1, i
 							entArray[iEntityIndex][ent_chat] = true;
 						} else FixedEquipPlayerWeapon(iReceiver, entArray[iEntityIndex][ent_weaponid]);
 
-						CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%stransfered all items from \x07%s%N \x07%sto \x07%s%N", color_tag, color_name, iParam1, color_warning, color_name, iCurOwner, color_warning, color_name, iReceiver);
+						CPrintToChatAll("\x07%s[entWatch] \x07%s%N \x07%s%t \x07%s%N \x07%s%t \x07%s%N", color_tag, color_name, iParam1, color_warning, "transfered all items", color_name, iCurOwner, color_warning, "tai to", color_name, iReceiver);
 						LogAction(iParam1, iCurOwner, "\"%L\" transfered all items from \"%L\" to \"%L\"", iParam1, iCurOwner, iReceiver);
 					}
-				} else CPrintToChat(iParam1, "\x07%s[entWatch] \x07%sItem is not valid anymore.", color_tag, color_warning);
+				} else CPrintToChat(iParam1, "\x07%s[entWatch] \x07%s%t", color_tag, color_warning, "Item is not valid anymore");
 			}
 		}
 	}
@@ -2112,20 +2068,31 @@ stock void LoadConfig()
 				entArray[entArraySize][ent_glow_r]=255;
 				entArray[entArraySize][ent_glow_g]=255;
 				entArray[entArraySize][ent_glow_b]=255;
-				if((StrEqual(sBuffer_temp,"{green}",true))||(StrEqual(sBuffer_temp,"{GREEN}",true))){entArray[entArraySize][ent_glow_r]=0;entArray[entArraySize][ent_glow_g]=255;entArray[entArraySize][ent_glow_b]=0;}
-				if((StrEqual(sBuffer_temp,"{default}",true))||(StrEqual(sBuffer_temp,"{DEFAULT}",true))){entArray[entArraySize][ent_glow_r]=255;entArray[entArraySize][ent_glow_g]=255;entArray[entArraySize][ent_glow_b]=255;}
-				if((StrEqual(sBuffer_temp,"{darkred}",true))||(StrEqual(sBuffer_temp,"{DARKRED}",true))){entArray[entArraySize][ent_glow_r]=140;entArray[entArraySize][ent_glow_g]=0;entArray[entArraySize][ent_glow_b]=0;}
-				if((StrEqual(sBuffer_temp,"{pink}",true))||(StrEqual(sBuffer_temp,"{PINK}",true))){entArray[entArraySize][ent_glow_r]=255;entArray[entArraySize][ent_glow_g]=105;entArray[entArraySize][ent_glow_b]=180;}
-				if((StrEqual(sBuffer_temp,"{lightgreen}",true))||(StrEqual(sBuffer_temp,"{LIGHTGREEN}",true))){entArray[entArraySize][ent_glow_r]=144;entArray[entArraySize][ent_glow_g]=238;entArray[entArraySize][ent_glow_b]=144;}
-				if((StrEqual(sBuffer_temp,"{lime}",true))||(StrEqual(sBuffer_temp,"{LIME}",true))){entArray[entArraySize][ent_glow_r]=199;entArray[entArraySize][ent_glow_g]=234;entArray[entArraySize][ent_glow_b]=7;}
-				if((StrEqual(sBuffer_temp,"{red}",true))||(StrEqual(sBuffer_temp,"{RED}",true))){entArray[entArraySize][ent_glow_r]=255;entArray[entArraySize][ent_glow_g]=0;entArray[entArraySize][ent_glow_b]=0;}
-				if((StrEqual(sBuffer_temp,"{grey}",true))||(StrEqual(sBuffer_temp,"{GREY}",true))){entArray[entArraySize][ent_glow_r]=128;entArray[entArraySize][ent_glow_g]=128;entArray[entArraySize][ent_glow_b]=128;}
-				if((StrEqual(sBuffer_temp,"{olive}",true))||(StrEqual(sBuffer_temp,"{OLIVE}",true))){entArray[entArraySize][ent_glow_r]=112;entArray[entArraySize][ent_glow_g]=130;entArray[entArraySize][ent_glow_b]=56;}
-				if((StrEqual(sBuffer_temp,"{lightblue}",true))||(StrEqual(sBuffer_temp,"{LIGHTBLUE}",true))){entArray[entArraySize][ent_glow_r]=173;entArray[entArraySize][ent_glow_g]=216;entArray[entArraySize][ent_glow_b]=230;}
-				if((StrEqual(sBuffer_temp,"{blue}",true))||(StrEqual(sBuffer_temp,"{BLUE}",true))){entArray[entArraySize][ent_glow_r]=0;entArray[entArraySize][ent_glow_g]=0;entArray[entArraySize][ent_glow_b]=255;}
-				if((StrEqual(sBuffer_temp,"{purple}",true))||(StrEqual(sBuffer_temp,"{PURPLE}",true))){entArray[entArraySize][ent_glow_r]=128;entArray[entArraySize][ent_glow_g]=0;entArray[entArraySize][ent_glow_b]=128;}
-				if((StrEqual(sBuffer_temp,"{darkorange}",true))||(StrEqual(sBuffer_temp,"{DARKORANGE}",true))){entArray[entArraySize][ent_glow_r]=255;entArray[entArraySize][ent_glow_g]=140;entArray[entArraySize][ent_glow_b]=0;}
-				if((StrEqual(sBuffer_temp,"{orange}",true))||(StrEqual(sBuffer_temp,"{ORANGE}",true))){entArray[entArraySize][ent_glow_r]=240;entArray[entArraySize][ent_glow_g]=94;entArray[entArraySize][ent_glow_b]=35;}
+				if(StrEqual(sBuffer_temp,"{green}",false)){entArray[entArraySize][ent_glow_r]=0;entArray[entArraySize][ent_glow_g]=255;entArray[entArraySize][ent_glow_b]=0;}
+				if(StrEqual(sBuffer_temp,"{default}",false)){entArray[entArraySize][ent_glow_r]=255;entArray[entArraySize][ent_glow_g]=255;entArray[entArraySize][ent_glow_b]=255;}
+				if(StrEqual(sBuffer_temp,"{darkred}",false)){entArray[entArraySize][ent_glow_r]=140;entArray[entArraySize][ent_glow_g]=0;entArray[entArraySize][ent_glow_b]=0;}
+				if(StrEqual(sBuffer_temp,"{purple}",false)){entArray[entArraySize][ent_glow_r]=128;entArray[entArraySize][ent_glow_g]=0;entArray[entArraySize][ent_glow_b]=128;}
+				if(StrEqual(sBuffer_temp,"{lightgreen}",false)){entArray[entArraySize][ent_glow_r]=144;entArray[entArraySize][ent_glow_g]=238;entArray[entArraySize][ent_glow_b]=144;}
+				if(StrEqual(sBuffer_temp,"{lime}",false)){entArray[entArraySize][ent_glow_r]=199;entArray[entArraySize][ent_glow_g]=234;entArray[entArraySize][ent_glow_b]=7;}
+				if(StrEqual(sBuffer_temp,"{red}",false)){entArray[entArraySize][ent_glow_r]=255;entArray[entArraySize][ent_glow_g]=0;entArray[entArraySize][ent_glow_b]=0;}
+				if(StrEqual(sBuffer_temp,"{grey}",false)){entArray[entArraySize][ent_glow_r]=128;entArray[entArraySize][ent_glow_g]=128;entArray[entArraySize][ent_glow_b]=128;}
+				if(StrEqual(sBuffer_temp,"{olive}",false)){entArray[entArraySize][ent_glow_r]=112;entArray[entArraySize][ent_glow_g]=130;entArray[entArraySize][ent_glow_b]=56;}
+				if(StrEqual(sBuffer_temp,"{a}",false)){entArray[entArraySize][ent_glow_r]=192;entArray[entArraySize][ent_glow_g]=192;entArray[entArraySize][ent_glow_b]=192;}
+				if(StrEqual(sBuffer_temp,"{lightblue}",false)){entArray[entArraySize][ent_glow_r]=173;entArray[entArraySize][ent_glow_g]=216;entArray[entArraySize][ent_glow_b]=230;}
+				if(StrEqual(sBuffer_temp,"{blue}",false)){entArray[entArraySize][ent_glow_r]=0;entArray[entArraySize][ent_glow_g]=0;entArray[entArraySize][ent_glow_b]=255;}
+				if(StrEqual(sBuffer_temp,"{d}",false)){entArray[entArraySize][ent_glow_r]=102;entArray[entArraySize][ent_glow_g]=153;entArray[entArraySize][ent_glow_b]=204;}
+				if(StrEqual(sBuffer_temp,"{pink}",false)){entArray[entArraySize][ent_glow_r]=255;entArray[entArraySize][ent_glow_g]=105;entArray[entArraySize][ent_glow_b]=180;}
+				if(StrEqual(sBuffer_temp,"{darkorange}",false)){entArray[entArraySize][ent_glow_r]=255;entArray[entArraySize][ent_glow_g]=140;entArray[entArraySize][ent_glow_b]=0;}
+				if(StrEqual(sBuffer_temp,"{orange}",false)){entArray[entArraySize][ent_glow_r]=240;entArray[entArraySize][ent_glow_g]=94;entArray[entArraySize][ent_glow_b]=35;}
+				if(StrEqual(sBuffer_temp,"{white}",false)){entArray[entArraySize][ent_glow_r]=255;entArray[entArraySize][ent_glow_g]=255;entArray[entArraySize][ent_glow_b]=255;}
+				if(StrEqual(sBuffer_temp,"{yellow}",false)){entArray[entArraySize][ent_glow_r]=112;entArray[entArraySize][ent_glow_g]=130;entArray[entArraySize][ent_glow_b]=56;}
+				if(StrEqual(sBuffer_temp,"{magenta}",false)){entArray[entArraySize][ent_glow_r]=255;entArray[entArraySize][ent_glow_g]=105;entArray[entArraySize][ent_glow_b]=180;}
+				if(StrEqual(sBuffer_temp,"{silver}",false)){entArray[entArraySize][ent_glow_r]=192;entArray[entArraySize][ent_glow_g]=192;entArray[entArraySize][ent_glow_b]=192;}
+				if(StrEqual(sBuffer_temp,"{bluegrey}",false)){entArray[entArraySize][ent_glow_r]=102;entArray[entArraySize][ent_glow_g]=153;entArray[entArraySize][ent_glow_b]=204;}
+				if(StrEqual(sBuffer_temp,"{lightred}",false)){entArray[entArraySize][ent_glow_r]=255;entArray[entArraySize][ent_glow_g]=90;entArray[entArraySize][ent_glow_b]=0;}
+				if(StrEqual(sBuffer_temp,"{cyan}",false)){entArray[entArraySize][ent_glow_r]=0;entArray[entArraySize][ent_glow_g]=150;entArray[entArraySize][ent_glow_b]=220;}
+				if(StrEqual(sBuffer_temp,"{gray}",false)){entArray[entArraySize][ent_glow_r]=128;entArray[entArraySize][ent_glow_g]=128;entArray[entArraySize][ent_glow_b]=128;}
+				
 
 				KvGetString(hKeyValues, "buttonclass", sBuffer_temp, sizeof(sBuffer_temp));
 				FormatEx(entArray[entArraySize][ent_buttonclass], 32, "%s", sBuffer_temp);
@@ -2480,11 +2447,15 @@ public int Native_HasSpecialItem(Handle hPlugin, int iArgC)
 
 stock void FixedEquipPlayerWeapon(int iClient, int iWeapon)
 {
-	int iWeaponSlot = SDKCall(g_hGetSlot, iWeapon);
-	int WeaponInSlot = GetPlayerWeaponSlot(iClient, iWeaponSlot);
-	if(WeaponInSlot	!= -1) CS_DropWeapon(iClient, WeaponInSlot, false);
-
-	if(SDKCall(g_hBumpWeapon, iClient, iWeapon)) SDKCall(g_hOnPickedUp, iWeapon, iClient);
+	int wSlot = GetSlotCSGO(iWeapon);
+	if((wSlot>=0) && (wSlot<=2))
+	{
+		int TargetWInSlot = GetPlayerWeaponSlot(iClient, wSlot);
+		if(TargetWInSlot != -1) CS_DropWeapon(iClient, TargetWInSlot, false);
+		float iClientOrigin[3];
+		GetClientAbsOrigin(iClient,iClientOrigin);
+		TeleportEntity(iWeapon, iClientOrigin, NULL_VECTOR, NULL_VECTOR);
+	}
 }
 
 stock bool IsValidPlayer(int client){
@@ -2769,4 +2740,49 @@ public Action Command_ToggleHUD(int client, int args)
 		G_bDisplay2[client] = true;
 	}
 	return Plugin_Handled;
+}
+
+stock int GetSlotCSGO(int eWeapon)
+{
+	/*Slots:
+	Invalid/Unknown: -1
+	Primary: 0
+	Secondary: 1
+	Melee(Knife): 2
+	Projectile(Grenades): 3
+	Explosive(c4): 4
+	*/
+	char wClassName[64];
+	GetEntityClassname(eWeapon,wClassName,sizeof(wClassName));
+	
+	if((StrEqual(wClassName,"weapon_elite",false))||(StrEqual(wClassName,"weapon_deagle",false))||(StrEqual(wClassName,"weapon_fiveseven",false))||
+		(StrEqual(wClassName,"weapon_glock",false))||(StrEqual(wClassName,"weapon_revolver",false))||(StrEqual(wClassName,"weapon_usp_silencer",false))||
+		(StrEqual(wClassName,"weapon_cz75a",false))||(StrEqual(wClassName,"weapon_hkp2000",false))||(StrEqual(wClassName,"weapon_p250",false))||
+		(StrEqual(wClassName,"weapon_tec9",false)))
+	{
+		return 1;
+	} else if((StrEqual(wClassName,"weapon_knife",false))||(StrEqual(wClassName,"weapon_knifegg",false))||(StrEqual(wClassName,"weapon_taser",false))||
+		(StrEqual(wClassName,"weapon_axe",false))||(StrEqual(wClassName,"weapon_hammer",false))||(StrEqual(wClassName,"weapon_spanner",false)))
+	{
+		return 2;
+	} else if((StrEqual(wClassName,"weapon_decoy",false))||(StrEqual(wClassName,"weapon_flashbang",false))||(StrEqual(wClassName,"weapon_hegrenade",false))||
+		(StrEqual(wClassName,"weapon_incgrenade",false))||(StrEqual(wClassName,"weapon_molotov",false))||(StrEqual(wClassName,"weapon_smokegrenade",false))||
+		(StrEqual(wClassName,"weapon_tagrenade",false))||(StrEqual(wClassName,"weapon_diversion",false))||(StrEqual(wClassName,"weapon_snowball",false)))
+	{
+		return 3;
+	} else if((StrEqual(wClassName,"weapon_ak47",false))||(StrEqual(wClassName,"weapon_aug",false))||(StrEqual(wClassName,"weapon_awp",false))||
+		(StrEqual(wClassName,"weapon_bizon",false))||(StrEqual(wClassName,"weapon_famas",false))||(StrEqual(wClassName,"weapon_g3sg1",false))||
+		(StrEqual(wClassName,"weapon_galilar",false))||(StrEqual(wClassName,"weapon_m4a1",false))||(StrEqual(wClassName,"weapon_m4a1_silencer",false))||
+		(StrEqual(wClassName,"weapon_m249",false))||(StrEqual(wClassName,"weapon_negev",false))||(StrEqual(wClassName,"weapon_p90",false))||
+		(StrEqual(wClassName,"weapon_scar20",false))||(StrEqual(wClassName,"weapon_ssg08",false))||(StrEqual(wClassName,"weapon_ump45",false))||
+		(StrEqual(wClassName,"weapon_xm1014",false))||(StrEqual(wClassName,"weapon_mac10",false))||(StrEqual(wClassName,"weapon_mag7",false))||
+		(StrEqual(wClassName,"weapon_mp7",false))||(StrEqual(wClassName,"weapon_mp9",false))||(StrEqual(wClassName,"weapon_nova",false))||
+		(StrEqual(wClassName,"weapon_sawedoff",false))||(StrEqual(wClassName,"weapon_sg556",false)))
+	{
+		return 0;
+	} else if((StrEqual(wClassName,"weapon_c4",false))||(StrEqual(wClassName,"weapon_breachcharge",false))||(StrEqual(wClassName,"weapon_bumpmine",false))||
+		(StrEqual(wClassName,"weapon_healthshot",false))||(StrEqual(wClassName,"weapon_shield",false)))
+	{
+		return 4;
+	} else return -1;
 }
