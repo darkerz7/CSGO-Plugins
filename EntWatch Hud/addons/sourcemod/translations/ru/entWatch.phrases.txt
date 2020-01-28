@@ -48,4 +48,212 @@
 	{
 		"ru" 	"Позиция ХУД сохранена."
 	}
+	"restricted"
+	{
+		"ru" 	"запретил подбор итемов игроку"
+	}
+	"unrestricted"
+	{
+		"ru" 	"разрешил подбор итемов игроку"
+	}
+	"entWatch Commands"
+	{
+		"ru" 	"entWatch Команды"
+	}
+	"List Banned Clients"
+	{
+		"ru" 	"Список Забаненных"
+	}
+	"Ban a Client"
+	{
+		"ru" 	"Забанить Игрока"
+	}
+	"Transfer an item"
+	{
+		"ru" 	"Передать Итем"
+	}
+	"Give an Item"
+	{
+		"ru" 	"Выдать Итем"
+	}
+	"Unban a Client"
+	{
+		"ru" 	"Разбанить Игрока"
+	}
+	"Banned Clients"
+	{
+		"ru" 	"Забаненные Игроки"
+	}
+	"No Banned Clients"
+	{
+		"ru" 	"Нет Забаненных Игроков"
+	}
+	"No transferable items currently held"
+	{
+		"ru" 	"В настоящий момент нет передаваемых итемов"
+	}
+	"No Give items currently held"
+	{
+		"ru" 	"В настоящий момент нет выдаваемых итемов"
+	}
+	"Item no longer available"
+	{
+		"ru" 	"Итем больше не доступен"
+	}
+	"Item is already picked up"
+	{
+		"ru" 	"Итем уже был подобран"
+	}
+	"Transfer iTarget"
+	{
+		"ru" 	"Кому Передать"
+	}
+	"Give iTarget"
+	{
+		"ru" 	"Кому Выдать"
+	}
+	"Receiver is not valid anymore"
+	{
+		"ru" 	"Получатель больше не доступен"
+	}
+	"The receivers team differs from the targets team"
+	{
+		"ru" 	"Получатель и Отправитель находятся в разных командах"
+	}
+	"transfered all items"
+	{
+		"ru" 	"передал все итемы от"
+	}
+	"transfered"
+	{
+		"ru" 	"передал"
+	}
+	"tai to"
+	{
+		"ru" 	"игроку"
+	}
+	"Item is not valid anymore"
+	{
+		"ru" 	"Итем больше не доступен"
+	}
+	"The receivers team is not CT or TER"
+	{
+		"ru" 	"Получатель играет ни за CT, ни за TER"
+	}
+	"give item"
+	{
+		"ru" 	"выдал итем"
+	}
+	"Item dont pickable"
+	{
+		"ru" 	"Предмет не подбирается"
+	}
+	"Ban Time for"
+	{
+		"ru" 	"Время Бана для"
+	}
+	"Temporary"
+	{
+		"ru" 	"Временно"
+	}
+	"Minutes"
+	{
+		"ru" 	"Минут"
+	}
+	"Hour"
+	{
+		"ru" 	"Час"
+	}
+	"Day"
+	{
+		"ru" 	"День"
+	}
+	"Week"
+	{
+		"ru" 	"Неделя"
+	}
+	"Month"
+	{
+		"ru" 	"Месяц"
+	}
+	"Permanent"
+	{
+		"ru" 	"Навсегда"
+	}
+	"Banned Client"
+	{
+		"ru" 	"Забаненный Игрок"
+	}
+	"Duration"
+	{
+		"ru" 	"Продолжительность"
+	}
+	"Expires"
+	{
+		"ru" 	"Истекает"
+	}
+	"Never"
+	{
+		"ru" 	"Никогда"
+	}
+	"On Map Change"
+	{
+		"ru" 	"По окончанию карты"
+	}
+	"Issued on"
+	{
+		"ru" 	"Выдано"
+	}
+	"Admin SID"
+	{
+		"ru" 	"SID Админа"
+	}
+	"Unban"
+	{
+		"ru" 	"Разбанить"
+	}
+	"is temporarily restricted"
+	{
+		"ru" 	"запрещено подбирать итемы временно"
+	}
+	"is not restricted"
+	{
+		"ru" 	"не имеет блокировки по поднятию итемов"
+	}
+	"is permanently restricted"
+	{
+		"ru" 	"запрещено подбирать итемы навсегда"
+	}
+	"is restricted for another"
+	{
+		"ru" 	"запрещено подбирать итемы на"
+	}
+	"cookies havent loaded yet"
+	{
+		"ru" 	"куки не были загружены"
+	}
+	"No players found"
+	{
+		"ru" 	"Игроки не найдены"
+	}
+	"Currently e-banned"
+	{
+		"ru" 	"Текущие ЕБаны"
+	}
+	"Edict targets"
+	{
+		"ru" 	"Итемы"
+	}
+	"Target is not valid"
+	{
+		"ru" 	"Цель не доступна"
+	}
+	"No one is currently holding that item"
+	{
+		"ru" 	"Никто в данный момент не владеет этим итемом"
+	}
+	"Invalid item name"
+	{
+		"ru" 	"Неправильное имя итема"
+	}
 }
