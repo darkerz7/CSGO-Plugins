@@ -48,4 +48,212 @@
 	{
 		"en" 	"hud position is saved."
 	}
+	"restricted"
+	{
+		"en" 	"restricted"
+	}
+	"unrestricted"
+	{
+		"en" 	"unrestricted"
+	}
+	"entWatch Commands"
+	{
+		"en" 	"entWatch Commands"
+	}
+	"List Banned Clients"
+	{
+		"en" 	"List Banned Clients"
+	}
+	"Ban a Client"
+	{
+		"en" 	"Ban a Client"
+	}
+	"Transfer an item"
+	{
+		"en" 	"Transfer an item"
+	}
+	"Give an Item"
+	{
+		"en" 	"Give an Item"
+	}
+	"Unban a Client"
+	{
+		"en" 	"Unban a Client"
+	}
+	"Banned Clients"
+	{
+		"en" 	"Banned Clients"
+	}
+	"No Banned Clients"
+	{
+		"en" 	"No Banned Clients"
+	}
+	"No transferable items currently held"
+	{
+		"en" 	"No transferable items currently held"
+	}
+	"No Give items currently held"
+	{
+		"en" 	"No Give items currently held"
+	}
+	"Item no longer available"
+	{
+		"en" 	"Item no longer available"
+	}
+	"Item is already picked up"
+	{
+		"en" 	"Item is already picked up"
+	}
+	"Transfer iTarget"
+	{
+		"en" 	"Transfer iTarget"
+	}
+	"Give iTarget"
+	{
+		"en" 	"Give iTarget"
+	}
+	"Receiver is not valid anymore"
+	{
+		"en" 	"Receiver is not valid anymore"
+	}
+	"The receivers team differs from the targets team"
+	{
+		"en" 	"The receivers team differs from the targets team"
+	}
+	"transfered all items"
+	{
+		"en" 	"transfered all items from"
+	}
+	"transfered"
+	{
+		"en" 	"transfered"
+	}
+	"tai to"
+	{
+		"en" 	"to"
+	}
+	"Item is not valid anymore"
+	{
+		"en" 	"Item is not valid anymore"
+	}
+	"The receivers team is not CT or TER"
+	{
+		"en" 	"The receivers team is not CT or TER"
+	}
+	"give item"
+	{
+		"en" 	"give item"
+	}
+	"Item dont pickable"
+	{
+		"en" 	"Item dont pickable"
+	}
+	"Ban Time for"
+	{
+		"en" 	"Ban Time for"
+	}
+	"Temporary"
+	{
+		"en" 	"Temporary"
+	}
+	"Minutes"
+	{
+		"en" 	"Minutes"
+	}
+	"Hour"
+	{
+		"en" 	"Hour"
+	}
+	"Day"
+	{
+		"en" 	"Day"
+	}
+	"Week"
+	{
+		"en" 	"Week"
+	}
+	"Month"
+	{
+		"en" 	"Month"
+	}
+	"Permanent"
+	{
+		"en" 	"Permanent"
+	}
+	"Banned Client"
+	{
+		"en" 	"Banned Client"
+	}
+	"Duration"
+	{
+		"en" 	"Duration"
+	}
+	"Expires"
+	{
+		"en" 	"Expires"
+	}
+	"Never"
+	{
+		"en" 	"Never"
+	}
+	"On Map Change"
+	{
+		"en" 	"On Map Change"
+	}
+	"Issued on"
+	{
+		"en" 	"Issued on"
+	}
+	"Admin SID"
+	{
+		"en" 	"Admin SID"
+	}
+	"Unban"
+	{
+		"en" 	"Unban"
+	}
+	"is temporarily restricted"
+	{
+		"en" 	"is temporarily restricted"
+	}
+	"is not restricted"
+	{
+		"en" 	"is not restricted"
+	}
+	"is permanently restricted"
+	{
+		"en" 	"is permanently restricted"
+	}
+	"is restricted for another"
+	{
+		"en" 	"is restricted for another"
+	}
+	"cookies havent loaded yet"
+	{
+		"en" 	"s cookies havent loaded yet"
+	}
+	"No players found"
+	{
+		"en" 	"No players found"
+	}
+	"Currently e-banned"
+	{
+		"en" 	"Currently e-banned"
+	}
+	"Edict targets"
+	{
+		"en" 	"Edict targets"
+	}
+	"Target is not valid"
+	{
+		"en" 	"Target is not valid"
+	}
+	"No one is currently holding that item"
+	{
+		"en" 	"No one is currently holding that item"
+	}
+	"Invalid item name"
+	{
+		"en" 	"Invalid item name"
+	}
 }
