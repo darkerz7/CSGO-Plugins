@@ -1,0 +1,93 @@
+"Phrases"
+{
+	"Help Menu Tag"
+	{
+		"en"			"{lightblue}[{green}Help Menu{lightblue}]"
+		"ru"			"{lightblue}[{green}Меню помощи{lightblue}]"
+	}
+	"Help Menu Title"
+	{
+		"en"			"Help Menu"
+		"ru"			"Меню помощи"
+	}
+	"Help Menu TRules"
+	{
+		"en"			"Server Rules"
+		"ru"			"Правила Сервера"
+	}
+	"Help Menu TInfo"
+	{
+		"en"			"Server Information"
+		"ru"			"Информация о сервере"
+	}
+	"Help Menu TCommands"
+	{
+		"en"			"Commands Menu"
+		"ru"			"Меню команд"
+	}
+	"Enable Show"
+	{
+		"en"			"Enable Show"
+		"ru"			"Включить показ"
+	}
+	"No Longer Show"
+	{
+		"en"			"No Longer Show"
+		"ru"			"Больше не показывать"
+	}
+	"Server Rules"
+	{
+		"en"			"Server Rules"
+		"ru"			"Правила на сервере"
+	}
+	"Server Commands"
+	{
+		"en"			"Server Commands"
+		"ru"			"Команды на сервере"
+	}
+	"Server Info"
+	{
+		"en"			"Server Info"
+		"ru"			"Информация о сервере"
+	}
+	"Help Menu Show Disable"
+	{
+		"en"			"{default}Help Menu will {red}no longer be {default}displayed when connecting"
+		"ru"			"{default}Меню Помощи больше {red}не будет {default}показваться при заходе"
+	}
+	"Help Menu Show Enable"
+	{
+		"en"			"{default}You have {green}turned on {default}the Help Menu display"
+		"ru"			"{default}Вы {green}включили {default}показ меню помощи"
+	}
+	"Help Menu Config Reload"
+	{
+		"en"			"{orange}The command config has been reloaded"
+		"ru"			"{orange}Конфиг команд был перезагружен"
+	}
+	"Help Text Main"
+	{
+		"en"			"You are connected to: {SERVERNAME} \ nUse this menu for reference\nPress F4, to quickly open the command menu"
+		"ru"			"Вы зашли на: {SERVERNAME}\nИспользуйте это меню для справки\nНажмите F4, чтобы быстро открыть меню команд"
+	}
+	"Help Text Rules"
+	{
+		"en"			"Forbidden:\n-Use cheats\n-Insult other players\n-Use foul language\n-Spam/Flood\n-Interfere with other players\n-Use any bugs"
+		"ru"			"Запрещено:\n-Использовать читы\n-Оскорблять других игроков\n-Использовать нецензурные выражения\n-Спамить/Флудить\n-Мешать другим игрокам\n-Использовать любые баги"
+	}
+	"Help Text Info"
+	{
+		"en"			"Server Name: {SERVERNAME}\nIP Servers: {IP}:{PORT}\nTickrate: {TIC}\nPlayers: {PL}/{PLMAX}\nMap: {MAP}\nNext Map: {NEXTMAP}\nDate and Time: {DATE} {TIME}\nRemaining time: {TIMELEFT}\nMain Admin: DarkerZ [RUS]\nDiscord: discord.gg/mylink"
+		"ru"			"Имя сервера:{SERVERNAME}\nIP Сервера: {IP}:{PORT}\nТикрейт: {TIC}\nИгроки: {PL}/{PLMAX}\nКарта: {MAP}\nСледующая карта: {NEXTMAP}\nДата и время: {DATE} {TIME}\nОставшееся время: {TIMELEFT}\nГлавный админ: DarkerZ[RUS]\nДискорд: discord.gg/ссылка"
+	}
+	"Translate Command RTV"
+	{
+		"en"			"!rtv - vote for map change"
+		"ru"			"!rtv - проголосовать за смену карты"
+	}
+	"Translate Command NOMINATE"
+	{
+		"en"			"!nominate - for map nomination"
+		"ru"			"!nominate - для номинации карты"
+	}
+}
