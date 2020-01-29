@@ -30,3 +30,11 @@ Next Map: {NEXTMAP}
 Date: {DATE}
 Time: {TIME}
 Remaining time: {TIMELEFT}
+
+Commands:
+sm_helpmenu - Show Main HelpMenu
+sm_helpmenu_reload - Reload Config Commands HelpMenu
+
+Ingame:
+After joining the players will be shown a menu(can be disabled)
+The server command menu is called up by clicking on F4
