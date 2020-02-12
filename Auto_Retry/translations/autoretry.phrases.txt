@@ -1,0 +1,36 @@
+"Phrases"
+{
+	"Auto Retry Tag"
+	{
+		"en"			"[AutoRetry]"
+		"ru"			"[АвтоРеконнект]"
+	}
+	"Auto Retry Tag Color"
+	{
+		"en"			"{lightblue}[{green}AutoRetry{lightblue}]"
+		"ru"			"{lightblue}[{green}АвтоРеконнект{lightblue}]"
+	}
+	"Auto Retry Connected Time"
+	{
+		"#format"		"{1:d}"
+		"en"			"You connected for {1} seconds"
+		"ru"			"Вы присоединились за {1} секунд"
+	}
+	"Auto Retry New Map"
+	{
+		"#format"		"{1:d}"
+		"en"			"You downloaded a new map. Retry after {1} seconds"
+		"ru"			"Вы скачали новую карту. Реконнект через {1} секунд"
+	}
+	"Auto Retry New Map Color"
+	{
+		"#format"		"{1:d}"
+		"en"			"{default}You downloaded a new map. Retry after {red}{1} {default}seconds"
+		"ru"			"{default}Вы скачали новую карту. Реконнект через {red}{1} {default}секунд"
+	}
+	"Auto Retry Clear DB"
+	{
+		"en"			"{orange}You cleared the database"
+		"ru"			"{orange}Вы очистили базу данных"
+	}
+}
