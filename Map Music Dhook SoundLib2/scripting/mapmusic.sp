@@ -9,7 +9,7 @@
 #include <soundlib2>
 
 #define PLUGIN_NAME 	"Map Music Control with Dynamic Volume Control"
-#define PLUGIN_VERSION 	"4.3b"
+#define PLUGIN_VERSION 	"4.3c"
 
 //#define Debug
 
@@ -112,7 +112,7 @@ public void OnPluginStart() {
 
 		int entity = INVALID_ENT_REFERENCE;
 		while ((entity = FindEntityByClassname(entity, "ambient_generic")) != INVALID_ENT_REFERENCE) {
-			if(GetHammerIdOfEntity(entity) > 0) {
+			if(IsValidEntity(entity)) {
 				SetEntProp(entity, Prop_Data, "m_spawnflags", GetEntProp(entity, Prop_Data, "m_spawnflags")|32);
 				DHookEntity(hAcceptInput, false, entity);
 			}
@@ -292,12 +292,9 @@ public MRESReturn AcceptInput(int pThis, Handle hReturn, Handle hParams) {
 	char command[PLATFORM_MAX_PATH];
 	DHookGetParamString(hParams, 1, command, sizeof(command));
 	if(IsValidEntity(pThis)) {
-		if(GetHammerIdOfEntity(pThis) <= 0)
-			return MRES_Ignored;
-
 		char sample[PLATFORM_MAX_PATH];
 		GetEntPropString(pThis, Prop_Data, "m_iszSound", sample, sizeof(sample));
-
+		
 		float fSoundLen = 0.0;
 		char sPath[PLATFORM_MAX_PATH],sPathFull[PLATFORM_MAX_PATH];
 		if(sample[0]=='#') strcopy(sPath, sizeof(sPath), sample[1]); else FormatEx(sPath, sizeof sPath, "%s", sample);
@@ -310,10 +307,10 @@ public MRESReturn AcceptInput(int pThis, Handle hReturn, Handle hParams) {
 		if(fSoundLen < f_stopmusic_music_length)
 			return MRES_Ignored;
 
-		/*
-		 * Inputs: PlaySound, StopSound, ToggleSound, FadeIn, FadeOut, Volume, Pitch, Kill
-		*/
-
+		
+		// * Inputs: PlaySound, StopSound, ToggleSound, FadeIn, FadeOut, Volume, Pitch, Kill
+		
+		
 		if(StrEqual(command, "FadeOut", false)) {
 			char sString[128];
 			DHookGetParamObjectPtrString(hParams, 4, 0, ObjectValueType_String, sString, sizeof(sString));
@@ -382,9 +379,10 @@ public Action Timer_FadeOut_StopSound(Handle timer, DataPack pack) {
 public Action SoundHook(char sample[PLATFORM_MAX_PATH], int &entity, float &volume, int &level, int &pitch, float pos[3], int &flags, float &delay) {
 	if(flags == SND_SPAWNING)
 		return Plugin_Continue;
-
-	if(GetHammerIdOfEntity(entity) <= 0)
+	
+	if(!IsValidEntity(entity)){
 		return Plugin_Continue;
+	}
 
 	char sClassname[64];
 	GetEntityClassname(entity, sClassname, sizeof(sClassname));
@@ -637,9 +635,9 @@ stock void Client_StopSound(int client) {
 stock void Client_UpdateMusics(int client) {
 	int entity = INVALID_ENT_REFERENCE;
 	while ((entity = FindEntityByClassname(entity, "ambient_generic")) != INVALID_ENT_REFERENCE) {
-		if(GetHammerIdOfEntity(entity) <= 0)
+		if(!IsValidEntity(entity))
 			continue;
-
+		
 		char sample[PLATFORM_MAX_PATH];
 		GetEntPropString(entity, Prop_Data, "m_iszSound", sample, sizeof(sample));
 
@@ -681,11 +679,4 @@ stock void StopSoundEx(int client, const char[] sample) {
 	}
 
 	EmitSoundToClient(client, sample, SOUND_FROM_PLAYER, SNDCHAN_STATIC, SNDLEVEL_NONE, SND_STOP, 0.0, SNDPITCH_NORMAL, _, _, _, true);
-}
-
-stock int GetHammerIdOfEntity(int entity) {
-	if(IsValidEntity(entity)) {
-		return GetEntProp(entity, Prop_Data, "m_iHammerID");
-	}
-	return -1;
 }
