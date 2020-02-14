@@ -5,13 +5,14 @@
 
 Database g_DB = null;
 int MainTimer[MAXPLAYERS+1] = 0;
+int AutoRetryTimer[MAXPLAYERS+1] = -1;
 
 public Plugin:myinfo =
 {
 	name = "AutoRetry",
 	author = "DarkerZ[RUS]",
 	description = "AutoRetry After Download Map",
-	version = "1.0",
+	version = "1.1",
 	url = "dark-skill.ru"
 }
 
@@ -40,6 +41,21 @@ public void OnPluginStart()
 	g_DB.SetCharset("utf8");
 }
 
+public void OnMapStart()
+{
+	CreateTimer(1.0, Timer_To_Retry, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+
+	/* Handle late load */
+	for(int i = 1; i <= MaxClients; i++)
+	{
+		if(IsClientConnected(i))
+		{
+			if(IsClientInGame(i) && IsClientAuthorized(i))
+				OnClientPostAdminCheck(i);
+		}
+	}
+}
+
 public SQL_DefCallback(Handle owner, Handle hndl, const String:error[], any data)
 {
     if(hndl == INVALID_HANDLE) LogError(error);
@@ -47,8 +63,15 @@ public SQL_DefCallback(Handle owner, Handle hndl, const String:error[], any data
 
 public bool OnClientConnect(client, String:rejectmsg[], maxlen)
 {
+	AutoRetryTimer[client]=-1;
 	MainTimer[client] = GetTime();
 	return true;
+}
+
+public void OnClientDisconnect(int client)
+{
+	MainTimer[client]=0;
+	AutoRetryTimer[client]=-1;
 }
 
 public OnClientPostAdminCheck(client)
@@ -61,33 +84,44 @@ public OnClientPostAdminCheck(client)
 	char query[255];  
 	Format(query, sizeof(query), "SELECT * FROM AR_UserMaps WHERE steamid='%s' AND mapname='%s'", steamid, mapname);  
 	Handle hquery = SQL_Query(g_DB, query);
-	if (hquery != INVALID_HANDLE && SQL_FetchRow(hquery))
+	if (hquery == INVALID_HANDLE)
 	{
+		AutoRetryTimer[client]=-1;
+		return;
+	}
+	if (SQL_FetchRow(hquery))
+	{
+		AutoRetryTimer[client]=-1;
 		return;
 	}
 	Format(query, sizeof(query), "INSERT INTO AR_UserMaps(steamid, mapname) VALUES('%s', '%s')", steamid, mapname);
 	SQL_Query(g_DB, query);
-	MainTimer[client]=5;
-	CreateTimer(1.0, Timer_To_Retry, client, TIMER_REPEAT);
+	AutoRetryTimer[client]=5;
 }
 
-public Action Timer_To_Retry(Handle hTimer, any client)
+public Action Timer_To_Retry(Handle hTimer, any data)
 {
-	if(MainTimer[client]>0)
+	for(int client = 1; client <= MaxClients; client++)
 	{
-		char message[255]; 
-		Format(message, 255, "%T %T", "Auto Retry Tag", client, "Auto Retry New Map", client, MainTimer[client]);
-		ReplyToCommand(client, message);
-		CPrintToChat(client, "%t %t", "Auto Retry Tag Color", "Auto Retry New Map Color",MainTimer[client]);
-		Handle hHudText = CreateHudSynchronizer();
-		SetHudTextParams(-1.0, 0.15, 1.0, 255, 10, 10, 255, 1, 1.0, 0.1, 0.1);
-		ShowSyncHudText(client, hHudText, message);
-		CloseHandle(hHudText);
-		MainTimer[client]--;
-	} else 
-	{
-		ClientCommand(client, "retry");
-		KillTimer(hTimer);
+		if(IsClientInGame(client) && !IsFakeClient(client) && (AutoRetryTimer[client] >= 0))
+		{
+			if(AutoRetryTimer[client]>0)
+			{
+				char message[255]; 
+				Format(message, 255, "%T %T", "Auto Retry Tag", client, "Auto Retry New Map", client, AutoRetryTimer[client]);
+				ReplyToCommand(client, message);
+				CPrintToChat(client, "%t %t", "Auto Retry Tag Color", "Auto Retry New Map Color",AutoRetryTimer[client]);
+				Handle hHudText = CreateHudSynchronizer();
+				SetHudTextParams(-1.0, 0.15, 1.0, 255, 10, 10, 255, 1, 1.0, 0.1, 0.1);
+				ShowSyncHudText(client, hHudText, message);
+				CloseHandle(hHudText);
+				AutoRetryTimer[client]--;
+			} else if(AutoRetryTimer[client]==0)
+			{
+				AutoRetryTimer[client]=-1;
+				ClientCommand(client, "retry");
+			}
+		}
 	}
 }
 
