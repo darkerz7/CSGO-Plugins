@@ -38,7 +38,7 @@ public Plugin:myinfo =
 	name = "Button Watcher with BBans",
 	author = "DarkerZ [RUS]",
 	description = "Generates an output when a button is pressed and Bans Clients",
-	version = "1.8",
+	version = "1.9",
 	url = ""
 };
 
@@ -544,6 +544,7 @@ public Action Event_RoundEnd(Event hEvent, const char[] sName, bool bDontBroadca
 		SDKUnhook(g_aButtons[index], SDKHook_Use, OnButtonUse);
 		SDKUnhook(g_aButtons[index], SDKHook_OnTakeDamage, OnButtonDamage);
 	}
+	g_iMaxButtons = 0;
 }
 
 public Action OnButtonUse(int iButton, int iActivator)
