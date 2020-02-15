@@ -558,7 +558,7 @@ public Action OnButtonUse(int iButton, int iActivator)
 	return Plugin_Continue;
 }
 
-public Action OnButtonDamage(int iButton, int &iActivator)
+public Action OnButtonDamage(int iButton, int iActivator)
 {
 	if((IsValidEdict(iButton))&&(IsValidClient(iActivator)))
 	{	
