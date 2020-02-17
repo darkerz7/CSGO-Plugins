@@ -31,4 +31,3 @@ My Plugins:
     #F4 - Show Commands Menu(FakeClientCommand)
   -Admin Command:
     #sm_helpmenu_reload - Reload Config
-  
