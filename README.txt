@@ -2,6 +2,14 @@
 My Plugins:
 *AntiStackDamage - CS:GO Fix Fix trigger_hurt that has Parent
 
+*AutoRestart - Automatically restarts the server at a specific time. Hud + Chat + Console Announce every minute(last minute - every second). AutoRetry clients when restarting the server
+  -CVARS:
+    #sm_autorestart <0/1> - Enable/Disable Auto Restart
+    #sm_autorestart_time <0000-2359> - Time to restart server at
+    #sm_autorestart_wait <0-30> - Wait to restart server at in Minutes
+  -Admin Command:
+    #sm_forcerestart [<time in minutes>] - Force Restart Server After <time>
+
 *Auto_Retry - Remembers which maps the player played(SQLite DB). if the player plays for the first time on the map, then he automatically reconnects
   -Client Command:
     #sm_retryclear - Сleans the DB of maps played by the client
