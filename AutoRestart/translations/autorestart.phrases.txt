@@ -1,0 +1,43 @@
+"Phrases"
+{
+	"Auto Restart Tag"
+	{
+		"en"			"[AutoRestart]"
+		"ru"			"[АвтоРестарт]"
+	}
+	"Auto Restart Tag Color"
+	{
+		"en"			"{lightblue}[{green}AutoRestart{lightblue}]"
+		"ru"			"{lightblue}[{green}АвтоРестарт{lightblue}]"
+	}
+	"Auto Restart Wait Min"
+	{
+		"#format"		"{1:d}"
+		"en"			"Server restart in {1} minutes"
+		"ru"			"Рестарт сервера через {1} минут(у;ы)"
+	}
+	"Auto Restart Wait Min Color"
+	{
+		"#format"		"{1:d}"
+		"en"			"{default}Server restart in {red}{1} {default}minutes"
+		"ru"			"{default}Рестарт сервера через {red}{1} {default}минут(у;ы)"
+	}
+	"Auto Restart Wait Sec"
+	{
+		"#format"		"{1:d}"
+		"en"			"Server restart in {1} seconds"
+		"ru"			"Рестарт сервера через {1} секунд(у;ы)"
+	}
+	"Auto Restart Wait Sec Color"
+	{
+		"#format"		"{1:d}"
+		"en"			"{default}Server restart in {red}{1} {default}seconds"
+		"ru"			"{default}Рестарт сервера через {red}{1} {default}секунд(у;ы)"
+	}
+	"Auto Restart Admin Start"
+	{
+		"#format"		"{1:N}"
+		"en"			"{green}{1} {orange}Launched a Restart Server"
+		"ru"			"{green}{1} {orange}Запустил Рестарт Сервера"
+	}
+}
