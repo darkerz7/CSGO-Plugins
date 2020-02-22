@@ -7,12 +7,14 @@ Database g_DB = null;
 int MainTimer[MAXPLAYERS+1] = 0;
 int AutoRetryTimer[MAXPLAYERS+1] = -1;
 
+ArrayList CurrentMapPlayersSteam;
+
 public Plugin:myinfo =
 {
 	name = "AutoRetry",
 	author = "DarkerZ[RUS]",
 	description = "AutoRetry After Download Map",
-	version = "1.1",
+	version = "1.4",
 	url = "dark-skill.ru"
 }
 
@@ -21,6 +23,8 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_retryclear", SMRETRYCLEAR);
 	
 	LoadTranslations("autoretry.phrases");
+	
+	CurrentMapPlayersSteam = new ArrayList(ByteCountToCells(32));
 	
 	char error[256];
 	g_DB = SQLite_UseDatabase("AutoRetryDB", error, 256);
@@ -43,7 +47,22 @@ public void OnPluginStart()
 
 public void OnMapStart()
 {
-	CreateTimer(1.0, Timer_To_Retry, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	CurrentMapPlayersSteam.Clear();
+	char mapname[64];
+	GetCurrentMap(mapname, sizeof(mapname));
+	char query[255];
+	FormatEx(query, sizeof(query), "SELECT `steamid` FROM AR_UserMaps WHERE mapname='%s'", mapname);  
+	DBResultSet hquery = SQL_Query(g_DB, query);
+	if (hquery != INVALID_HANDLE)
+	{
+		while(hquery.FetchRow())
+		{
+			char steamid[32];
+			hquery.FetchString(0, steamid, sizeof(steamid));
+			CurrentMapPlayersSteam.PushString(steamid);
+			
+		}
+	}
 
 	/* Handle late load */
 	for(int i = 1; i <= MaxClients; i++)
@@ -76,53 +95,56 @@ public void OnClientDisconnect(int client)
 
 public OnClientPostAdminCheck(client)
 {
-	ReplyToCommand(client, "%T %T", "Auto Retry Tag", client,"Auto Retry Connected Time", client, GetTime()-MainTimer[client]);
-	char steamid[32];
-	GetClientAuthId(client, AuthId_Engine, steamid, sizeof(steamid));
-	char mapname[64];
-	GetCurrentMap(mapname, sizeof(mapname));
-	char query[255];  
-	Format(query, sizeof(query), "SELECT * FROM AR_UserMaps WHERE steamid='%s' AND mapname='%s'", steamid, mapname);  
-	Handle hquery = SQL_Query(g_DB, query);
-	if (hquery == INVALID_HANDLE)
+	if((client>0)&&(client<=MaxClients))
 	{
-		AutoRetryTimer[client]=-1;
-		return;
-	}
-	if (SQL_FetchRow(hquery))
-	{
-		AutoRetryTimer[client]=-1;
-		return;
-	}
-	Format(query, sizeof(query), "INSERT INTO AR_UserMaps(steamid, mapname) VALUES('%s', '%s')", steamid, mapname);
-	SQL_Query(g_DB, query);
-	AutoRetryTimer[client]=5;
-}
-
-public Action Timer_To_Retry(Handle hTimer, any data)
-{
-	for(int client = 1; client <= MaxClients; client++)
-	{
-		if(IsClientInGame(client) && !IsFakeClient(client) && (AutoRetryTimer[client] >= 0))
+		if(!IsFakeClient(client))
 		{
-			if(AutoRetryTimer[client]>0)
-			{
-				char message[255]; 
-				Format(message, 255, "%T %T", "Auto Retry Tag", client, "Auto Retry New Map", client, AutoRetryTimer[client]);
-				ReplyToCommand(client, message);
-				CPrintToChat(client, "%t %t", "Auto Retry Tag Color", "Auto Retry New Map Color",AutoRetryTimer[client]);
-				Handle hHudText = CreateHudSynchronizer();
-				SetHudTextParams(-1.0, 0.15, 1.0, 255, 10, 10, 255, 1, 1.0, 0.1, 0.1);
-				ShowSyncHudText(client, hHudText, message);
-				CloseHandle(hHudText);
-				AutoRetryTimer[client]--;
-			} else if(AutoRetryTimer[client]==0)
+			ReplyToCommand(client, "%T %T", "Auto Retry Tag", client,"Auto Retry Connected Time", client, GetTime()-MainTimer[client]);
+			char steamid[32];
+			GetClientAuthId(client, AuthId_Engine, steamid, sizeof(steamid));
+			if (CurrentMapPlayersSteam.FindString(steamid)>-1)
 			{
 				AutoRetryTimer[client]=-1;
-				ClientCommand(client, "retry");
+			} else
+			{
+				CurrentMapPlayersSteam.PushString(steamid);
+				AutoRetryTimer[client]=5;
+				CreateTimer(1.0, Timer_To_Retry, client, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+				char query[255];
+				char mapname[64];
+				GetCurrentMap(mapname, sizeof(mapname));
+				FormatEx(query, sizeof(query), "INSERT INTO AR_UserMaps(steamid, mapname) VALUES('%s', '%s')", steamid, mapname);
+				SQL_LockDatabase(g_DB);
+				SQL_TQuery(g_DB, SQL_DefCallback, query);
+				SQL_UnlockDatabase(g_DB);
 			}
 		}
 	}
+}
+
+public Action Timer_To_Retry(Handle hTimer, any client)
+{
+	if(IsClientInGame(client) && !IsFakeClient(client) && (AutoRetryTimer[client] >= 0))
+	{
+		if(AutoRetryTimer[client]>0)
+		{
+			char message[255]; 
+			FormatEx(message, 255, "%T %T", "Auto Retry Tag", client, "Auto Retry New Map", client, AutoRetryTimer[client]);
+			ReplyToCommand(client, message);
+			CPrintToChat(client, "%t %t", "Auto Retry Tag Color", "Auto Retry New Map Color",AutoRetryTimer[client]);
+			Handle hHudText = CreateHudSynchronizer();
+			SetHudTextParams(-1.0, 0.15, 1.0, 255, 10, 10, 255, 1, 1.0, 0.1, 0.1);
+			ShowSyncHudText(client, hHudText, message);
+			CloseHandle(hHudText);
+			AutoRetryTimer[client]--;
+			return Plugin_Continue;
+		} else if(AutoRetryTimer[client]==0)
+		{
+			AutoRetryTimer[client]=-1;
+			ClientCommand(client, "retry");
+		}
+	}
+	return Plugin_Stop;
 }
 
 public Action SMRETRYCLEAR(client, args)
@@ -130,8 +152,15 @@ public Action SMRETRYCLEAR(client, args)
 	char query[255];
 	char steamid[32];
 	GetClientAuthId(client, AuthId_Engine, steamid, sizeof(steamid));
-	Format(query, sizeof(query), "DELETE FROM AR_UserMaps WHERE steamid='%s'", steamid);
-	SQL_Query(g_DB, query);
+	FormatEx(query, sizeof(query), "DELETE FROM AR_UserMaps WHERE steamid='%s'", steamid);
+	SQL_LockDatabase(g_DB);
+	SQL_TQuery(g_DB, SQL_DefCallback, query);
+	SQL_UnlockDatabase(g_DB);
+	int index = CurrentMapPlayersSteam.FindString(steamid);
+	if(index>-1)
+	{
+		CurrentMapPlayersSteam.Erase(index);
+	}
 	CPrintToChat(client, "%t %t", "Auto Retry Tag Color", "Auto Retry Clear DB");
 	return Plugin_Handled;
 }
