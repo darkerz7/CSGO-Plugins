@@ -40,8 +40,6 @@ My Plugins:
     #sm_bstatus - Show status client's Buttons Ban
     #sm_buttons - Enable/Disable showing the client the button clicks
 
-*cash_damage - Top Defender + Cash for Damage + Show Damage
-
 *helpmenu_multilang - Custom Multilang HelpMenu for new Clients. Show rules/Server Info/Clients Commands. Allows you to set your own text without Recompile plugin
   -Client Command:
     #sm_helpmenu - Show Helpmenu

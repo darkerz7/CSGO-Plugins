@@ -1,7 +1,0 @@
-"Sprite"
-{
-	"$basetexture" "sprites/n4a/def_sprite_sword"
-	"$spriteorientation" "oriented"
-	"$spriteorigin" "[0.50 0.50]"
-	"$alphatest" "1"
-}
