@@ -25,13 +25,14 @@ public Plugin myinfo =
 	name = "Hide Teammates", 
 	author = "DarkerZ [RUS]", 
 	description = "A plugin that can !hide with individual distances", 
-	version = "1.0", 
+	version = "1.1", 
 	url = "dark-skill.ru" 
 } 
 
 public void OnPluginStart() 
 { 
-	RegConsoleCmd("sm_hide", Command_Hide); 
+	RegConsoleCmd("sm_hide", Command_Hide);
+	RegConsoleCmd("sm_hideall", Command_HideAll);
 	sm_hide_enabled	= CreateConVar("sm_hide_enabled", "1", "Disabled/enabled [0/1]", _, true, 0.0, true, 1.0);
 	sm_hide_maximum	= CreateConVar("sm_hide_maximum", "8000", "The maximum distance a player can choose [1000-8000]", _, true, 1000.0, true, 8000.0);
 	sm_hide_enabled.AddChangeHook(OnConVarChange);
@@ -201,6 +202,31 @@ public Action Command_Hide(int client, int args)
 	}
 	
 	return Plugin_Handled; 
+}
+
+public Action Command_HideAll(int client, int args) 
+{ 
+	if(!bEnabled)
+	{
+		CPrintToChat(client, "%t %t", "HideT Tag", "HideT Disabled");
+		return Plugin_Handled;
+	}
+
+	if(!AreClientCookiesCached(client))
+	{
+		CPrintToChat(client, "%t %t", "HideT Tag", "HideT Wait");
+		return Plugin_Handled;
+	}
+	if(g_bHide[client]==true)
+	{
+		SetClientHide(client, false, g_iHide[client]);
+		CPrintToChat(client,"%t %t", "HideT Tag", "HideT Client Disable");
+	}else
+	{
+		CPrintToChat(client,"%t %t", "HideT Tag", "HideT Client Enable All Map");
+		SetClientHide(client, true, 0);
+	}
+	return Plugin_Handled;
 }
 
 public bool SetClientHide(int client, bool hide_enable, int hide_distance)
