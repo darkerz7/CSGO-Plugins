@@ -9,7 +9,7 @@
 #include <soundlib2_windows>
 
 #define PLUGIN_NAME 	"Map Music Control with Dynamic Volume Control"
-#define PLUGIN_VERSION 	"4.3c_win"
+#define PLUGIN_VERSION 	"4.3d_win"
 
 //#define Debug
 
@@ -673,9 +673,16 @@ stock void StopSoundEx(int client, const char[] sample) {
 	#endif
 
 	if(client == ALL_CLIENTS) {
-		EmitSoundToAll(sample, SOUND_FROM_PLAYER, SNDCHAN_STATIC, SNDLEVEL_NONE, SND_STOP, 0.0, SNDPITCH_NORMAL, _, _, _, true);
+		//EmitSoundToAll(sample, SOUND_FROM_PLAYER, SNDCHAN_STATIC, SNDLEVEL_NONE, SND_STOP, 0.0, SNDPITCH_NORMAL, _, _, _, true);
+		for(new i = 1; i<= MaxClients; i++)
+		{
+			if(IsClientInGame(i))
+				StopSound(i, SNDCHAN_STATIC, sample);
+		}
 		return;
 	}
 
-	EmitSoundToClient(client, sample, SOUND_FROM_PLAYER, SNDCHAN_STATIC, SNDLEVEL_NONE, SND_STOP, 0.0, SNDPITCH_NORMAL, _, _, _, true);
+	//EmitSoundToClient(client, sample, SOUND_FROM_PLAYER, SNDCHAN_STATIC, SNDLEVEL_NONE, SND_STOP, 0.0, SNDPITCH_NORMAL, _, _, _, true);
+	if(IsClientInGame(client))
+		StopSound(client, SNDCHAN_STATIC, sample);
 }
