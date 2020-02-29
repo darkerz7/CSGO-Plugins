@@ -15,7 +15,7 @@
 #tryinclude <csgocolors_fix>
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.8.140"
+#define PLUGIN_VERSION "3.8.141"
 
 //----------------------------------------------------------------------------------------------------
 // Purpose: Entity data
@@ -2239,7 +2239,7 @@ public void OnEntitySpawned2(int iEntity)
 	int iHammerID = GetEntProp(iEntity, Prop_Data, "m_iHammerID");
 	for (int index = 0; index < entArraySize; index++)
 	{
-		if (entArray[index][ent_hammerid] == iHammerID)
+		if ((entArray[index][ent_hammerid] == iHammerID)  && (entArray[index][ent_weaponid] == -1))
 		{
 			//LogMessage("Found Item HammerID:%i EntityID:%i", iHammerID, iEntity);
 			entArray[index][ent_weaponid] = iEntity;
@@ -2267,6 +2267,7 @@ public void OnEntitySpawned2(int iEntity)
 					}
 				}
 			}
+			break;
 		}
 	}
 }
