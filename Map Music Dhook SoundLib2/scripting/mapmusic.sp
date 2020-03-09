@@ -9,7 +9,7 @@
 #include <soundlib2>
 
 #define PLUGIN_NAME 	"Map Music Control with Dynamic Volume Control"
-#define PLUGIN_VERSION 	"4.3d"
+#define PLUGIN_VERSION 	"4.3e"
 
 //#define Debug
 
@@ -504,7 +504,7 @@ void PlayAdjustedSound(char[] sample, float &volume, int &pitch, int flags, floa
 				play_volume = 0.03;
 			}
 			EmitSoundToClient(i, sample, SOUND_FROM_PLAYER, SNDCHAN_STATIC,
-							 SNDLEVEL_NORMAL, flags, play_volume, pitch, -1,
+							 SNDLEVEL_NONE, flags, play_volume, pitch, -1,
 							 NULL_VECTOR, NULL_VECTOR, true);
 
 			#if defined Debug
@@ -661,7 +661,7 @@ stock void Client_UpdateMusics(int client) {
 
 		float play_volume = FloatDiv(float(clientvolume[client]), 100.0);
 		EmitSoundToClient(client, sample, SOUND_FROM_PLAYER, SNDCHAN_STATIC,
-						 SNDLEVEL_NORMAL, SND_CHANGEVOL, play_volume, SNDPITCH_NORMAL, -1,
+						 SNDLEVEL_NONE, SND_CHANGEVOL, play_volume, SNDPITCH_NORMAL, -1,
 						 NULL_VECTOR, NULL_VECTOR, true);
 	}
 }
