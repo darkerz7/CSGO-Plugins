@@ -25,7 +25,7 @@ public Plugin myinfo =
 	name = "Hide Teammates", 
 	author = "DarkerZ [RUS]", 
 	description = "A plugin that can !hide with individual distances", 
-	version = "1.1", 
+	version = "1.3", 
 	url = "dark-skill.ru" 
 } 
 
@@ -67,7 +67,7 @@ public void OnMapStart()
 	}
 	if(!bEnabled) return;
 
-	g_timer = CreateTimer(0.1, HideTimer, _,TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	g_timer = CreateTimer(0.2, HideTimer, _,TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public void OnClientPutInServer(int client) 
@@ -155,7 +155,7 @@ public void OnConVarChange(Handle hCvar, const char[] oldValue, const char[] new
 		}
 		if(bEnabled)
 		{
-			g_timer = CreateTimer(0.1, HideTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+			g_timer = CreateTimer(0.2, HideTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 		}
 	}
 }
@@ -256,33 +256,32 @@ public Action HideTimer(Handle timer)
 
 	for(int client = 1; client <= MaxClients; client++)
 	{
-		if(IsClientInGame(client) && IsPlayerAlive(client)) 
+		for(int target = 1; target <= MaxClients; target++)
 		{
-			for(int target = 1; target <= MaxClients; target++)
+			g_HidePlayers[client][target] = false;
+			if(IsClientInGame(client) && IsPlayerAlive(client)) 
 			{
 				if(target != client && g_bHide[client] && IsClientInGame(target) && IsPlayerAlive(target))
 				{
-					if(g_iHide[client]==0)
+					if((GetClientTeam(client)==GetClientTeam(target)))
 					{
-						g_HidePlayers[client][target] = true;
-					} else 
-					{
-						GetClientAbsOrigin(target, timer_vec_target);
-						GetClientAbsOrigin(client, timer_vec_client);
-						timer_distance = GetVectorDistance(timer_vec_target, timer_vec_client, true);
-						if(timer_distance < g_iHideP2[client])
+						if((GetClientTeam(client)==2)||(GetClientTeam(client)==3))
 						{
-							g_HidePlayers[client][target] = true;
-						} 
-						else 
-						{
-							g_HidePlayers[client][target] = false;
-						} 
-					}
-				}
-				else
-				{
-					g_HidePlayers[client][target] = false;
+							if(g_iHide[client]==0)
+							{
+								g_HidePlayers[client][target] = true;
+							} else 
+							{
+								GetClientAbsOrigin(target, timer_vec_target);
+								GetClientAbsOrigin(client, timer_vec_client);
+								timer_distance = GetVectorDistance(timer_vec_target, timer_vec_client, true);
+								if(timer_distance < g_iHideP2[client])
+								{
+									g_HidePlayers[client][target] = true;
+								}
+							}
+						}
+					} 
 				}
 			}
 		} 
@@ -293,13 +292,10 @@ public Action HideTimer(Handle timer)
 public Action Hook_SetTransmit(int target, int client) 
 { 
 	if(!bEnabled) return Plugin_Continue;
-	if(!IsPlayerAlive(client) || !IsClientInGame(client)) return Plugin_Continue;
-	if(!IsPlayerAlive(target) || !IsClientInGame(target)) return Plugin_Continue;
 
 	if(g_HidePlayers[client][target])
 	{
-		if((GetClientTeam(client)==3) == (GetClientTeam(target)==3)) return Plugin_Handled;
-		if((GetClientTeam(client)==2) == (GetClientTeam(target)==2)) return Plugin_Handled;
+		return Plugin_Handled;
 	}
 	return Plugin_Continue; 
 }
