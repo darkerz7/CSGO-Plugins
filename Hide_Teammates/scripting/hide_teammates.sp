@@ -25,7 +25,7 @@ public Plugin myinfo =
 	name = "Hide Teammates", 
 	author = "DarkerZ [RUS]", 
 	description = "A plugin that can !hide with individual distances", 
-	version = "1.3", 
+	version = "1.4", 
 	url = "dark-skill.ru" 
 } 
 
@@ -117,6 +117,7 @@ public void OnClientDisconnect(int client)
 	{
 		g_HidePlayers[client][target] = false;
 	}
+	SDKUnhook(client, SDKHook_SetTransmit, Hook_SetTransmit);
 }
 
 public void OnConVarChange(Handle hCvar, const char[] oldValue, const char[] newValue)
