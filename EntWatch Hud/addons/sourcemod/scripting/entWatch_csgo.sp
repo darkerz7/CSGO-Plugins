@@ -15,7 +15,7 @@
 #tryinclude <csgocolors_fix>
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.8.141"
+#define PLUGIN_VERSION "3.8.142"
 
 //----------------------------------------------------------------------------------------------------
 // Purpose: Entity data
@@ -1272,7 +1272,7 @@ public Action OnWeaponCanUse(int iClient, int iWeapon)
 				
 				else if (entArray[index][ent_weaponid] == iWeapon)
 				{
-					if (entArray[index][ent_blockpickup] || g_bRestricted[iClient]) return Plugin_Handled;
+					if (entArray[index][ent_blockpickup] || g_bRestricted[iClient] || (GetClientButtons(iClient) & IN_USE)) return Plugin_Handled;
 
 					if (g_iRestrictedLength[iClient] != 1 && g_iRestrictedLength[iClient] != 0 && g_iRestrictedLength[iClient] <= GetTime())
 					{
@@ -2205,13 +2205,22 @@ stock void GlowWeapon(int index)
 		AcceptEntityInput(entArray[index][ent_glowent], "SetParent", entArray[index][ent_weaponid]);
 
 		AcceptEntityInput(entArray[index][ent_glowent], "TurnOn");
-	} else AcceptEntityInput(entArray[index][ent_glowent], "TurnOn");
+		AcceptEntityInput(entArray[index][ent_glowent], "SetGlowEnabled");
+	} else 
+	{
+		AcceptEntityInput(entArray[index][ent_glowent], "TurnOn");
+		AcceptEntityInput(entArray[index][ent_glowent], "SetGlowEnabled");
+	}
 }
 //----------------------------------------------------------------------------------------------------
 // Purpose: Disable glow
 //----------------------------------------------------------------------------------------------------
 stock void DisableGlow(int index) {
-	if (IsValidEdict(entArray[index][ent_glowent])) AcceptEntityInput(entArray[index][ent_glowent], "TurnOff");
+	if (IsValidEdict(entArray[index][ent_glowent]))
+	{
+		AcceptEntityInput(entArray[index][ent_glowent], "SetGlowDisabled");
+		AcceptEntityInput(entArray[index][ent_glowent], "TurnOff");
+	}
 }
 
 
