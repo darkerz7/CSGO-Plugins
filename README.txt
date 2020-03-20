@@ -14,7 +14,7 @@ My Plugins:
   -Client Command:
     #sm_retryclear - Сleans the DB of maps played by the client
 
-*EntWatch Hud - Entwatch 3 fo CS:GO with Hud + HudPos + Glow + Transfer of discarded items(Give) + Menus + Block Pick up items with E
+*EntWatch Hud - Entwatch 3 for CS:GO with Hud + HudPos + HudColor + Glow + Transfer of discarded items(Give) + Menus + Block Pick up items with E
 
 *Hide_Teammates - Hides Teammates on the entire map or distance
   -Client Command:
