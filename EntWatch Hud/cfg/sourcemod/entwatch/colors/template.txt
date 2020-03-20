@@ -9,8 +9,9 @@
 	"color_disconnect"	""
 	"color_death"		""
 	"color_warning"		""
-	"color_glow_red"	""
-	"color_glow_green"	""
-	"color_glow_blue"	""
-	"color_glow_alpha"	""
+	"color_hud_red"		""
+	"color_hud_green"	""
+	"color_hud_blue"	""
+	"color_hud_posx"	""
+	"color_hud_posy"	""
 }
