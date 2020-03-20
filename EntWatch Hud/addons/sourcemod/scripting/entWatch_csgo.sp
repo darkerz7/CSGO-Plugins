@@ -15,7 +15,7 @@
 #tryinclude <csgocolors_fix>
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.8.142"
+#define PLUGIN_VERSION "3.8.143"
 
 //----------------------------------------------------------------------------------------------------
 // Purpose: Entity data
@@ -72,7 +72,10 @@ char color_tag[16]        = "{green}",
 Handle g_hCookie_Restricted  = null,
 	g_hCookie_RestrictedLength = null,
 	g_hCookie_RestrictedIssued = null,
-	g_hCookie_RestrictedBy	  = null;
+	g_hCookie_RestrictedBy	  = null,
+	g_hCookie_Display		  = null,
+	g_hCookie_HudPos		  = null,
+	g_hCookie_HudColor		  = null;
 
 bool g_bRestricted[MAXPLAYERS + 1] = false;
 char g_sRestrictedBy[MAXPLAYERS + 1][64];
@@ -92,25 +95,21 @@ Handle g_hAdminMenu,
 	g_hOnBanForward,
 	g_hOnUnbanForward;
 
-int g_iGlowColor[4];
-
 bool g_bRoundTransition  = false,
 	g_bConfigLoaded     = false,
 	g_bLateLoad = false;
 	
 bool isMapRunning;
 
-ConVar     G_hCvar_DefaultHudPos;
-bool G_bDisplay[MAXPLAYERS + 1]     = false;
-bool G_bDisplay2[MAXPLAYERS + 1]     = false;
-float DefaultHudPos[2];
-Handle G_hCookie_Display     = INVALID_HANDLE;
+bool g_bDisplay[MAXPLAYERS + 1]     = false;
+bool g_bDisplay2[MAXPLAYERS + 1]     = false;
+float g_DefaultHudPos[2];
+int g_DefaultHudColor[3];
 int ItemIdx=1;
 char ShowCools[64][512];
 char ShowCoolsPlayerName[64][512];
 float HudPosition[MAXPLAYERS+1][2];
-static Handle Vault;
-static char StringPath[33];
+int HudColor[MAXPLAYERS+1][3];
 //----------------------------------------------------------------------------------------------------
 // Purpose: Plugin information
 //----------------------------------------------------------------------------------------------------
@@ -149,15 +148,14 @@ public void OnPluginStart()
 	g_hCvar_DisplayCooldowns  = CreateConVar("entwatch_display_cooldowns", "1", "Show/Hide the cooldowns on the display.", _, true, 0.0, true, 1.0);
 	g_hCvar_ModeTeamOnly      = CreateConVar("entwatch_mode_teamonly", "1", "Enable/Disable team only mode.", _, true, 0.0, true, 1.0);
 	g_hCvar_ConfigColor       = CreateConVar("entwatch_config_color", "color_classic", "The name of the color config.", _);
-	G_hCvar_DefaultHudPos	  = CreateConVar("entwatch_default_hudpos", "0.0 0.4", "default hudpos.");
 
-	G_hCookie_Display     = RegClientCookie("entwatch_display", "", CookieAccess_Private);
+	g_hCookie_Display     = RegClientCookie("entwatch_display", "", CookieAccess_Private);
 	g_hCookie_Restricted  = RegClientCookie("entwatch_restricted", "", CookieAccess_Private);
 	g_hCookie_RestrictedLength = RegClientCookie("entwatch_restrictedlength", "", CookieAccess_Private);
 	g_hCookie_RestrictedIssued = RegClientCookie("entwatch_restrictedissued", "", CookieAccess_Private);
 	g_hCookie_RestrictedBy     = RegClientCookie("entwatch_restrictedby", "", CookieAccess_Private);
-	
-	G_hCvar_DefaultHudPos.AddChangeHook(ConVarChange);
+	g_hCookie_HudPos      = RegClientCookie("entwatch_hudpos", "", CookieAccess_Private);
+	g_hCookie_HudColor    = RegClientCookie("entwatch_hudcolor", "", CookieAccess_Private);
 
 	Handle hTopMenu;
 
@@ -175,6 +173,7 @@ public void OnPluginStart()
 	
 	RegConsoleCmd("sm_hud", Command_ToggleHUD);
 	RegConsoleCmd("sm_hudpos", Command_Hudpos);
+	RegConsoleCmd("sm_hudcolor", Command_HudColor);
 
 	HookEventEx("round_start", Event_RoundStart, EventHookMode_Pre);
 	HookEventEx("round_end", Event_RoundEnd, EventHookMode_Pre);
@@ -198,24 +197,6 @@ public void OnPluginStart()
 			OnClientCookiesCached(i);
 		}
 	}
-	
-	GetConVars();
-}
-
-public void GetConVars()
-{
-	char DefPosition[2][8];
-	char DefPosValue[16];
-	G_hCvar_DefaultHudPos.GetString(DefPosValue, sizeof(DefPosValue));
-	ExplodeString(DefPosValue, " ", DefPosition, sizeof(DefPosition), sizeof(DefPosition[]));
-
-	DefaultHudPos[0] = StringToFloat(DefPosition[0]);
-	DefaultHudPos[1] = StringToFloat(DefPosition[1]);
-}
-
-public void ConVarChange(ConVar convar, char[] oldValue, char[] newValue)
-{
-	GetConVars();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -948,10 +929,6 @@ public void OnMapStart()
 	LoadColors();
 	LoadConfig();
 	
-	BuildPath(Path_SM, StringPath, 64, "data/hudpos.txt");
-	Vault = CreateKeyValues("Vault");
-	FileToKeyValues(Vault, StringPath);
-	
 	isMapRunning = true;
 }
 
@@ -1000,8 +977,8 @@ public void OnClientCookiesCached(int iClient)
 {
 	char sBuffer_cookie[32];
 	
-	GetClientCookie(iClient, G_hCookie_Display, sBuffer_cookie, sizeof(sBuffer_cookie));
-	G_bDisplay[iClient] = view_as<bool>(StringToInt(sBuffer_cookie));
+	GetClientCookie(iClient, g_hCookie_Display, sBuffer_cookie, sizeof(sBuffer_cookie));
+	g_bDisplay[iClient] = view_as<bool>(StringToInt(sBuffer_cookie));
 
 	GetClientCookie(iClient, g_hCookie_RestrictedLength, sBuffer_cookie, sizeof(sBuffer_cookie));
 
@@ -1016,6 +993,36 @@ public void OnClientCookiesCached(int iClient)
 
 	GetClientCookie(iClient, g_hCookie_RestrictedBy, sBuffer_cookie, sizeof(sBuffer_cookie));
 	FormatEx(g_sRestrictedBy[iClient], sizeof(g_sRestrictedBy[]), "%s", sBuffer_cookie);
+	
+	GetClientCookie(iClient, g_hCookie_HudPos, sBuffer_cookie, sizeof(sBuffer_cookie));
+	if (StrEqual(sBuffer_cookie,"")){
+		Format(sBuffer_cookie, sizeof(sBuffer_cookie), "%f/%f", g_DefaultHudPos[0], g_DefaultHudPos[1]);
+		SetClientCookie(iClient, g_hCookie_HudPos, sBuffer_cookie);
+		HudPosition[iClient][0] = g_DefaultHudPos[0];
+		HudPosition[iClient][1] = g_DefaultHudPos[1];
+	}else 
+	{
+		char Explode_HudPosition[2][32];
+		ExplodeString(sBuffer_cookie, "/", Explode_HudPosition, 2, 32);
+		HudPosition[iClient][0] = StringToFloat(Explode_HudPosition[0]);
+		HudPosition[iClient][1] = StringToFloat(Explode_HudPosition[1]);
+	}
+	
+	GetClientCookie(iClient, g_hCookie_HudColor, sBuffer_cookie, sizeof(sBuffer_cookie));
+	if (StrEqual(sBuffer_cookie,"")){
+		Format(sBuffer_cookie, sizeof(sBuffer_cookie), "%i/%i/%i", g_DefaultHudColor[0], g_DefaultHudColor[1], g_DefaultHudColor[2]);
+		SetClientCookie(iClient, g_hCookie_HudColor, sBuffer_cookie);
+		HudColor[iClient][0] = g_DefaultHudColor[0];
+		HudColor[iClient][1] = g_DefaultHudColor[1];
+		HudColor[iClient][2] = g_DefaultHudColor[2];
+	}else 
+	{
+		char Explode_HudColor[3][8];
+		ExplodeString(sBuffer_cookie, "/", Explode_HudColor, 3, 8);
+		HudColor[iClient][0] = StringToInt(Explode_HudColor[0]);
+		HudColor[iClient][1] = StringToInt(Explode_HudColor[1]);
+		HudColor[iClient][2] = StringToInt(Explode_HudColor[2]);
+	}
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1027,11 +1034,16 @@ public void OnClientPutInServer(int iClient)
 	SDKHookEx(iClient, SDKHook_WeaponEquipPost, OnWeaponEquip);
 	SDKHookEx(iClient, SDKHook_WeaponCanUse, OnWeaponCanUse);
 	
-	G_bDisplay2[iClient] = true;
+	g_bDisplay2[iClient] = true;
 	if (!AreClientCookiesCached(iClient))
 	{
-		G_bDisplay2[iClient] = true;
-		G_bDisplay[iClient] = false;
+		HudPosition[iClient][0] = g_DefaultHudPos[0];
+		HudPosition[iClient][1] = g_DefaultHudPos[1];
+		HudColor[iClient][0] = g_DefaultHudColor[0];
+		HudColor[iClient][1] = g_DefaultHudColor[1];
+		HudColor[iClient][2] = g_DefaultHudColor[2];
+		g_bDisplay2[iClient] = true;
+		g_bDisplay[iClient] = false;
 	}
 
 	g_bRestricted[iClient] = false;
@@ -1049,18 +1061,6 @@ public void OnClientPutInServer(int iClient)
 			}
 		}
 	}
-	
-	char SteamID[32];
-	char Explode_HudPosition[2][32];
-	char Last_HudPosition[32];
-	GetClientAuthId(iClient, AuthId_Steam2, SteamID, sizeof(SteamID));
-	
-	KvJumpToKey(Vault, "HudPosition", false);
-	KvGetString(Vault, SteamID, Last_HudPosition, sizeof(Last_HudPosition));
-	ExplodeString(Last_HudPosition, "/", Explode_HudPosition, 2, 32);
-	HudPosition[iClient][0] = StringToFloat(Explode_HudPosition[0]);
-	HudPosition[iClient][1] = StringToFloat(Explode_HudPosition[1]);
-	KvRewind(Vault);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1103,8 +1103,8 @@ public void OnClientDisconnect(int iClient)
 	SDKUnhook(iClient, SDKHook_WeaponCanUse, OnWeaponCanUse);
 
 	//g_bDisplay[iClient] = false;
-	G_bDisplay[iClient] = false;
-	G_bDisplay2[iClient] = true;
+	g_bDisplay[iClient] = false;
+	g_bDisplay2[iClient] = true;
 	g_bRestricted[iClient] = false;
 	g_iRestrictedLength[iClient] = 0;
 }
@@ -2007,19 +2007,22 @@ stock void LoadColors()
 
 	KvGetString(hKeyValues, "color_warning", sBuffer_temp, sizeof(sBuffer_temp));
 	FormatEx(color_warning, sizeof(color_warning), "%s", sBuffer_temp);
-
-	KvGetString(hKeyValues, "color_glow_red", sBuffer_temp, sizeof(sBuffer_temp));
-	g_iGlowColor[0] = StringToInt(sBuffer_temp);
-
-	KvGetString(hKeyValues, "color_glow_green", sBuffer_temp, sizeof(sBuffer_temp));
-	g_iGlowColor[1] = StringToInt(sBuffer_temp);
-
-	KvGetString(hKeyValues, "color_glow_blue", sBuffer_temp, sizeof(sBuffer_temp));
-	g_iGlowColor[2] = StringToInt(sBuffer_temp);
-
-	KvGetString(hKeyValues, "color_glow_alpha", sBuffer_temp, sizeof(sBuffer_temp));
-	g_iGlowColor[3] = StringToInt(sBuffer_temp);
-
+	
+	KvGetString(hKeyValues, "color_hud_red", sBuffer_temp, sizeof(sBuffer_temp), "255");
+	g_DefaultHudColor[0] = StringToInt(sBuffer_temp);
+	
+	KvGetString(hKeyValues, "color_hud_green", sBuffer_temp, sizeof(sBuffer_temp), "255");
+	g_DefaultHudColor[1] = StringToInt(sBuffer_temp);
+	
+	KvGetString(hKeyValues, "color_hud_blue", sBuffer_temp, sizeof(sBuffer_temp), "255");
+	g_DefaultHudColor[2] = StringToInt(sBuffer_temp);
+	
+	KvGetString(hKeyValues, "color_hud_posx", sBuffer_temp, sizeof(sBuffer_temp), "0.0");
+	g_DefaultHudPos[0] = StringToFloat(sBuffer_temp);
+	
+	KvGetString(hKeyValues, "color_hud_posy", sBuffer_temp, sizeof(sBuffer_temp), "0.4");
+	g_DefaultHudPos[1] = StringToFloat(sBuffer_temp);
+	
 	delete hKeyValues;
 }
 
@@ -2656,12 +2659,28 @@ public Action Timer_DisplayHUD(Handle timer, int client)
 				{
 					if(IsClientInGame(i) && !IsFakeClient(i))
 					{
-						if (G_bDisplay2[i])
+						if (g_bDisplay2[i])
 						{
-							if(HudPosition[i][0] <= 0.0 && HudPosition[i][1] <= 0.0)
-								SetHudTextParams(DefaultHudPos[0], DefaultHudPos[1], 1.1, 255, 255, 255, 255, 0, 0.0, 0.0, 0.0);
+							if((HudPosition[i][0] < 0.0) || (HudPosition[i][1] < 0.0))
+							{
+								if((HudColor[i][0] < 0) || (HudColor[i][0] > 255) || (HudColor[i][1] < 0) || (HudColor[i][1] > 255) || (HudColor[i][2] < 0) || (HudColor[i][2] > 255))
+								{
+									SetHudTextParams(g_DefaultHudPos[0], g_DefaultHudPos[1], 1.1, g_DefaultHudColor[0], g_DefaultHudColor[1], g_DefaultHudColor[2], 255, 0, 0.0, 0.0, 0.0);
+								} else 
+								{
+									SetHudTextParams(g_DefaultHudPos[0], g_DefaultHudPos[1], 1.1, HudColor[i][0], HudColor[i][1], HudColor[i][2], 255, 0, 0.0, 0.0, 0.0);
+								}
+							}
 							else
-								SetHudTextParams(HudPosition[i][0], HudPosition[i][1], 1.1, 255, 255, 255, 255, 0, 0.0, 0.0, 0.0);
+							{
+								if((HudColor[i][0] < 0) || (HudColor[i][0] > 255) || (HudColor[i][1] < 0) || (HudColor[i][1] > 255) || (HudColor[i][2] < 0) || (HudColor[i][2] > 255))
+								{
+									SetHudTextParams(HudPosition[i][0], HudPosition[i][1], 1.1, g_DefaultHudColor[0], g_DefaultHudColor[1], g_DefaultHudColor[2], 255, 0, 0.0, 0.0, 0.0);
+								} else 
+								{
+									SetHudTextParams(HudPosition[i][0], HudPosition[i][1], 1.1, HudColor[i][0], HudColor[i][1], HudColor[i][2], 255, 0, 0.0, 0.0, 0.0);
+								}
+							}
 							ShowHudText(i, 5, buffer_hud);
 						}
 					}
@@ -2675,7 +2694,7 @@ public Action Timer_DisplayHUD(Handle timer, int client)
 			{
 				if (IsClientConnected(ply) && IsClientInGame(ply))
 				{
-					if (G_bDisplay[ply])
+					if (g_bDisplay[ply])
 					{
 						char buffer_text[512];
 						
@@ -2705,49 +2724,80 @@ public Action Command_Hudpos(int client, int args)
 		return Plugin_Handled;
 	}
 	char buffer[128];
-	
+	float HudPosX_validate;
+	float HudPosY_validate;
 	GetCmdArg(1, buffer, sizeof(buffer));
-	HudPosition[client][0] = StringToFloat(buffer);
+	HudPosX_validate = StringToFloat(buffer);
 	
 	GetCmdArg(2, buffer, sizeof(buffer));
-	HudPosition[client][1] = StringToFloat(buffer);
+	HudPosY_validate = StringToFloat(buffer);
 	
-	char SteamID[32];
-	GetClientAuthId(client, AuthId_Steam2, SteamID, sizeof(SteamID));
-	
-	if(HudPosition[client][0] >= 0.0 && HudPosition[client][1] >= 0.0)
+	if(HudPosX_validate >= 0.0 && HudPosY_validate >= 0.0)
 	{
-		KvDeleteKey(Vault, SteamID);
-		KvJumpToKey(Vault, "HudPosition", true);
-		Format(buffer, sizeof(buffer), "%f/%f", HudPosition[client][0], HudPosition[client][1]);
-		KvSetString(Vault, SteamID, buffer);
-		KvRewind(Vault);
-		
-	}
-	else
+		HudPosition[client][0]=HudPosX_validate;
+		HudPosition[client][1]=HudPosY_validate;
+		char sBuffer_cookie[32];
+		Format(sBuffer_cookie, sizeof(sBuffer_cookie), "%f/%f", HudPosition[client][0], HudPosition[client][1]);
+		SetClientCookie(client, g_hCookie_HudPos, sBuffer_cookie);
+	} else 
 	{
-		KvDeleteKey(Vault, SteamID);
-		KvJumpToKey(Vault, "HudPosition", false);
-		KvRewind(Vault);
+		CPrintToChat(client, "\x07%s[entWatch] \x03%t", color_tag, "hudpos_wrong");
+		return Plugin_Handled;
 	}
-	KeyValuesToFile(Vault, StringPath);
 	
 	CPrintToChat(client, "\x07%s[entWatch] \x03%t", color_tag, "hudpos");
 	
 	return Plugin_Handled;
 }
 
+public Action Command_HudColor(int client, int args)
+{
+	if (GetCmdArgs() < 3)
+	{
+		CReplyToCommand(client, "\x07%s[entWatch] \x07%sUsage: sm_hudcolor <R> <G> <B>", color_tag, color_warning);
+		return Plugin_Handled;
+	}
+	char buffer[128];
+	int color_validate[3];
+	GetCmdArg(1, buffer, sizeof(buffer));
+	color_validate[0] = StringToInt(buffer);
+	
+	GetCmdArg(2, buffer, sizeof(buffer));
+	color_validate[1] = StringToInt(buffer);
+	
+	GetCmdArg(3, buffer, sizeof(buffer));
+	color_validate[2] = StringToInt(buffer);
+	
+	if((color_validate[0] >= 0) && (color_validate[0] <= 255) && (color_validate[1] >= 0) && (color_validate[1] <= 255) && (color_validate[2] >= 0) && (color_validate[2] <= 255))
+	{
+		HudColor[client][0]=color_validate[0];
+		HudColor[client][1]=color_validate[1];
+		HudColor[client][2]=color_validate[2];
+		char sBuffer_cookie[32];
+		Format(sBuffer_cookie, sizeof(sBuffer_cookie), "%i/%i/%i", HudColor[client][0], HudColor[client][1], HudColor[client][2]);
+		SetClientCookie(client, g_hCookie_HudColor, sBuffer_cookie);
+	} else 
+	{
+		CPrintToChat(client, "\x07%s[entWatch] \x03%t", color_tag, "hudcolor_wrong");
+		return Plugin_Handled;
+	}
+	
+	CPrintToChat(client, "\x07%s[entWatch] \x03%t", color_tag, "hudcolor");
+	
+	return Plugin_Handled;
+}
+
 public Action Command_ToggleHUD(int client, int args)
 {
-	if (G_bDisplay2[client])
+	if (g_bDisplay2[client])
 	{
 		CPrintToChat(client, "\x07%s[entWatch] \x0b%t", color_tag, "display disabled");
-		G_bDisplay2[client] = false;
+		g_bDisplay2[client] = false;
 	}
 	else
 	{
 		CPrintToChat(client, "\x07%s[entWatch] \x07%t", color_tag, "display enabled");
-		G_bDisplay2[client] = true;
+		g_bDisplay2[client] = true;
 	}
 	return Plugin_Handled;
 }

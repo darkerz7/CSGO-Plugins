@@ -48,6 +48,18 @@
 	{
 		"en" 	"hud position is saved."
 	}
+	"hudpos_wrong"
+	{
+		"en" 	"hud position is wrong."
+	}
+	"hudcolor"
+	{
+		"en" 	"hud color is saved."
+	}
+	"hudcolor_wrong"
+	{
+		"en" 	"hud color is wrong."
+	}
 	"restricted"
 	{
 		"en" 	"restricted"
