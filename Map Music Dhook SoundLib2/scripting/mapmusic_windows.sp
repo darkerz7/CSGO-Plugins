@@ -9,7 +9,7 @@
 #include <soundlib2_windows>
 
 #define PLUGIN_NAME 	"Map Music Control with Dynamic Volume Control"
-#define PLUGIN_VERSION 	"4.3f_win"
+#define PLUGIN_VERSION 	"4.3g_win"
 
 //#define Debug
 
@@ -114,7 +114,7 @@ public void OnPluginStart() {
 		int entity = INVALID_ENT_REFERENCE;
 		while ((entity = FindEntityByClassname(entity, "ambient_generic")) != INVALID_ENT_REFERENCE) {
 			if(IsValidEntity(entity)) {
-				//SetEntProp(entity, Prop_Data, "m_spawnflags", GetEntProp(entity, Prop_Data, "m_spawnflags")|32);
+				SetEntProp(entity, Prop_Data, "m_spawnflags", GetEntProp(entity, Prop_Data, "m_spawnflags")|32);
 				DHookEntity(hAcceptInput, false, entity);
 			}
 		}
@@ -284,7 +284,7 @@ public Action Event_RoundStart(Handle event, const char[] name, bool dontBroadca
 
 public void OnEntityCreated(int entity, const char[] classname) {
 	if(StrEqual(classname, "ambient_generic", false)){
-		//SetEntProp(entity, Prop_Data, "m_spawnflags", GetEntProp(entity, Prop_Data, "m_spawnflags")|32);
+		SetEntProp(entity, Prop_Data, "m_spawnflags", GetEntProp(entity, Prop_Data, "m_spawnflags")|32);
 		DHookEntity(hAcceptInput, false, entity);
 	}
 }
