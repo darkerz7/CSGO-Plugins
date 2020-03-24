@@ -9,7 +9,7 @@
 #include <soundlib2>
 
 #define PLUGIN_NAME 	"Map Music Control with Dynamic Volume Control"
-#define PLUGIN_VERSION 	"4.3e"
+#define PLUGIN_VERSION 	"4.3f"
 
 //#define Debug
 
@@ -58,6 +58,7 @@ public void OnPluginStart() {
 
 	RegConsoleCmd("sm_mapmusic", Command_Music, "Brings up the music menu");
 	RegConsoleCmd("sm_music", Command_Music, "Brings up the music menu");
+	RegConsoleCmd("sm_volume", Command_Music, "Brings up the music menu");
 	RegConsoleCmd("sm_stopmusic", Command_StopMusic, "Toggles map music");
 	RegConsoleCmd("sm_startmusic", Command_StartMusic, "Toggles map music");
 	RegConsoleCmd("sm_playmusic", Command_StartMusic, "Toggles map music");
@@ -113,7 +114,7 @@ public void OnPluginStart() {
 		int entity = INVALID_ENT_REFERENCE;
 		while ((entity = FindEntityByClassname(entity, "ambient_generic")) != INVALID_ENT_REFERENCE) {
 			if(IsValidEntity(entity)) {
-				SetEntProp(entity, Prop_Data, "m_spawnflags", GetEntProp(entity, Prop_Data, "m_spawnflags")|32);
+				//SetEntProp(entity, Prop_Data, "m_spawnflags", GetEntProp(entity, Prop_Data, "m_spawnflags")|32);
 				DHookEntity(hAcceptInput, false, entity);
 			}
 		}
@@ -283,7 +284,7 @@ public Action Event_RoundStart(Handle event, const char[] name, bool dontBroadca
 
 public void OnEntityCreated(int entity, const char[] classname) {
 	if(StrEqual(classname, "ambient_generic", false)){
-		SetEntProp(entity, Prop_Data, "m_spawnflags", GetEntProp(entity, Prop_Data, "m_spawnflags")|32);
+		//SetEntProp(entity, Prop_Data, "m_spawnflags", GetEntProp(entity, Prop_Data, "m_spawnflags")|32);
 		DHookEntity(hAcceptInput, false, entity);
 	}
 }
@@ -294,7 +295,7 @@ public MRESReturn AcceptInput(int pThis, Handle hReturn, Handle hParams) {
 	if(IsValidEntity(pThis)) {
 		char sample[PLATFORM_MAX_PATH];
 		GetEntPropString(pThis, Prop_Data, "m_iszSound", sample, sizeof(sample));
-		
+
 		float fSoundLen = 0.0;
 		char sPath[PLATFORM_MAX_PATH],sPathFull[PLATFORM_MAX_PATH];
 		if(sample[0]=='#') strcopy(sPath, sizeof(sPath), sample[1]); else FormatEx(sPath, sizeof sPath, "%s", sample);
@@ -380,9 +381,8 @@ public Action SoundHook(char sample[PLATFORM_MAX_PATH], int &entity, float &volu
 	if(flags == SND_SPAWNING)
 		return Plugin_Continue;
 	
-	if(!IsValidEntity(entity)){
+	if(!IsValidEntity(entity))
 		return Plugin_Continue;
-	}
 
 	char sClassname[64];
 	GetEntityClassname(entity, sClassname, sizeof(sClassname));
@@ -437,9 +437,10 @@ public Action SoundHook(char sample[PLATFORM_MAX_PATH], int &entity, float &volu
 				pack.WriteCell(pitch);
 				pack.WriteCell(flags);
 				pack.WriteFloat(fSoundLen);
+				pack.WriteCell(entity);
 				pack.WriteCell(false);
 			} else {
-				PlayAdjustedSound(sample, volume, pitch, flags, fSoundLen);
+				PlayAdjustedSound(sample, volume, pitch, flags, fSoundLen, entity);
 			}
 		} else {
 			StopSoundEx(ALL_CLIENTS, sample);
@@ -459,14 +460,15 @@ public Action Timer_LatePlaySound(Handle timer, DataPack pack) {
 	int pitch = pack.ReadCell();
 	int flags = pack.ReadCell();
 	float fSoundLen = pack.ReadFloat();
+	int entity = pack.ReadCell();
 	bool retry = pack.ReadCell();
 
-	PlayAdjustedSound(sample, volume, pitch, flags, fSoundLen, retry);
+	PlayAdjustedSound(sample, volume, pitch, flags, fSoundLen, entity, retry);
 	KillTimer(timer);
 	return Plugin_Stop;
 }
 
-void PlayAdjustedSound(char[] sample, float &volume, int &pitch, int flags, float fSoundLen, bool retry = false) {
+void PlayAdjustedSound(char[] sample, float &volume, int &pitch, int flags, float fSoundLen, int &entity, bool retry = false) {
 	float currentvolume = 0.0;
 	bool playing = smSampleVolume.GetValue(sample, currentvolume);
 
@@ -496,6 +498,13 @@ void PlayAdjustedSound(char[] sample, float &volume, int &pitch, int flags, floa
 			if(disabled[i]) continue;
 
 			float play_volume = FloatDiv(FloatMul(volume, float(clientvolume[i])), 100.0);
+			if(FloatCompare(play_volume,0.5)>0)
+			{
+				play_volume=0.25+(play_volume-0.5)*1.5;
+			}else
+			{
+				play_volume*=0.5;
+			}
 			if(FloatCompare(volume, 0.019) > 0 && FloatCompare(play_volume, 0.02) <= 0) {
 				#if defined Debug
 					if(IsClientInGame(i))
@@ -503,8 +512,14 @@ void PlayAdjustedSound(char[] sample, float &volume, int &pitch, int flags, floa
 				#endif
 				play_volume = 0.03;
 			}
+			int iFlags = GetEntProp(entity, Prop_Data, "m_spawnflags");
+			if(iFlags & 1)
 			EmitSoundToClient(i, sample, SOUND_FROM_PLAYER, SNDCHAN_STATIC,
 							 SNDLEVEL_NONE, flags, play_volume, pitch, -1,
+							 NULL_VECTOR, NULL_VECTOR, true);
+			else
+			EmitSoundToClient(i, sample, entity, SNDCHAN_STATIC,
+							 SNDLEVEL_NORMAL, flags, play_volume, pitch, -1,
 							 NULL_VECTOR, NULL_VECTOR, true);
 
 			#if defined Debug
@@ -522,6 +537,7 @@ void PlayAdjustedSound(char[] sample, float &volume, int &pitch, int flags, floa
 		pack.WriteCell(pitch);
 		pack.WriteCell(SND_CHANGEVOL);
 		pack.WriteFloat(fSoundLen);
+		pack.WriteCell(entity);
 		pack.WriteCell(true);
 	}
 }
@@ -659,9 +675,30 @@ stock void Client_UpdateMusics(int client) {
 		if(fSoundLen < f_stopmusic_music_length)
 			continue;
 
-		float play_volume = FloatDiv(float(clientvolume[client]), 100.0);
+		//float play_volume = FloatDiv(float(clientvolume[client]), 100.0);
+		float play_volume = FloatDiv(FloatMul(currentvolume, float(clientvolume[client])), 100.0);
+		if(FloatCompare(play_volume,0.5)>0)
+		{
+			play_volume=0.25+(play_volume-0.5)*1.5;
+		}else
+		{
+			play_volume*=0.5;
+		}
+		if(FloatCompare(currentvolume, 0.019) > 0 && FloatCompare(play_volume, 0.02) <= 0) {
+			#if defined Debug
+				if(IsClientInGame(client))
+					PrintToConsole(client, "[Override To Playable Volume] old play_volume: %.4f -> 0.029", play_volume);
+			#endif
+			play_volume = 0.03;
+		}
+		int iFlags = GetEntProp(entity, Prop_Data, "m_spawnflags");
+		if(iFlags & 1)
 		EmitSoundToClient(client, sample, SOUND_FROM_PLAYER, SNDCHAN_STATIC,
 						 SNDLEVEL_NONE, SND_CHANGEVOL, play_volume, SNDPITCH_NORMAL, -1,
+						 NULL_VECTOR, NULL_VECTOR, true);
+		else
+		EmitSoundToClient(client, sample, entity, SNDCHAN_STATIC,
+						 SNDLEVEL_NORMAL, SND_CHANGEVOL, play_volume, SNDPITCH_NORMAL, -1,
 						 NULL_VECTOR, NULL_VECTOR, true);
 	}
 }
