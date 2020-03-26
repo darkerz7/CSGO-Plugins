@@ -9,7 +9,7 @@
 #include <soundlib2>
 
 #define PLUGIN_NAME 	"Map Music Control with Dynamic Volume Control"
-#define PLUGIN_VERSION 	"4.3g"
+#define PLUGIN_VERSION 	"4.3h"
 
 //#define Debug
 
@@ -579,11 +579,12 @@ public Action Command_StopMusic(int client, int args) {
 		Client_UpdateMusics(client);
 		disabled[client] = false;
 		CPrintToChat(client, "\x04[MapMusic] \x01%t", "Text_MapMusicEnable");
+		SetClientCookie(client, cDisableSounds, "0");
 		return Plugin_Handled;
 	}
 
 	CPrintToChat(client, "\x04[MapMusic] \x01%t", "Text_MapMusicDisable");
-	SetClientCookie(client, cDisableSounds, (!disabled[client]) ? "1" : "0");
+	SetClientCookie(client, cDisableSounds, "1");
 	Client_StopSound(client);
 	disabled[client] = true;
 	return Plugin_Handled;
@@ -599,6 +600,7 @@ public Action Command_StartMusic(int client, int args) {
 		Client_UpdateMusics(client);
 	disabled[client] = false;
 	CPrintToChat(client, "\x04[MapMusic] \x01%t", "Text_MapMusicEnable");
+	SetClientCookie(client, cDisableSounds, "0");
 	return Plugin_Handled;
 }
 
