@@ -32,6 +32,7 @@ My Plugins:
 *buttonwatcher - Buttons Watcher with Bans and Menus. Watching func_button, momentary_rot_button, func_rot_button. Reacts: Use and Damage
   -CVARS:
     #sm_buttons_view <0/1> - Enable/Disable Global the display Buttons
+    #sm_buttons_timer <0.0/10.0> - Timer before showing the pressed button again
   -Admin Command:
     #sm_bban <target> [<time in minutes>] - Buttons Ban on time. (-1 temporarily, 0 permanently, 1-... - ban on time)
     #sm_unbban <target> - Buttons UnBan
