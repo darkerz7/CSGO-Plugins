@@ -14,18 +14,20 @@ Handle g_hCookie_BBans  = null,
 	g_hCookie_BBansBy	  = null,
 	g_hCookie_Buttons     = null;
 
-bool g_bBBans[MAXPLAYERS + 1] = false;
+bool g_bBBans[MAXPLAYERS + 1] = {false,...};
 char g_sBBansBy[MAXPLAYERS + 1][64];
 int  g_iBBansLength[MAXPLAYERS + 1],
 	g_iBBansIssued[MAXPLAYERS + 1];
 	
-bool g_bButtons[MAXPLAYERS + 1] = false;
+bool g_bButtons[MAXPLAYERS + 1] = {false,...};
 	
 Handle g_hAdminMenu;
 
 int g_iAdminMenuTarget[MAXPLAYERS + 1];
 
-ConVar g_hCvar_ButtonsEnabled;
+ConVar 	g_hCvar_ButtonsEnabled,
+		g_hCvar_ButtonsTimer;
+
 bool g_bButtonsEnabled = true;
 
 bool isMapRunning;
@@ -33,12 +35,15 @@ bool isMapRunning;
 int g_aButtons[MAX_EDICTS],
 	g_iMaxButtons = 0;
 
+bool g_aTimerButtons[MAX_EDICTS] = {false,...};
+float g_fTimerTime = 0.0;
+
 public Plugin:myinfo =
 {
 	name = "Button Watcher with BBans",
 	author = "DarkerZ [RUS]",
 	description = "Generates an output when a button is pressed and Bans Clients",
-	version = "1.9",
+	version = "2.0",
 	url = ""
 };
 
@@ -56,7 +61,9 @@ public OnPluginStart()
 	
 	//CVARs
 	g_hCvar_ButtonsEnabled    = CreateConVar("sm_buttons_view", "1", "Enable/Disable Global the display Buttons.", _, true, 0.0, true, 1.0);
+	g_hCvar_ButtonsTimer      = CreateConVar("sm_buttons_timer", "0.0", "Timer before showing the pressed button again(0.0 - Disabled)", _, true, 0.0, true, 10.0);
 	HookConVarChange(g_hCvar_ButtonsEnabled, Cvar_ButtonsEnabled);
+	HookConVarChange(g_hCvar_ButtonsTimer, Cvar_ButtonsTimer);
 	
 	//Reg Cookies
 	g_hCookie_BBans  = RegClientCookie("buttonwatcher_BBans", "", CookieAccess_Private);
@@ -85,6 +92,11 @@ public OnPluginStart()
 public void Cvar_ButtonsEnabled(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	g_bButtonsEnabled = GetConVarBool(convar);
+}
+
+public void Cvar_ButtonsTimer(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	g_fTimerTime = GetConVarFloat(convar);
 }
 
 public void OnLibraryRemoved(const char[] sName) {
@@ -911,7 +923,10 @@ public Action PressBTN(const String:output[], caller, activator, Float:delay)
 {
 	if(!IsValidClient(activator)) return Plugin_Continue;
 	if(!g_bButtonsEnabled) return Plugin_Continue;
-	
+	if(g_fTimerTime>0.0)
+		if(g_aTimerButtons[caller]==true)
+			return Plugin_Continue;
+
 	decl String:entity[512];
 	GetEntPropString(caller, Prop_Data, "m_iName", entity, sizeof(entity));
 
@@ -925,7 +940,18 @@ public Action PressBTN(const String:output[], caller, activator, Float:delay)
 	
 	LogMessage("[EYE] %L pressed the button %s [HammerID: %i]", activator, entity, caller);
 	
+	if(g_fTimerTime>0.0)
+	{
+		g_aTimerButtons[caller] = true;
+		CreateTimer(g_fTimerTime, Timer_End, caller);
+	}
+	
 	return Plugin_Continue;
+}
+
+public Action Timer_End(Handle timer, int entity)
+{
+	g_aTimerButtons[entity] = false;
 }
 
 public IsValidClient(client) 
