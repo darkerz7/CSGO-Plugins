@@ -25,7 +25,7 @@ public Plugin myinfo =
 	name = "Hide Teammates", 
 	author = "DarkerZ [RUS]", 
 	description = "A plugin that can !hide with individual distances", 
-	version = "1.4", 
+	version = "1.5", 
 	url = "dark-skill.ru" 
 } 
 
@@ -162,7 +162,10 @@ public void OnConVarChange(Handle hCvar, const char[] oldValue, const char[] new
 }
 
 public Action Command_Hide(int client, int args) 
-{ 
+{
+	if (!IsClientInGame(client))
+		return Plugin_Handled;
+	
 	if(!bEnabled)
 	{
 		CPrintToChat(client, "%t %t", "HideT Tag", "HideT Disabled");
@@ -207,6 +210,9 @@ public Action Command_Hide(int client, int args)
 
 public Action Command_HideAll(int client, int args) 
 { 
+	if (!IsClientInGame(client))
+		return Plugin_Handled;
+	
 	if(!bEnabled)
 	{
 		CPrintToChat(client, "%t %t", "HideT Tag", "HideT Disabled");
