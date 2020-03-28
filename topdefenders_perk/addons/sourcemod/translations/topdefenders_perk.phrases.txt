@@ -1,0 +1,140 @@
+"Phrases"
+{
+	"Chat Top Defenders"
+	{
+		"en"		"{darkred}~~~~~{default}TOP Defenders{darkred}~~~~~"
+		"ru"		"{darkred}~~~~~{default}ТОП Дефующих{darkred}~~~~~"
+	}
+	"HUD Top Defenders"
+	{
+		"en"		"~~~~~TOP Defenders~~~~~"
+		"ru"		"~~~~~ТОП Дефующих~~~~~"
+	}
+	"Chat Top DefFirst"
+	{
+		"#format"	"{1:i},{2:N},{3:i}"
+		"en"		"{green}{1}. {darkred}{2} {default}- {purple}{3} {pink}DMG"
+		"ru"		"{green}{1}. {darkred}{2} {default}- {purple}{3} {pink}Урона"
+	}
+	"Chat Top DefSecond"
+	{
+		"#format"	"{1:i},{2:N},{3:i}"
+		"en"		"{red}{1}. {blue}{2} {default}- {purple}{3} {pink}DMG"
+		"ru"		"{red}{1}. {blue}{2} {green}- {purple}{3} {pink}Урона"
+	}
+	"Chat Top DefThird"
+	{
+		"#format"	"{1:i},{2:N},{3:i}"
+		"en"		"{blue}{1}. {green}{2} {default}- {purple}{3} {pink}DMG"
+		"ru"		"{blue}{1}. {green}{2} {default}- {purple}{3} {pink}Урона"
+	}
+	"Chat Top DefOther"
+	{
+		"#format"	"{1:i},{2:N},{3:i}"
+		"en"		"{grey}{1}. {lime}{2} {default}- {purple}{3} {pink}DMG"
+		"ru"		"{grey}{1}. {lime}{2} {default}- {purple}{3} {pink}Урона"
+	}
+	"Chat Top DefNone"
+	{
+		"#format"	"{1:i}"
+		"en"		"{blue}{1}. {lightblue} None"
+		"ru"		"{blue}{1}. {lightblue} Пусто"
+	}
+	"HUD Top DefPosition"
+	{
+		"#format"	"{1:i},{2:N},{3:i}"
+		"en"		"{1}. {2} - {3} DMG"
+		"ru"		"{1}. {2} - {3} Урона"
+	}
+	"HUD Top DefNone"
+	{
+		"#format"	"{1:i}"
+		"en"		"{1}. None"
+		"ru"		"{1}. Пусто"
+	}
+	"Chat Top Infectors"
+	{
+		"en"		"{darkred}~~~~~{default}TOP Infectors{darkred}~~~~~"
+		"ru"		"{darkred}~~~~~{default}ТОП Заражающих{darkred}~~~~~"
+	}
+	"HUD Top Infectors"
+	{
+		"en"		"~~~~~TOP Infectors~~~~~"
+		"ru"		"~~~~~ТОП Заражающих~~~~~"
+	}
+	"Chat Top InfFirst"
+	{
+		"#format"	"{1:i},{2:N},{3:i}"
+		"en"		"{green}{1}. {darkred}{2} {default}- {purple}{3} {pink}Infections"
+		"ru"		"{green}{1}. {darkred}{2} {default}- {purple}{3} {pink}Заражений"
+	}
+	"Chat Top InfSecond"
+	{
+		"#format"	"{1:i},{2:N},{3:i}"
+		"en"		"{red}{1}. {blue}{2} {default}- {purple}{3} {pink}Infections"
+		"ru"		"{red}{1}. {blue}{2} {green}- {purple}{3} {pink}Заражений"
+	}
+	"Chat Top InfThird"
+	{
+		"#format"	"{1:i},{2:N},{3:i}"
+		"en"		"{blue}{1}. {green}{2} {default}- {purple}{3} {pink}Infections"
+		"ru"		"{blue}{1}. {green}{2} {default}- {purple}{3} {pink}Заражений"
+	}
+	"Chat Top InfOther"
+	{
+		"#format"	"{1:i},{2:N},{3:i}"
+		"en"		"{grey}{1}. {lime}{2} {default}- {purple}{3} {pink}Infections"
+		"ru"		"{grey}{1}. {lime}{2} {default}- {purple}{3} {pink}Заражений"
+	}
+	"Chat Top InfNone"
+	{
+		"#format"	"{1:i}"
+		"en"		"{blue}{1}. {lightblue} None"
+		"ru"		"{blue}{1}. {lightblue} Пусто"
+	}
+	"HUD Top InfPosition"
+	{
+		"#format"	"{1:i},{2:N},{3:i}"
+		"en"		"{1}. {2} - {3} Infections"
+		"ru"		"{1}. {2} - {3} Заражений"
+	}
+	"HUD Top InfNone"
+	{
+		"#format"	"{1:i}"
+		"en"		"{1}. None"
+		"ru"		"{1}. Пусто"
+	}
+	"Hint Damage"
+	{
+		"#format"	"{1:i},{2:i},{3:i}"
+		"en"		"\t\t-{1}HP\nKills: {2}\nTotal Damage: {3}"
+		"ru"		"\t\t-{1}ХП\nУбийств: {2}\nОбщий урон: {3}"
+	}
+	"Hint Infect"
+	{
+		"#format"	"{1:N},{2:i}"
+		"en"		"Infected: {1}\nTotal Amount: {2}"
+		"ru"		"Зараженный: {1}\nОбщее Количество: {2}"
+	}
+	"Config Refresh"
+	{
+		"en"		"{lightblue}[{green}Top Defenders{lightblue}] {default}Config File Refreshed"
+		"ru"		"{lightblue}[{green}Топ Дефующих{lightblue}] {default}Кофигурационный Файл Обновлён"
+	}
+	"Perk Remove"
+	{
+		"en"			"{lightblue}[{green}Top Defenders{lightblue}] {purple}You have removed the perk and the color of the skin"
+		"ru"			"{lightblue}[{green}Top Defenders{lightblue}] {purple}У вас удалён перк и цвет скина"
+	}
+	"No Perk"
+	{
+		"en"			"{lightblue}[{green}Top Defenders{lightblue}] {lime}You do not have a perk"
+		"ru"			"{lightblue}[{green}Top Defenders{lightblue}] {lime}У вас нету перка"
+	}
+	"Immunity From Infection"
+	{
+		"#format"		"{1:N}"
+		"en"			"{lightblue}[{green}Top Defenders{lightblue}] {pink}You have been saved from infection. Instead you are infected {green}{1}"
+		"ru"			"{lightblue}[{green}Top Defenders{lightblue}] {pink}Вы были спасены от инфекции. Вместо вас заражён {green}{1}"
+	}
+}

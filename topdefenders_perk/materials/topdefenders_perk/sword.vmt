@@ -1,0 +1,7 @@
+"Sprite"
+{
+	"$basetexture" "topdefenders_perk/sword"
+	"$spriteorientation" "oriented"
+	"$spriteorigin" "[0.50 0.50]"
+	"$alphatest" "1"
+}
