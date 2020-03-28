@@ -15,7 +15,7 @@
 #tryinclude <csgocolors_fix>
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.8.143"
+#define PLUGIN_VERSION "3.8.144"
 
 //----------------------------------------------------------------------------------------------------
 // Purpose: Entity data
@@ -89,7 +89,9 @@ int  g_iRestrictedLength[MAXPLAYERS + 1],
 ConVar g_hCvar_DisplayEnabled,
 	g_hCvar_DisplayCooldowns,
 	g_hCvar_ModeTeamOnly,
-	g_hCvar_ConfigColor;
+	g_hCvar_ConfigColor,
+	g_hCvar_Glow,
+	g_hCvar_Default_BanTime;
 
 Handle g_hAdminMenu,
 	g_hOnBanForward,
@@ -100,6 +102,9 @@ bool g_bRoundTransition  = false,
 	g_bLateLoad = false;
 	
 bool isMapRunning;
+bool g_bPostWarmUp = false;
+
+bool g_bGlow = true;
 
 bool g_bDisplay[MAXPLAYERS + 1]     = false;
 bool g_bDisplay2[MAXPLAYERS + 1]     = false;
@@ -148,6 +153,8 @@ public void OnPluginStart()
 	g_hCvar_DisplayCooldowns  = CreateConVar("entwatch_display_cooldowns", "1", "Show/Hide the cooldowns on the display.", _, true, 0.0, true, 1.0);
 	g_hCvar_ModeTeamOnly      = CreateConVar("entwatch_mode_teamonly", "1", "Enable/Disable team only mode.", _, true, 0.0, true, 1.0);
 	g_hCvar_ConfigColor       = CreateConVar("entwatch_config_color", "color_classic", "The name of the color config.", _);
+	g_hCvar_Glow              = CreateConVar("entwatch_glow", "1", "Enable/Disable the glow.", _, true, 0.0, true, 1.0);
+	g_hCvar_Default_BanTime   = CreateConVar("entwatch_bantime", "0", "Default ban time (0-43200)", _, true, 0.0, true, 43200.0);
 
 	g_hCookie_Display     = RegClientCookie("entwatch_display", "", CookieAccess_Private);
 	g_hCookie_Restricted  = RegClientCookie("entwatch_restricted", "", CookieAccess_Private);
@@ -175,9 +182,11 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_hudpos", Command_Hudpos);
 	RegConsoleCmd("sm_hudcolor", Command_HudColor);
 
-	HookEventEx("round_start", Event_RoundStart, EventHookMode_Pre);
-	HookEventEx("round_end", Event_RoundEnd, EventHookMode_Pre);
-	HookEventEx("player_death", Event_PlayerDeath, EventHookMode_Pre);
+	HookEvent("round_start", Event_RoundStart, EventHookMode_Pre);
+	HookEvent("round_end", Event_RoundEnd, EventHookMode_Pre);
+	HookEvent("player_death", Event_PlayerDeath, EventHookMode_Pre);
+	
+	HookConVarChange(g_hCvar_Glow, Cvar_Glow_Changed);
 
 	CreateTimer(1.0, Timer_DisplayHUD, _, TIMER_REPEAT);
 	CreateTimer(1.0, Timer_Cooldowns, _, TIMER_REPEAT);
@@ -197,6 +206,16 @@ public void OnPluginStart()
 			OnClientCookiesCached(i);
 		}
 	}
+}
+
+public void Cvar_Glow_Changed(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	g_bGlow = GetConVarBool(convar);
+	if(!g_bGlow)
+		for (int index = 0; index < entArraySize; index++)
+		{
+			if (IsValidEdict(entArray[index][ent_glowent])) AcceptEntityInput(entArray[index][ent_glowent], "Kill");
+		}
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -944,6 +963,25 @@ public Action Event_RoundStart(Event hEvent, const char[] sName, bool bDontBroad
 {
 	if (g_bConfigLoaded && g_bRoundTransition) CPrintToChatAll("\x07%s[entWatch] \x07%s%t", color_tag, color_warning, "welcome");
 
+	if((GameRules_GetProp("m_bWarmupPeriod") == 1)||g_bPostWarmUp)
+	{
+		g_bPostWarmUp = false;
+		for (int index = 0; index < entArraySize; index++)
+		{
+			SDKUnhook(entArray[index][ent_buttonid], SDKHook_Use, OnButtonUse);
+			entArray[index][ent_weaponid]       = -1;
+			entArray[index][ent_buttonid]       = -1;
+			entArray[index][ent_ownerid]        = -1;
+			entArray[index][ent_cooldowntime]   = -1;
+			entArray[index][ent_uses]           = 0;
+			if (IsValidEdict(entArray[index][ent_glowent])) AcceptEntityInput(entArray[index][ent_glowent], "Kill");
+			entArray[index][ent_glowent]		= -1;
+		}
+	}
+	if(GameRules_GetProp("m_bWarmupPeriod") == 1)
+	{
+		g_bPostWarmUp = true;
+	}
 	g_bRoundTransition = false;
 }
 
@@ -1586,8 +1624,14 @@ public Action Command_Restrict(int iClient, int iArgs)
 		}
 		return Plugin_Handled;
 	}
-
-	EBanClient(iTarget, "0", iClient);
+	
+	int cvarLen = GetConVarInt(g_hCvar_Default_BanTime);
+	char cvarsFlength[64];
+	FormatEx(cvarsFlength, sizeof(cvarsFlength), "%d", GetTime() + (cvarLen * 60));
+	if (cvarLen != 0) EBanClient(iTarget, cvarsFlength, iClient);
+	else {
+		EBanClient(iTarget, "1", iClient);
+	}
 	return Plugin_Handled;
 }
 
@@ -1921,11 +1965,21 @@ public Action Command_DebugArray(int iClient, int iArgs)
 	if (g_bConfigLoaded && !g_bRoundTransition)
 	{
 		for (int i = 0; i < entArraySize; i++) {
-			CPrintToChat(iClient, "\x07%s[entWatch] \x07%sInfo at \x07%sindex \x04%i\x07%s: \x07%sWeaponID \x04%i\x07%s | \x07%sOwnerID \x04%i\x07%s | \x07%sHammerID \x04%i\x07%s | \x07%sName\x07%s \"\x04%s\x07%s\" | \x07%sShortName\x07%s \"\x04%s\x07%s\"", color_tag, color_warning, color_pickup, i, color_warning, color_pickup, entArray[i][ent_weaponid], color_warning, color_pickup, entArray[i][ent_ownerid], color_warning, color_pickup, entArray[i][ent_hammerid], color_warning, color_pickup, color_warning, entArray[i][ent_name], color_warning, color_pickup, color_warning, entArray[i][ent_shortname], color_warning);
+			CreateTimer(i*0.05, Debug_Timer, i);
 		}
-	} else CPrintToChat(iClient, "\x07%s[entWatch] \x07%sConfig file has not yet loaded or the round is transitioning.", color_tag, color_warning);
+	} else CReplyToCommand(iClient, "\x07%s[entWatch] \x07%sConfig file has not yet loaded or the round is transitioning.", color_tag, color_warning);
 
 	return Plugin_Handled;
+}
+
+public Action Debug_Timer(Handle timer, int i)
+{
+	for (int iClient = 1; iClient <= MaxClients; iClient++)
+	{
+		if(IsClientInGame(iClient))
+			CReplyToCommand(iClient, "\x07%s[entWatch] \x07%sInfo at \x07%sindex \x04%i\x07%s: \x07%sWeaponID \x04%i\x07%s | \x07%sOwnerID \x04%i\x07%s | \x07%sHammerID \x04%i\x07%s | \x07%sName\x07%s \"\x04%s\x07%s\" | \x07%sShortName\x07%s \"\x04%s\x07%s\"", color_tag, color_warning, color_pickup, i, color_warning, color_pickup, entArray[i][ent_weaponid], color_warning, color_pickup, entArray[i][ent_ownerid], color_warning, color_pickup, entArray[i][ent_hammerid], color_warning, color_pickup, color_warning, entArray[i][ent_name], color_warning, color_pickup, color_warning, entArray[i][ent_shortname], color_warning);
+	}
+	CReplyToCommand(0, "\x07%s[entWatch] \x07%sInfo at \x07%sindex \x04%i\x07%s: \x07%sWeaponID \x04%i\x07%s | \x07%sOwnerID \x04%i\x07%s | \x07%sHammerID \x04%i\x07%s | \x07%sName\x07%s \"\x04%s\x07%s\" | \x07%sShortName\x07%s \"\x04%s\x07%s\"", color_tag, color_warning, color_pickup, i, color_warning, color_pickup, entArray[i][ent_weaponid], color_warning, color_pickup, entArray[i][ent_ownerid], color_warning, color_pickup, entArray[i][ent_hammerid], color_warning, color_pickup, color_warning, entArray[i][ent_name], color_warning, color_pickup, color_warning, entArray[i][ent_shortname], color_warning);
 }
 
 
@@ -2159,70 +2213,76 @@ stock void LoadConfig()
 //----------------------------------------------------------------------------------------------------
 stock void GlowWeapon(int index)
 {
-	if (!IsValidEdict(entArray[index][ent_glowent]))
+	if(g_bGlow)
 	{
-		char sModelPath[PLATFORM_MAX_PATH];
-		float fWOrigin[3], fWAngle[3];
+		if (!IsValidEdict(entArray[index][ent_glowent]))
+		{
+			char sModelPath[PLATFORM_MAX_PATH];
+			float fWOrigin[3], fWAngle[3];
 
-		// Get the original model path
-		GetEntPropString(entArray[index][ent_weaponid], Prop_Data, "m_ModelName", sModelPath, sizeof(sModelPath));
-		ReplaceString(sModelPath, sizeof(sModelPath), "_dropped", "", false);
-		
-		// Find the location of the weapon
-		GetEntPropVector(entArray[index][ent_weaponid], Prop_Send, "m_vecOrigin", fWOrigin);
-		GetEntPropVector(entArray[index][ent_weaponid], Prop_Send, "m_angRotation", fWAngle);
+			// Get the original model path
+			GetEntPropString(entArray[index][ent_weaponid], Prop_Data, "m_ModelName", sModelPath, sizeof(sModelPath));
+			ReplaceString(sModelPath, sizeof(sModelPath), "_dropped", "", false);
+			
+			// Find the location of the weapon
+			GetEntPropVector(entArray[index][ent_weaponid], Prop_Send, "m_vecOrigin", fWOrigin);
+			GetEntPropVector(entArray[index][ent_weaponid], Prop_Send, "m_angRotation", fWAngle);
 
-		// Create & set dynamic glow entity and give properties
-		entArray[index][ent_glowent] = CreateEntityByName("prop_dynamic_glow");
-		
-		DispatchKeyValue(entArray[index][ent_glowent], "model", sModelPath);
-		DispatchKeyValue(entArray[index][ent_glowent], "disablereceiveshadows", "1");
-		DispatchKeyValue(entArray[index][ent_glowent], "disableshadows", "1");
-		DispatchKeyValue(entArray[index][ent_glowent], "solid", "0");
-		DispatchKeyValue(entArray[index][ent_glowent], "spawnflags", "256");
-		SetEntProp(entArray[index][ent_glowent], Prop_Send, "m_CollisionGroup", 11);
-		
-		//Fix Origin
-		fWOrigin[0]-=Cosine(DegToRad(fWAngle[1]))*5;
-		fWOrigin[1]-=Cosine(DegToRad(fWAngle[1]-90))*5;
-		
-		// Spawn and teleport the entity
-		DispatchSpawn(entArray[index][ent_glowent]);
-		TeleportEntity(entArray[index][ent_glowent], fWOrigin, fWAngle, NULL_VECTOR);
+			// Create & set dynamic glow entity and give properties
+			entArray[index][ent_glowent] = CreateEntityByName("prop_dynamic_glow");
+			
+			DispatchKeyValue(entArray[index][ent_glowent], "model", sModelPath);
+			DispatchKeyValue(entArray[index][ent_glowent], "disablereceiveshadows", "1");
+			DispatchKeyValue(entArray[index][ent_glowent], "disableshadows", "1");
+			DispatchKeyValue(entArray[index][ent_glowent], "solid", "0");
+			DispatchKeyValue(entArray[index][ent_glowent], "spawnflags", "256");
+			SetEntProp(entArray[index][ent_glowent], Prop_Send, "m_CollisionGroup", 11);
+			
+			//Fix Origin
+			fWOrigin[0]-=Cosine(DegToRad(fWAngle[1]))*5;
+			fWOrigin[1]-=Cosine(DegToRad(fWAngle[1]-90))*5;
+			
+			// Spawn and teleport the entity
+			DispatchSpawn(entArray[index][ent_glowent]);
+			TeleportEntity(entArray[index][ent_glowent], fWOrigin, fWAngle, NULL_VECTOR);
 
-		// Give glowing effect to the entity
-		SetEntProp(entArray[index][ent_glowent], Prop_Send, "m_bShouldGlow", true, true);
-		SetEntPropFloat(entArray[index][ent_glowent], Prop_Send, "m_flGlowMaxDist", 10000000.0);
+			// Give glowing effect to the entity
+			SetEntProp(entArray[index][ent_glowent], Prop_Send, "m_bShouldGlow", true, true);
+			SetEntPropFloat(entArray[index][ent_glowent], Prop_Send, "m_flGlowMaxDist", 10000000.0);
 
-		// Set glowing color
-		int color_glow[4];
-		color_glow[0]=entArray[index][ent_glow_r];
-		color_glow[1]=entArray[index][ent_glow_g];
-		color_glow[2]=entArray[index][ent_glow_b];
-		color_glow[3]=200;
-		SetVariantColor(color_glow);
-		AcceptEntityInput(entArray[index][ent_glowent], "SetGlowColor");
+			// Set glowing color
+			int color_glow[4];
+			color_glow[0]=entArray[index][ent_glow_r];
+			color_glow[1]=entArray[index][ent_glow_g];
+			color_glow[2]=entArray[index][ent_glow_b];
+			color_glow[3]=200;
+			SetVariantColor(color_glow);
+			AcceptEntityInput(entArray[index][ent_glowent], "SetGlowColor");
 
-		// Set the activator and group the entity
-		SetVariantString("!activator");
-		AcceptEntityInput(entArray[index][ent_glowent], "SetParent", entArray[index][ent_weaponid]);
+			// Set the activator and group the entity
+			SetVariantString("!activator");
+			AcceptEntityInput(entArray[index][ent_glowent], "SetParent", entArray[index][ent_weaponid]);
 
-		AcceptEntityInput(entArray[index][ent_glowent], "TurnOn");
-		AcceptEntityInput(entArray[index][ent_glowent], "SetGlowEnabled");
-	} else 
-	{
-		AcceptEntityInput(entArray[index][ent_glowent], "TurnOn");
-		AcceptEntityInput(entArray[index][ent_glowent], "SetGlowEnabled");
+			AcceptEntityInput(entArray[index][ent_glowent], "TurnOn");
+			AcceptEntityInput(entArray[index][ent_glowent], "SetGlowEnabled");
+		} else 
+		{
+			AcceptEntityInput(entArray[index][ent_glowent], "TurnOn");
+			AcceptEntityInput(entArray[index][ent_glowent], "SetGlowEnabled");
+		}
 	}
 }
 //----------------------------------------------------------------------------------------------------
 // Purpose: Disable glow
 //----------------------------------------------------------------------------------------------------
 stock void DisableGlow(int index) {
-	if (IsValidEdict(entArray[index][ent_glowent]))
+	if(g_bGlow)
 	{
-		AcceptEntityInput(entArray[index][ent_glowent], "SetGlowDisabled");
-		AcceptEntityInput(entArray[index][ent_glowent], "TurnOff");
+		if (IsValidEdict(entArray[index][ent_glowent]))
+		{
+			AcceptEntityInput(entArray[index][ent_glowent], "SetGlowDisabled");
+			AcceptEntityInput(entArray[index][ent_glowent], "TurnOff");
+		}
 	}
 }
 
@@ -2236,14 +2296,10 @@ public Action Command_ReloadConfig(int iClient, int iArgs)
 	return Plugin_Handled;
 }
 
-#if SOURCEMOD_V_MAJOR >= 1 && (SOURCEMOD_V_MINOR >= 8 || SOURCEMOD_V_MINOR >= 7 && SOURCEMOD_V_RELEASE >= 2)
 public void OnEntityCreated(int iEntity, const char[] sClassname)
-#else
-public int OnEntityCreated(int iEntity, const char[] sClassname)
-#endif
 {
-	if (triggerSize > 0 && StrContains(sClassname, "trigger_", false) != -1 && IsValidEntity(iEntity)) SDKHookEx(iEntity, SDKHook_Spawn, OnEntitySpawned);
-	if (StrContains(sClassname, "weapon_", false) != -1 && IsValidEntity(iEntity) && isMapRunning) SDKHook(iEntity, SDKHook_Spawn, OnEntitySpawned2);
+	if (triggerSize > 0 && StrContains(sClassname, "trigger_", false) != -1 && IsValidEntity(iEntity)) SDKHook(iEntity, SDKHook_SpawnPost, OnEntitySpawned);
+	if (StrContains(sClassname, "weapon_", false) != -1 && IsValidEntity(iEntity) && isMapRunning) SDKHook(iEntity, SDKHook_SpawnPost, OnEntitySpawned2);
 }
 
 public void OnEntitySpawned2(int iEntity)
@@ -2251,7 +2307,7 @@ public void OnEntitySpawned2(int iEntity)
 	int iHammerID = GetEntProp(iEntity, Prop_Data, "m_iHammerID");
 	for (int index = 0; index < entArraySize; index++)
 	{
-		if ((entArray[index][ent_hammerid] == iHammerID)  && (entArray[index][ent_weaponid] == -1))
+		if ((entArray[index][ent_hammerid] == iHammerID)  && ((entArray[index][ent_weaponid] == -1) || (!IsValidEntity(entArray[index][ent_weaponid]))))
 		{
 			//LogMessage("Found Item HammerID:%i EntityID:%i", iHammerID, iEntity);
 			entArray[index][ent_weaponid] = iEntity;
@@ -2478,8 +2534,8 @@ stock bool IsValidPlayer(int client){
 
 public Action Timer_DisplayHUD(Handle timer, int client)
 {
-	if (GameRules_GetProp("m_bWarmupPeriod") == 1)
-		return Plugin_Continue;
+	//if (GameRules_GetProp("m_bWarmupPeriod") == 1)
+	//	return Plugin_Continue;
 	
 	if (GetConVarBool(g_hCvar_DisplayEnabled))
 	{
