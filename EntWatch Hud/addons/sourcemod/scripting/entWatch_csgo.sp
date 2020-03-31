@@ -15,7 +15,13 @@
 #tryinclude <csgocolors_fix>
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.8.144"
+#define PLUGIN_VERSION "3.8.145"
+
+//uncomment the next line if you using DynamicChannels: https://github.com/Vauff/DynamicChannels
+//#define DYNAMIC_CHANNELS
+#if defined DYNAMIC_CHANNELS
+#include <DynamicChannels>
+#endif
 
 //----------------------------------------------------------------------------------------------------
 // Purpose: Entity data
@@ -91,7 +97,8 @@ ConVar g_hCvar_DisplayEnabled,
 	g_hCvar_ModeTeamOnly,
 	g_hCvar_ConfigColor,
 	g_hCvar_Glow,
-	g_hCvar_Default_BanTime;
+	g_hCvar_Default_BanTime,
+	g_hCvar_HUD_Channel;
 
 Handle g_hAdminMenu,
 	g_hOnBanForward,
@@ -105,6 +112,7 @@ bool isMapRunning;
 bool g_bPostWarmUp = false;
 
 bool g_bGlow = true;
+int g_iHUDChannel = 5;
 
 bool g_bDisplay[MAXPLAYERS + 1]     = false;
 bool g_bDisplay2[MAXPLAYERS + 1]     = false;
@@ -155,6 +163,7 @@ public void OnPluginStart()
 	g_hCvar_ConfigColor       = CreateConVar("entwatch_config_color", "color_classic", "The name of the color config.", _);
 	g_hCvar_Glow              = CreateConVar("entwatch_glow", "1", "Enable/Disable the glow.", _, true, 0.0, true, 1.0);
 	g_hCvar_Default_BanTime   = CreateConVar("entwatch_bantime", "0", "Default ban time (0-43200)", _, true, 0.0, true, 43200.0);
+	g_hCvar_HUD_Channel       = CreateConVar("entwatch_hud_channel", "5", "Change HUD Channel/Group Dynamic channel.", _, true, 0.0, true, 5.0);
 
 	g_hCookie_Display     = RegClientCookie("entwatch_display", "", CookieAccess_Private);
 	g_hCookie_Restricted  = RegClientCookie("entwatch_restricted", "", CookieAccess_Private);
@@ -187,6 +196,7 @@ public void OnPluginStart()
 	HookEvent("player_death", Event_PlayerDeath, EventHookMode_Pre);
 	
 	HookConVarChange(g_hCvar_Glow, Cvar_Glow_Changed);
+	HookConVarChange(g_hCvar_HUD_Channel, Cvar_HUD_Channel_Changed);
 
 	CreateTimer(1.0, Timer_DisplayHUD, _, TIMER_REPEAT);
 	CreateTimer(1.0, Timer_Cooldowns, _, TIMER_REPEAT);
@@ -216,6 +226,11 @@ public void Cvar_Glow_Changed(ConVar convar, const char[] oldValue, const char[]
 		{
 			if (IsValidEdict(entArray[index][ent_glowent])) AcceptEntityInput(entArray[index][ent_glowent], "Kill");
 		}
+}
+
+public void Cvar_HUD_Channel_Changed(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	g_iHUDChannel = GetConVarInt(convar);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -2737,7 +2752,11 @@ public Action Timer_DisplayHUD(Handle timer, int client)
 									SetHudTextParams(HudPosition[i][0], HudPosition[i][1], 1.1, HudColor[i][0], HudColor[i][1], HudColor[i][2], 255, 0, 0.0, 0.0, 0.0);
 								}
 							}
-							ShowHudText(i, 5, buffer_hud);
+							#if defined DYNAMIC_CHANNELS
+							ShowHudText(i, GetDynamicChannel(g_iHUDChannel), buffer_hud);
+							#else
+							ShowHudText(i, g_iHUDChannel, buffer_hud);
+							#endif
 						}
 					}
 				}
