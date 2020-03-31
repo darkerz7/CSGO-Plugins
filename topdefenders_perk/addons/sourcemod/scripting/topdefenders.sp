@@ -5,6 +5,15 @@
 #include <csgocolors_fix>
 #include <zombiereloaded>
 
+//uncomment the next line to integrate store plugin and configure function names
+//#define SHOP
+
+#if defined SHOP
+#include <shop>
+#define SHOP_SET_CREDITS_FUNC Shop_SetClientCredits
+#define SHOP_GET_CREDITS_FUNC Shop_GetClientCredits
+#endif
+
 #define CS_TEAM_T 2
 #define CS_TEAM_CT 3
 
@@ -18,12 +27,14 @@ ConVar	cvar_Enable,
 		cvar_InfectorPerk,
 		cvar_Immunity,
 		cvar_MinPlayers,
-		cvar_MaxMoney;
+		cvar_MaxMoney,
+		cvar_ShowDamage;
 
 float	g_fCashDiv = 20.0;
 int		g_iMaxMoney = 16000;
 
 bool	g_bEnable = true;
+bool	g_bShowDamage = true;
 int		g_iTopCount = 3;
 bool	g_bPerk = true;
 
@@ -41,7 +52,9 @@ int g_iTopNextRound[MAXPLAYERS+1] = 0;
 int g_iPlayerCurrentDamage[MAXPLAYERS+1] = 0;
 bool g_bBlockTimer[MAXPLAYERS+1] = {false,...};
 
-int Config_Defender_Skin_Color[4][4];
+#if defined SHOP
+int Config_Defender_Shop[4];
+#endif
 bool Config_Defender_Immunity[3];
 float Config_Defender_Speed[4];
 float Config_Defender_Gravity[4];
@@ -51,7 +64,9 @@ int Config_Defender_RenderMode[4];
 float Config_Defender_Trail_Config[4][3];
 Handle Config_Defender_Perk_List[4];
 
-int Config_Infector_Skin_Color[4][4];
+#if defined SHOP
+int Config_Infector_Shop[4];
+#endif
 bool Config_Infector_Immunity[3];
 float Config_Infector_Speed[4];
 float Config_Infector_Gravity[4];
@@ -86,7 +101,7 @@ public Plugin:myinfo =
 	name = "[ZR] TopDefenders with Perk CS:GO",
 	author = "DarkerZ [RUS]",
 	description = "Shows damage by zombies and gives perk for the top",
-	version = "2.0",
+	version = "2.1",
 	url = "dark-skill.ru"
 }
 
@@ -110,6 +125,7 @@ public OnPluginStart()
 	cvar_TopCount = CreateConVar("sm_topdefenders_topcount", "3", "[TopDefenders] Count top on round end (min 3/max 15)", _, true, 3.0, true, 15.0);
 	cvar_Perk = CreateConVar("sm_topdefenders_perk", "1", "[TopDefenders] Gives perk for the top", _, true, 0.0, true, 1.0);
 	cvar_CashDiv = CreateConVar("sm_topdefenders_cashdiv", "20", "[TopDefenders] Divider (min 0/max 50; 0 - Disable)", _, true, 0.0, true, 50.0);
+	cvar_ShowDamage = CreateConVar("sm_topdefenders_showdamage", "1", "[TopDefenders] Enable Show Damage Addon", _, true, 0.0, true, 1.0);
 	
 	cvar_TopInfector = CreateConVar("sm_topdefenders_infectors_enable", "1", "[TopDefenders] Enable Top Infector Addon", _, true, 0.0, true, 1.0);
 	cvar_InfectorCount = CreateConVar("sm_topdefenders_infectors_topcount", "3", "[TopDefenders] Count top Infector on round end (min 3/max 15)", _, true, 3.0, true, 15.0);
@@ -128,6 +144,7 @@ public OnPluginStart()
 	HookConVarChange(cvar_TopCount, Cvar_Changed);
 	HookConVarChange(cvar_Perk, Cvar_Changed);
 	HookConVarChange(cvar_CashDiv, Cvar_Changed);
+	HookConVarChange(cvar_ShowDamage, Cvar_Changed);
 	
 	HookConVarChange(cvar_TopInfector, Cvar_Changed);
 	HookConVarChange(cvar_InfectorCount, Cvar_Changed);
@@ -168,6 +185,8 @@ public void Cvar_Changed(ConVar convar, const char[] oldValue, const char[] newV
 		g_iMinPlayersImmunity = GetConVarInt(convar);
 	if(convar==cvar_MaxMoney)
 		g_iMaxMoney= GetConVarInt(convar);
+	if(convar==cvar_ShowDamage)
+		g_bShowDamage = GetConVarBool(convar);
 }
 
 public void OnMapStart()
@@ -279,6 +298,18 @@ public Event_RoundEnd(Handle:event, const String:name[], bool:dontBroadcast)
 	{
 		if (IsValidClient(i) && IsClientInGame(i) && (IsFakeClient(i) == false))
 		{
+			#if defined SHOP
+			if(g_iTopNextRound[i]>0)
+			{
+				int iPlace=g_iTopNextRound[i]-1;
+				if(iPlace>3) iPlace=3;
+				if(Config_Defender_Shop[iPlace]>0)
+				{
+					CPrintToChat(i, "%t", "Chat Give Credits Defenders", Config_Defender_Shop[iPlace], g_iTopNextRound[i]);
+					SHOP_SET_CREDITS_FUNC(i, SHOP_GET_CREDITS_FUNC(i)+Config_Defender_Shop[iPlace]);
+				}
+			}
+			#endif
 			ShowSyncHudText(i, g_hHudDefender, sHUD);
 		}
 	}
@@ -329,6 +360,18 @@ public Event_RoundEnd(Handle:event, const String:name[], bool:dontBroadcast)
 		{
 			if (IsValidClient(i) && IsClientInGame(i) && (IsFakeClient(i) == false))
 			{
+				#if defined SHOP
+				if(g_iTopNextRound[i]<0)
+				{
+					int iPlace=-g_iTopNextRound[i]-1;
+					if(iPlace>3) iPlace=3;
+					if(Config_Infector_Shop[iPlace]>0)
+					{
+						CPrintToChat(i, "%t", "Chat Give Credits Infectors", Config_Infector_Shop[iPlace], -g_iTopNextRound[i]);
+						SHOP_SET_CREDITS_FUNC(i, SHOP_GET_CREDITS_FUNC(i)+Config_Infector_Shop[iPlace]);
+					}
+				}
+				#endif
 				ShowSyncHudText(i, g_hHudInfector, sHUD);
 			}
 		}
@@ -345,7 +388,7 @@ public Action:Event_PlayerSpawn(Handle:event, const String:name[], bool:dontBroa
 
 public Event_PlayerDeath(Handle:event, const char[] name, bool dontBroadcast)
 {
-	if(!g_bEnable) return;
+	if(!g_bEnable||!g_bShowDamage) return;
 	int client  = GetClientOfUserId(GetEventInt(event, "userid"));
 	int attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
 	if(IsValidClient(attacker) && IsValidClient(client) && IsClientInGame(attacker))
@@ -371,7 +414,7 @@ public Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroadcast)
 				int iDmg = GetEventInt(event, "dmg_health");
 				g_iPlayerDamage[attacker]+= iDmg;
 				SetEntProp(attacker, Prop_Data, "m_iDeaths", g_iPlayerDamage[attacker]/1000);
-				CalcDamage(attacker, iDmg);
+				if(g_bShowDamage) CalcDamage(attacker, iDmg);
 				if(g_fCashDiv>0.0)
 				{
 					int iCurrentCash = GetEntData(attacker, g_iCash);
@@ -419,9 +462,6 @@ public GivePerk_TopDefender()
 						//code perk
 						int iPlace=i-1;
 						if(iPlace>3) iPlace = 3;
-						//color
-						SetEntityRenderMode(client, RENDER_TRANSCOLOR);
-						SetEntityRenderColor(client, Config_Defender_Skin_Color[iPlace][0], Config_Defender_Skin_Color[iPlace][1], Config_Defender_Skin_Color[iPlace][2], Config_Defender_Skin_Color[iPlace][3]);
 						//immunity
 						if(iPlace<3) if(Config_Defender_Immunity[iPlace] == true) g_bImmunity[client] = true;
 						//speed
@@ -453,9 +493,6 @@ public GivePerk_TopInfector()
 						//code perk
 						int iPlace=i-1;
 						if(iPlace>3) iPlace = 3;
-						//color
-						SetEntityRenderMode(client, RENDER_TRANSCOLOR);
-						SetEntityRenderColor(client, Config_Infector_Skin_Color[iPlace][0], Config_Infector_Skin_Color[iPlace][1], Config_Infector_Skin_Color[iPlace][2], Config_Infector_Skin_Color[iPlace][3]);
 						//immunity
 						if(iPlace<3) if(Config_Infector_Immunity[iPlace] == true) g_bImmunity[client] = true;
 						//speed
@@ -669,7 +706,7 @@ public int ZR_OnClientInfected(int client, int attacker, bool motherInfect, bool
 		{
 			g_iPlayerInfect[attacker]++;
 			SetEntProp(attacker, Prop_Data, "m_iDeaths", g_iPlayerInfect[attacker]);
-			PrintHintText(attacker, "%t", "Hint Infect", client, g_iPlayerInfect[attacker]);
+			if(g_bShowDamage) PrintHintText(attacker, "%t", "Hint Infect", client, g_iPlayerInfect[attacker]);
 		}
 }
 
@@ -736,7 +773,6 @@ public ReloadCfgFile()
 		{
 			if(KvConfig.JumpToKey(cNameKey[i]))
 			{
-				KvConfig.GetColor4("Skin_Color", Config_Defender_Skin_Color[i]);
 				if(i<3)
 				{
 					int Immunity = KvConfig.GetNum("Immunity_First_Infection");
@@ -745,6 +781,9 @@ public ReloadCfgFile()
 				}
 				Config_Defender_Speed[i] = KvConfig.GetFloat("Add_Speed");
 				Config_Defender_Gravity[i] = KvConfig.GetFloat("Subtract_Gravity");
+				#if defined SHOP
+				Config_Defender_Shop[i] = KvConfig.GetNum("Shop_Give_Credits");
+				#endif
 				char szBuffer[256];
 				KvConfig.GetString("Perk", szBuffer, sizeof(szBuffer));
 				if(StrEqual(szBuffer,"Sprite",false)) Config_Defender_Perk_Type[i] = 1;
@@ -790,7 +829,6 @@ public ReloadCfgFile()
 		{
 			if(KvConfig.JumpToKey(cNameKey[i]))
 			{
-				KvConfig.GetColor4("Skin_Color", Config_Infector_Skin_Color[i]);
 				if(i<3)
 				{
 					int Immunity = KvConfig.GetNum("Immunity_First_Infection");
@@ -799,6 +837,9 @@ public ReloadCfgFile()
 				}
 				Config_Infector_Speed[i] = KvConfig.GetFloat("Add_Speed");
 				Config_Infector_Gravity[i] = KvConfig.GetFloat("Subtract_Gravity");
+				#if defined SHOP
+				Config_Infector_Shop[i] = KvConfig.GetNum("Shop_Give_Credits");
+				#endif
 				char szBuffer[256];
 				KvConfig.GetString("Perk", szBuffer, sizeof(szBuffer));
 				if(StrEqual(szBuffer,"Sprite",false)) Config_Infector_Perk_Type[i] = 1;
@@ -876,9 +917,11 @@ public Action ConfigTest_Defenders(client, args)
 	for(int i=0;i<4;i++)
 	{
 		CPrintToChat(client, "{orange}Number: {purple}%i",i+1);
-		CPrintToChat(client, "{orange}Skin Color: {red}%i {green}%i {blue}%i {white}%i",Config_Defender_Skin_Color[i][0],Config_Defender_Skin_Color[i][1],Config_Defender_Skin_Color[i][2],Config_Defender_Skin_Color[i][3]);
 		if(i<3) CPrintToChat(client, "{orange}Immunity: {purple}%i", Config_Defender_Immunity[i]);
 		CPrintToChat(client, "{orange}Speed: {purple}%.2f {orange}Gravity: {purple}%.2f {orange}Perk Type: {purple}%i", Config_Defender_Speed[i], Config_Defender_Gravity[i], Config_Defender_Perk_Type[i]);
+		#if defined SHOP
+		CPrintToChat(client, "{orange}Shop Credits: {purple}%i", Config_Defender_Shop[i]);
+		#endif
 		if(Config_Defender_Perk_Type[i]!=0)
 		{
 			CPrintToChat(client, "{orange}Perk Color: {red}%i {green}%i {blue}%i {white}%i {orange}Perk RenderMode: {purple}%i",Config_Defender_Perk_Color[i][0],Config_Defender_Perk_Color[i][1],Config_Defender_Perk_Color[i][2],Config_Defender_Perk_Color[i][3], Config_Defender_RenderMode[i]);
@@ -904,9 +947,11 @@ public Action ConfigTest_Infectors(client, args)
 	for(int i=0;i<4;i++)
 	{
 		CPrintToChat(client, "{orange}Number: {purple}%i",i+1);
-		CPrintToChat(client, "{orange}Skin Color: {red}%i {green}%i {blue}%i {white}%i",Config_Infector_Skin_Color[i][0],Config_Infector_Skin_Color[i][1],Config_Infector_Skin_Color[i][2],Config_Infector_Skin_Color[i][3]);
 		if(i<3) CPrintToChat(client, "{orange}Immunity: {purple}%i", Config_Infector_Immunity[i]);
 		CPrintToChat(client, "{orange}Speed: {purple}%.2f {orange}Gravity: {purple}%.2f {orange}Perk Type: {purple}%i", Config_Infector_Speed[i], Config_Infector_Gravity[i], Config_Infector_Perk_Type[i]);
+		#if defined SHOP
+		CPrintToChat(client, "{orange}Shop Credits: {purple}%i", Config_Infector_Shop[i]);
+		#endif
 		if(Config_Infector_Perk_Type[i]!=0)
 		{
 			CPrintToChat(client, "{orange}Perk Color: {red}%i {green}%i {blue}%i {white}%i {orange}Perk RenderMode: {purple}%i",Config_Infector_Perk_Color[i][0],Config_Infector_Perk_Color[i][1],Config_Infector_Perk_Color[i][2],Config_Infector_Perk_Color[i][3], Config_Infector_RenderMode[i]);

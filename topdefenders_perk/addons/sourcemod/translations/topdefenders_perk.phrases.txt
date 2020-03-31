@@ -123,18 +123,30 @@
 	}
 	"Perk Remove"
 	{
-		"en"			"{lightblue}[{green}Top Defenders{lightblue}] {purple}You have removed the perk and the color of the skin"
-		"ru"			"{lightblue}[{green}Top Defenders{lightblue}] {purple}У вас удалён перк и цвет скина"
+		"en"			"{lightblue}[{green}Top Defenders{lightblue}] {purple}You have removed the perk"
+		"ru"			"{lightblue}[{green}Топ Дефующих{lightblue}] {purple}У вас удалён перк"
 	}
 	"No Perk"
 	{
 		"en"			"{lightblue}[{green}Top Defenders{lightblue}] {lime}You do not have a perk"
-		"ru"			"{lightblue}[{green}Top Defenders{lightblue}] {lime}У вас нету перка"
+		"ru"			"{lightblue}[{green}Топ Дефующих{lightblue}] {lime}У вас нету перка"
 	}
 	"Immunity From Infection"
 	{
 		"#format"		"{1:N}"
 		"en"			"{lightblue}[{green}Top Defenders{lightblue}] {pink}You have been saved from infection. Instead you are infected {green}{1}"
-		"ru"			"{lightblue}[{green}Top Defenders{lightblue}] {pink}Вы были спасены от инфекции. Вместо вас заражён {green}{1}"
+		"ru"			"{lightblue}[{green}Топ Дефующих{lightblue}] {pink}Вы были спасены от инфекции. Вместо вас заражён {green}{1}"
+	}
+	"Chat Give Credits Defenders"
+	{
+		"#format"	"{1:i},{2:i}"
+		"en"		"{lightblue}[{green}Top Defenders{lightblue}] {default}You received {green}{1} {default}credits for {pink}{2} {default}place in the Top Defenders"
+		"ru"		"{lightblue}[{green}Топ Дефующих{lightblue}] {default}Вы получили {green}{1} {default}кредитов за {pink}{2} {default}место в Топе Дефующих"
+	}
+	"Chat Give Credits Infectors"
+	{
+		"#format"	"{1:i},{2:i}"
+		"en"		"{lightblue}[{green}Top Defenders{lightblue}] {default}You received {green}{1} {default}credits for {pink}{2} {default}place in the Top Infectors"
+		"ru"		"{lightblue}[{green}Топ Дефующих{lightblue}] {default}Вы получили {green}{1} {default}кредитов за {pink}{2} {default}место в Топе Заражающих"
 	}
 }
