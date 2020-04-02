@@ -15,7 +15,7 @@
 #tryinclude <csgocolors_fix>
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.8.145"
+#define PLUGIN_VERSION "3.8.146"
 
 //uncomment the next line if you using DynamicChannels: https://github.com/Vauff/DynamicChannels
 //#define DYNAMIC_CHANNELS
@@ -97,6 +97,9 @@ ConVar g_hCvar_DisplayEnabled,
 	g_hCvar_ModeTeamOnly,
 	g_hCvar_ConfigColor,
 	g_hCvar_Glow,
+	g_hCvar_Glow_Spawn,
+	g_hCvar_Glow_Spawn_Type,
+	g_hCvar_Glow_Drop_Type,
 	g_hCvar_Default_BanTime,
 	g_hCvar_HUD_Channel;
 
@@ -112,6 +115,9 @@ bool isMapRunning;
 bool g_bPostWarmUp = false;
 
 bool g_bGlow = true;
+bool g_bGlow_Spawn = true;
+int g_iGlow_Spawn_Type = 0;
+int g_iGlow_Drop_Type = 0;
 int g_iHUDChannel = 5;
 
 bool g_bDisplay[MAXPLAYERS + 1]     = false;
@@ -161,7 +167,10 @@ public void OnPluginStart()
 	g_hCvar_DisplayCooldowns  = CreateConVar("entwatch_display_cooldowns", "1", "Show/Hide the cooldowns on the display.", _, true, 0.0, true, 1.0);
 	g_hCvar_ModeTeamOnly      = CreateConVar("entwatch_mode_teamonly", "1", "Enable/Disable team only mode.", _, true, 0.0, true, 1.0);
 	g_hCvar_ConfigColor       = CreateConVar("entwatch_config_color", "color_classic", "The name of the color config.", _);
-	g_hCvar_Glow              = CreateConVar("entwatch_glow", "1", "Enable/Disable the glow.", _, true, 0.0, true, 1.0);
+	g_hCvar_Glow              = CreateConVar("entwatch_glow", "1", "Enable/Disable the glow Global.", _, true, 0.0, true, 1.0);
+	g_hCvar_Glow_Spawn        = CreateConVar("entwatch_glow_spawn", "1", "Enable/Disable the glow after Spawn Items.", _, true, 0.0, true, 1.0);
+	g_hCvar_Glow_Spawn_Type   = CreateConVar("entwatch_glow_spawn_type", "0", "Glow Type after Spawn Items.", _, true, 0.0, true, 3.0);
+	g_hCvar_Glow_Drop_Type    = CreateConVar("entwatch_glow_drop_type", "0", "Glow Type after Drop Items.", _, true, 0.0, true, 3.0);
 	g_hCvar_Default_BanTime   = CreateConVar("entwatch_bantime", "0", "Default ban time (0-43200)", _, true, 0.0, true, 43200.0);
 	g_hCvar_HUD_Channel       = CreateConVar("entwatch_hud_channel", "5", "Change HUD Channel/Group Dynamic channel.", _, true, 0.0, true, 5.0);
 
@@ -196,6 +205,9 @@ public void OnPluginStart()
 	HookEvent("player_death", Event_PlayerDeath, EventHookMode_Pre);
 	
 	HookConVarChange(g_hCvar_Glow, Cvar_Glow_Changed);
+	HookConVarChange(g_hCvar_Glow_Spawn, Cvar_Glow_Changed);
+	HookConVarChange(g_hCvar_Glow_Spawn_Type, Cvar_Glow_Changed);
+	HookConVarChange(g_hCvar_Glow_Drop_Type, Cvar_Glow_Changed);
 	HookConVarChange(g_hCvar_HUD_Channel, Cvar_HUD_Channel_Changed);
 
 	CreateTimer(1.0, Timer_DisplayHUD, _, TIMER_REPEAT);
@@ -220,12 +232,22 @@ public void OnPluginStart()
 
 public void Cvar_Glow_Changed(ConVar convar, const char[] oldValue, const char[] newValue)
 {
-	g_bGlow = GetConVarBool(convar);
+	if(convar==g_hCvar_Glow)
+		g_bGlow = GetConVarBool(convar);
+	if(convar==g_hCvar_Glow_Spawn)
+		g_bGlow_Spawn = GetConVarBool(convar);
+	if(convar==g_hCvar_Glow_Spawn_Type)
+		g_iGlow_Spawn_Type = GetConVarInt(convar);
+	if(convar==g_hCvar_Glow_Drop_Type)
+		g_iGlow_Drop_Type = GetConVarInt(convar);
+	
 	if(!g_bGlow)
+	{
 		for (int index = 0; index < entArraySize; index++)
 		{
 			if (IsValidEdict(entArray[index][ent_glowent])) AcceptEntityInput(entArray[index][ent_glowent], "Kill");
 		}
+	}
 }
 
 public void Cvar_HUD_Channel_Changed(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -1255,7 +1277,7 @@ public Action OnWeaponDrop(int iClient, int iWeapon)
 				if (entArray[index][ent_weaponid] != -1 && entArray[index][ent_weaponid] == iWeapon)
 				{
 					entArray[index][ent_ownerid] = -1;
-					GlowWeapon(index);
+					GlowWeapon(index, false);
 					
 					if (entArray[index][ent_chat])
 					{
@@ -2226,7 +2248,7 @@ stock void LoadConfig()
 //----------------------------------------------------------------------------------------------------
 // Purpose: init Glow weapon on Drop weapons
 //----------------------------------------------------------------------------------------------------
-stock void GlowWeapon(int index)
+stock void GlowWeapon(int index, bool bSpawn)
 {
 	if(g_bGlow)
 	{
@@ -2264,6 +2286,9 @@ stock void GlowWeapon(int index)
 			// Give glowing effect to the entity
 			SetEntProp(entArray[index][ent_glowent], Prop_Send, "m_bShouldGlow", true, true);
 			SetEntPropFloat(entArray[index][ent_glowent], Prop_Send, "m_flGlowMaxDist", 10000000.0);
+			if(bSpawn)
+				SetEntProp(entArray[index][ent_glowent], Prop_Send, "m_nGlowStyle", g_iGlow_Spawn_Type);
+			else SetEntProp(entArray[index][ent_glowent], Prop_Send, "m_nGlowStyle", g_iGlow_Drop_Type);
 
 			// Set glowing color
 			int color_glow[4];
@@ -2282,6 +2307,7 @@ stock void GlowWeapon(int index)
 			AcceptEntityInput(entArray[index][ent_glowent], "SetGlowEnabled");
 		} else 
 		{
+			if(g_bGlow_Spawn) SetEntProp(entArray[index][ent_glowent], Prop_Send, "m_nGlowStyle", g_iGlow_Drop_Type);
 			AcceptEntityInput(entArray[index][ent_glowent], "TurnOn");
 			AcceptEntityInput(entArray[index][ent_glowent], "SetGlowEnabled");
 		}
@@ -2327,7 +2353,7 @@ public void OnEntitySpawned2(int iEntity)
 			//LogMessage("Found Item HammerID:%i EntityID:%i", iHammerID, iEntity);
 			entArray[index][ent_weaponid] = iEntity;
 			entArray[index][ent_glowent] = -1;
-			GlowWeapon(index);
+			if(g_bGlow_Spawn) GlowWeapon(index, true);
 			if (entArray[index][ent_buttonid] == -1 && entArray[index][ent_mode] != 0)
 			{
 				char sBuffer_targetname[32];
