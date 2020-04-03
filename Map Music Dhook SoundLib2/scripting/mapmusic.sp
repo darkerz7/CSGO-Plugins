@@ -9,7 +9,7 @@
 #include <soundlib2>
 
 #define PLUGIN_NAME 	"Map Music Control with Dynamic Volume Control"
-#define PLUGIN_VERSION 	"4.3h"
+#define PLUGIN_VERSION 	"4.3i"
 
 //#define Debug
 
@@ -298,10 +298,16 @@ public MRESReturn AcceptInput(int pThis, Handle hReturn, Handle hParams) {
 
 		float fSoundLen = 0.0;
 		char sPath[PLATFORM_MAX_PATH],sPathFull[PLATFORM_MAX_PATH];
-		if(sample[0]=='#') strcopy(sPath, sizeof(sPath), sample[1]); else FormatEx(sPath, sizeof sPath, "%s", sample);
-		FormatEx(sPathFull, sizeof sPathFull, "sound/%s", sPath);
+		FormatEx(sPathFull, sizeof sPathFull, "sound/%s", sample);
 		SoundFile hFile = new SoundFile(sPathFull, true);
-		if(hFile == INVALID_HANDLE) return MRES_Ignored;
+		if(hFile == INVALID_HANDLE)
+		{
+			strcopy(sPath, sizeof(sPath), sample[1]);
+			FormatEx(sPathFull, sizeof sPathFull, "sound/%s", sPath);
+			delete hFile;
+			hFile = new SoundFile(sPathFull, true);
+			if(hFile == INVALID_HANDLE) return MRES_Ignored;
+		}
 		fSoundLen = float(GetSoundLength(hFile));
 		delete hFile;
 
@@ -392,10 +398,16 @@ public Action SoundHook(char sample[PLATFORM_MAX_PATH], int &entity, float &volu
 
 	float fSoundLen = 0.0;
 	char sPath[PLATFORM_MAX_PATH],sPathFull[PLATFORM_MAX_PATH];
-	if(sample[0]=='#') strcopy(sPath, sizeof(sPath), sample[1]); else FormatEx(sPath, sizeof sPath, "%s", sample);
-	FormatEx(sPathFull, sizeof sPathFull, "sound/%s", sPath);
+	FormatEx(sPathFull, sizeof sPathFull, "sound/%s", sample);
 	SoundFile hFile = new SoundFile(sPathFull, true);
-	if(hFile == INVALID_HANDLE) return Plugin_Continue;
+	if(hFile == INVALID_HANDLE)
+	{
+		strcopy(sPath, sizeof(sPath), sample[1]);
+		FormatEx(sPathFull, sizeof sPathFull, "sound/%s", sPath);
+		delete hFile;
+		hFile = new SoundFile(sPathFull, true);
+		if(hFile == INVALID_HANDLE) return Plugin_Continue;
+	}
 	fSoundLen = float(GetSoundLength(hFile));
 	delete hFile;
 
@@ -667,10 +679,16 @@ stock void Client_UpdateMusics(int client) {
 
 		float fSoundLen = 0.0;
 		char sPath[PLATFORM_MAX_PATH],sPathFull[PLATFORM_MAX_PATH];
-		if(sample[0]=='#') strcopy(sPath, sizeof(sPath), sample[1]); else FormatEx(sPath, sizeof sPath, "%s", sample);
-		FormatEx(sPathFull, sizeof sPathFull, "sound/%s", sPath);
+		FormatEx(sPathFull, sizeof sPathFull, "sound/%s", sample);
 		SoundFile hFile = new SoundFile(sPathFull, true);
-		if(hFile == INVALID_HANDLE) continue;
+		if(hFile == INVALID_HANDLE)
+		{
+			strcopy(sPath, sizeof(sPath), sample[1]);
+			FormatEx(sPathFull, sizeof sPathFull, "sound/%s", sPath);
+			delete hFile;
+			hFile = new SoundFile(sPathFull, true);
+			if(hFile == INVALID_HANDLE) continue;
+		}
 		fSoundLen = float(GetSoundLength(hFile));
 		delete hFile;
 
