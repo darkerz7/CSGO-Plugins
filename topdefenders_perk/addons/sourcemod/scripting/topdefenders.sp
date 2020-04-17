@@ -106,7 +106,7 @@ public Plugin myinfo =
 	name = "[ZR] TopDefenders with Perk CS:GO",
 	author = "DarkerZ [RUS]",
 	description = "Shows damage by zombies and gives perk for the top",
-	version = "2.2",
+	version = "2.3",
 	url = "dark-skill.ru"
 }
 
@@ -293,32 +293,37 @@ public Action Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast
 		iSortDamage[i] = g_iPlayerDamage[i];
 	}
 	//sort
-	SortIntegers(iSortDamage, MaxClients, Sort_Descending);
+	SortIntegers(iSortDamage, MaxClients+1, Sort_Descending);
 	int iCount = 0;
 	int iSDindex = 0;
 	int iIgnoreLast = 0;
+	bool bMasNoEnd = true;
 	while(iCount<g_iTopCount)
 	{
-		if(iSortDamage[iSDindex]!=0 && iSortDamage[iSDindex]!=iIgnoreLast)
+		if(iSortDamage[iSDindex]!=0 && bMasNoEnd)
 		{
-			iIgnoreLast = iSortDamage[iSDindex];
-			for (int i = 1; i <= MaxClients; i++)
+			if(iSortDamage[iSDindex]!=iIgnoreLast)
 			{
-				if (g_iPlayerDamage[i]==iSortDamage[iSDindex])
+				iIgnoreLast = iSortDamage[iSDindex];
+				for (int i = 1; i <= MaxClients; i++)
 				{
-					iCount++;
-					char clientname[32];
-					GetClientName(i, clientname, sizeof(clientname));
-					if(iCount==1) CPrintToChatAll("%t", "Chat Top DefFirst",iCount, i, g_iPlayerDamage[i]);
-					if(iCount==2) CPrintToChatAll("%t", "Chat Top DefSecond",iCount, i, g_iPlayerDamage[i]);
-					if(iCount==3) CPrintToChatAll("%t", "Chat Top DefThird",iCount, i, g_iPlayerDamage[i]);
-					if((iCount!=1)&&(iCount!=2)&&(iCount!=3)) CPrintToChatAll("%t", "Chat Top DefOther",iCount, i, g_iPlayerDamage[i]);
-					Format(sHUD, sizeof(sHUD), "%s\n%t", sHUD, "HUD Top DefPosition", iCount, i, g_iPlayerDamage[i]);
-					g_iTopNextRound[i]=iCount;
+					if (g_iPlayerDamage[i]==iSortDamage[iSDindex])
+					{
+						iCount++;
+						char clientname[32];
+						GetClientName(i, clientname, sizeof(clientname));
+						if(iCount==1) CPrintToChatAll("%t", "Chat Top DefFirst",iCount, i, g_iPlayerDamage[i]);
+						if(iCount==2) CPrintToChatAll("%t", "Chat Top DefSecond",iCount, i, g_iPlayerDamage[i]);
+						if(iCount==3) CPrintToChatAll("%t", "Chat Top DefThird",iCount, i, g_iPlayerDamage[i]);
+						if((iCount!=1)&&(iCount!=2)&&(iCount!=3)) CPrintToChatAll("%t", "Chat Top DefOther",iCount, i, g_iPlayerDamage[i]);
+						Format(sHUD, sizeof(sHUD), "%s\n%t", sHUD, "HUD Top DefPosition", iCount, i, g_iPlayerDamage[i]);
+						g_iTopNextRound[i]=iCount;
+					}
+					if(iCount==g_iTopCount) break;
 				}
-				if(iCount==g_iTopCount) break;
 			}
-			iSDindex++;
+			if(iSDindex<MaxClients) iSDindex++;
+			else bMasNoEnd = false;
 		}else
 		{
 			iCount++;
@@ -360,32 +365,37 @@ public Action Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast
 			iSortDamage[i] = g_iPlayerInfect[i];
 		}
 		//sort
-		SortIntegers(iSortDamage, MaxClients, Sort_Descending);
+		SortIntegers(iSortDamage, MaxClients+1, Sort_Descending);
 		iCount = 0;
 		iSDindex = 0;
 		iIgnoreLast = 0;
+		bMasNoEnd = true;
 		while(iCount<g_iInfectorTopCount)
 		{
-			if(iSortDamage[iSDindex]!=0 && iSortDamage[iSDindex]!=iIgnoreLast)
+			if(iSortDamage[iSDindex]!=0 && bMasNoEnd)
 			{
-				iIgnoreLast = iSortDamage[iSDindex];
-				for (int i = 1; i <= MaxClients; i++)
+				if(iSortDamage[iSDindex]!=iIgnoreLast)
 				{
-					if (g_iPlayerInfect[i]==iSortDamage[iSDindex])
+					iIgnoreLast = iSortDamage[iSDindex];
+					for (int i = 1; i <= MaxClients; i++)
 					{
-						iCount++;
-						char clientname[32];
-						GetClientName(i, clientname, sizeof(clientname));
-						if(iCount==1) CPrintToChatAll("%t", "Chat Top InfFirst", iCount, i, g_iPlayerInfect[i]);
-						if(iCount==2) CPrintToChatAll("%t", "Chat Top InfSecond", iCount, i, g_iPlayerInfect[i]);
-						if(iCount==3) CPrintToChatAll("%t", "Chat Top InfThird", iCount, i, g_iPlayerInfect[i]);
-						if((iCount!=1)&&(iCount!=2)&&(iCount!=3)) CPrintToChatAll("%t", "Chat Top InfOther", iCount, i, g_iPlayerInfect[i]);
-						Format(sHUD, sizeof(sHUD), "%s\n%t", sHUD, "HUD Top InfPosition", iCount, i, g_iPlayerInfect[i]);
-						g_iTopNextRound[i]=-iCount;
+						if (g_iPlayerInfect[i]==iSortDamage[iSDindex])
+						{
+							iCount++;
+							char clientname[32];
+							GetClientName(i, clientname, sizeof(clientname));
+							if(iCount==1) CPrintToChatAll("%t", "Chat Top InfFirst", iCount, i, g_iPlayerInfect[i]);
+							if(iCount==2) CPrintToChatAll("%t", "Chat Top InfSecond", iCount, i, g_iPlayerInfect[i]);
+							if(iCount==3) CPrintToChatAll("%t", "Chat Top InfThird", iCount, i, g_iPlayerInfect[i]);
+							if((iCount!=1)&&(iCount!=2)&&(iCount!=3)) CPrintToChatAll("%t", "Chat Top InfOther", iCount, i, g_iPlayerInfect[i]);
+							Format(sHUD, sizeof(sHUD), "%s\n%t", sHUD, "HUD Top InfPosition", iCount, i, g_iPlayerInfect[i]);
+							g_iTopNextRound[i]=-iCount;
+						}
+						if(iCount==g_iInfectorTopCount) break;
 					}
-					if(iCount==g_iInfectorTopCount) break;
 				}
-				iSDindex++;
+				if(iSDindex<MaxClients) iSDindex++;
+				else bMasNoEnd = false;
 			}else
 			{
 				iCount++;
