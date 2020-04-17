@@ -15,13 +15,16 @@
 #tryinclude <csgocolors_fix>
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.8.146"
+#define PLUGIN_VERSION "3.8.147"
 
 //uncomment the next line if you using DynamicChannels: https://github.com/Vauff/DynamicChannels
 //#define DYNAMIC_CHANNELS
 #if defined DYNAMIC_CHANNELS
 #include <DynamicChannels>
 #endif
+
+//uncomment the next line if you want to use the item regardless of the position of the camera or in the crowd. Double triggering possible
+//#define ENTWATCH_USE_PRIORITY
 
 //----------------------------------------------------------------------------------------------------
 // Purpose: Entity data
@@ -2902,6 +2905,27 @@ public Action Command_ToggleHUD(int client, int args)
 	}
 	return Plugin_Handled;
 }
+
+#if defined ENTWATCH_USE_PRIORITY
+public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float[3] vel, float[3] angles, int &weapon)
+{
+	if(buttons & IN_USE)
+	{
+		if (g_bConfigLoaded && !g_bRoundTransition)
+		{
+			for (int index = 0; index < entArraySize; index++)
+			{
+				if(entArray[index][ent_ownerid]==client)
+				{
+					AcceptEntityInput(entArray[index][ent_buttonid], "Use", client, client); 
+					break;
+				}
+			}
+		}
+	}
+	return Plugin_Continue;
+}
+#endif
 
 stock int GetSlotCSGO(int eWeapon)
 {
