@@ -106,7 +106,7 @@ public Plugin myinfo =
 	name = "[ZR] TopDefenders with Perk CS:GO",
 	author = "DarkerZ [RUS]",
 	description = "Shows damage by zombies and gives perk for the top",
-	version = "2.3",
+	version = "2.3.1",
 	url = "dark-skill.ru"
 }
 
@@ -1034,7 +1034,6 @@ public Action Check_Human_Alive(Handle timer)
 				if(g_iEntityPerk[client] != -1)
 				{
 					if(IsValidEdict(g_iEntityPerk[client])) AcceptEntityInput(g_iEntityPerk[client], "Kill");//kill perk
-					SetEntityRenderColor(client, 255, 255, 255, 255);//change color
 					g_iEntityPerk[client]=-1;
 				}
 			}
@@ -1054,7 +1053,6 @@ public Action PerkRemove(int client, int args)
 			{
 				CPrintToChat(client, "%t", "Perk Remove");
 				if(IsValidEdict(g_iEntityPerk[client])) AcceptEntityInput(g_iEntityPerk[client], "Kill");//kill perk
-				SetEntityRenderColor(client, 255, 255, 255, 255);//change color
 				g_iEntityPerk[client]=-1;
 				SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);//speed
 				SetEntityGravity(client, 1.0);//gravity
