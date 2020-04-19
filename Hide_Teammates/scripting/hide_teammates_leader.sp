@@ -26,7 +26,7 @@ public Plugin myinfo =
 	name = "Hide Teammates", 
 	author = "DarkerZ [RUS]", 
 	description = "A plugin that can !hide with individual distances and ignore leader", 
-	version = "1.5L", 
+	version = "1.6L", 
 	url = "dark-skill.ru" 
 } 
 
@@ -68,7 +68,7 @@ public void OnMapStart()
 	}
 	if(!bEnabled) return;
 
-	g_timer = CreateTimer(0.2, HideTimer, _,TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	g_timer = CreateTimer(0.3, HideTimer, _,TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public void OnClientPutInServer(int client) 
@@ -157,7 +157,7 @@ public void OnConVarChange(Handle hCvar, const char[] oldValue, const char[] new
 		}
 		if(bEnabled)
 		{
-			g_timer = CreateTimer(0.2, HideTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+			g_timer = CreateTimer(0.3, HideTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 		}
 	}
 }
@@ -299,8 +299,6 @@ public Action HideTimer(Handle timer)
 
 public Action Hook_SetTransmit(int target, int client) 
 { 
-	if(!bEnabled) return Plugin_Continue;
-
 	if(g_HidePlayers[client][target])
 	{
 		return Plugin_Handled;
