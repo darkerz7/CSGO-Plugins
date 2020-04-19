@@ -15,7 +15,7 @@
 #tryinclude <csgocolors_fix>
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.8.148"
+#define PLUGIN_VERSION "3.8.149"
 
 //uncomment the next line if you using DynamicChannels: https://github.com/Vauff/DynamicChannels
 //#define DYNAMIC_CHANNELS
@@ -136,6 +136,9 @@ int HudColor[MAXPLAYERS+1][3];
 
 int g_iDelayUse = 3;
 bool g_bAdminsSee = true;
+bool g_bTeamOnly = true;
+bool g_bDispEnabled = true;
+bool g_bDispCooldowns = true;
 //----------------------------------------------------------------------------------------------------
 // Purpose: Plugin information
 //----------------------------------------------------------------------------------------------------
@@ -220,6 +223,9 @@ public void OnPluginStart()
 	HookConVarChange(g_hCvar_HUD_Channel, Cvar_HUD_Channel_Changed);
 	HookConVarChange(g_hCvar_Delay_Use, Cvar_Delay_Use_Changed);
 	HookConVarChange(g_hCvar_Admins_See, Cvar_Admins_See_Changed);
+	HookConVarChange(g_hCvar_ModeTeamOnly, Cvar_TeamOnly_Changed);
+	HookConVarChange(g_hCvar_DisplayEnabled, Cvar_DisplayEnabled_Changed);
+	HookConVarChange(g_hCvar_DisplayCooldowns, Cvar_DisplayCooldowns_Changed);
 
 	CreateTimer(1.0, Timer_DisplayHUD, _, TIMER_REPEAT);
 	CreateTimer(1.0, Timer_Cooldowns, _, TIMER_REPEAT);
@@ -274,6 +280,21 @@ public void Cvar_Delay_Use_Changed(ConVar convar, const char[] oldValue, const c
 public void Cvar_Admins_See_Changed(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	g_bAdminsSee = GetConVarBool(convar);
+}
+
+public void Cvar_TeamOnly_Changed(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	g_bTeamOnly = GetConVarBool(convar);
+}
+
+public void Cvar_DisplayEnabled_Changed(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	g_bDispEnabled = GetConVarBool(convar);
+}
+
+public void Cvar_DisplayCooldowns_Changed(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	g_bDispCooldowns = GetConVarBool(convar);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1189,7 +1210,7 @@ public void OnClientDisconnect(int iClient)
 					for (int iPly = 1; iPly <= MaxClients; iPly++)
 					{
 						if (IsClientConnected(iPly) && IsClientInGame(iPly)) {
-							if (!GetConVarBool(g_hCvar_ModeTeamOnly) || (GetConVarBool(g_hCvar_ModeTeamOnly) && GetClientTeam(iPly) == GetClientTeam(iClient) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT))) {
+							if (!g_bTeamOnly || (g_bTeamOnly && GetClientTeam(iPly) == GetClientTeam(iClient) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT))) {
 								CPrintToChat(iPly, "\x07%s[entWatch] \x07%s%N \x07%s(\x07%s%s\x07%s) \x07%s%t \x07%s%s", color_tag, color_name, iClient, color_disconnect, color_steamid, sBuffer_steamid, color_disconnect, color_disconnect, "disconnect", entArray[index][ent_color], entArray[index][ent_name]);
 							}
 						}
@@ -1235,7 +1256,7 @@ public Action Event_PlayerDeath(Event hEvent, const char[] sName, bool bDontBroa
 					{
 						if (IsClientConnected(iPly) && IsClientInGame(iPly))
 						{
-							if (!GetConVarBool(g_hCvar_ModeTeamOnly) || (GetConVarBool(g_hCvar_ModeTeamOnly) && GetClientTeam(iPly) == GetClientTeam(iClient) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT))) {
+							if (!g_bTeamOnly || (g_bTeamOnly && GetClientTeam(iPly) == GetClientTeam(iClient) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT))) {
 								CPrintToChat(iPly, "\x07%s[entWatch] \x07%s%N \x07%s(\x07%s%s\x07%s) \x07%s%t \x07%s%s", color_tag, color_name, iClient, color_death, color_steamid, sBuffer_steamid, color_death, color_death, "death", entArray[index][ent_color], entArray[index][ent_name]);
 							}
 						}
@@ -1273,7 +1294,7 @@ public Action OnWeaponEquip(int iClient, int iWeapon)
 						{
 							if (IsClientConnected(iPly) && IsClientInGame(iPly))
 							{
-								if (!GetConVarBool(g_hCvar_ModeTeamOnly) || (GetConVarBool(g_hCvar_ModeTeamOnly) && GetClientTeam(iPly) == GetClientTeam(iClient) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT)))
+								if (!g_bTeamOnly || (g_bTeamOnly && GetClientTeam(iPly) == GetClientTeam(iClient) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT)))
 								{
 									CPrintToChat(iPly, "\x07%s[entWatch] \x07%s%N \x07%s(\x07%s%s\x07%s) \x07%s%t \x07%s%s", color_tag, color_name, iClient, color_pickup, color_steamid, sBuffer_steamid, color_pickup, color_pickup, "pickup", entArray[index][ent_color], entArray[index][ent_name]);
 								}
@@ -1314,7 +1335,7 @@ public Action OnWeaponDrop(int iClient, int iWeapon)
 						{
 							if (IsClientConnected(iPly) && IsClientInGame(iPly))
 							{
-								if (!GetConVarBool(g_hCvar_ModeTeamOnly) || (GetConVarBool(g_hCvar_ModeTeamOnly) && GetClientTeam(iPly) == GetClientTeam(iClient) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT)))
+								if (!g_bTeamOnly || (g_bTeamOnly && GetClientTeam(iPly) == GetClientTeam(iClient) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT)))
 								{
 									CPrintToChat(iPly, "\x07%s[entWatch] \x07%s%N \x07%s(\x07%s%s\x07%s) \x07%s%t \x07%s%s", color_tag, color_name, iClient, color_drop, color_steamid, sBuffer_steamid, color_drop, color_drop, "drop", entArray[index][ent_color], entArray[index][ent_name]);
 								}
@@ -1422,7 +1443,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 							{
 								if (IsClientConnected(iPly) && IsClientInGame(iPly))
 								{
-									if (!GetConVarBool(g_hCvar_ModeTeamOnly) || (GetConVarBool(g_hCvar_ModeTeamOnly) && GetClientTeam(iPly) == GetClientTeam(iActivator) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT)))
+									if (!g_bTeamOnly || (g_bTeamOnly && GetClientTeam(iPly) == GetClientTeam(iActivator) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT)))
 									{
 										CPrintToChat(iPly, "\x07%s[entWatch] \x07%s%N \x07%s(\x07%s%s\x07%s) \x07%s%t \x07%s%s", color_tag, color_name, iActivator, color_use, color_steamid, sBuffer_steamid, color_use, color_use, "use", entArray[index][ent_color], entArray[index][ent_name]);
 									}
@@ -1440,7 +1461,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 							{
 								if (IsClientConnected(iPly) && IsClientInGame(iPly))
 								{
-									if (!GetConVarBool(g_hCvar_ModeTeamOnly) || (GetConVarBool(g_hCvar_ModeTeamOnly) && GetClientTeam(iPly) == GetClientTeam(iActivator) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT)))
+									if (!g_bTeamOnly || (g_bTeamOnly && GetClientTeam(iPly) == GetClientTeam(iActivator) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT)))
 									{
 										CPrintToChat(iPly, "\x07%s[entWatch] \x07%s%N \x07%s(\x07%s%s\x07%s) \x07%s%t \x07%s%s", color_tag, color_name, iActivator, color_use, color_steamid, sBuffer_steamid, color_use, color_use, "use", entArray[index][ent_color], entArray[index][ent_name]);
 									}
@@ -1459,7 +1480,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 							{
 								if (IsClientConnected(iPly) && IsClientInGame(iPly))
 								{
-									if (!GetConVarBool(g_hCvar_ModeTeamOnly) || (GetConVarBool(g_hCvar_ModeTeamOnly) && GetClientTeam(iPly) == GetClientTeam(iActivator) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT)))
+									if (!g_bTeamOnly || (g_bTeamOnly && GetClientTeam(iPly) == GetClientTeam(iActivator) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT)))
 									{
 										CPrintToChat(iPly, "\x07%s[entWatch] \x07%s%N \x07%s(\x07%s%s\x07%s) \x07%s%t \x07%s%s", color_tag, color_name, iActivator, color_use, color_steamid, sBuffer_steamid, color_use, color_use, "use", entArray[index][ent_color], entArray[index][ent_name]);
 									}
@@ -1478,7 +1499,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 							{
 								if (IsClientConnected(iPly) && IsClientInGame(iPly))
 								{
-									if (!GetConVarBool(g_hCvar_ModeTeamOnly) || (GetConVarBool(g_hCvar_ModeTeamOnly) && GetClientTeam(iPly) == GetClientTeam(iActivator) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT)))
+									if (!g_bTeamOnly || (g_bTeamOnly && GetClientTeam(iPly) == GetClientTeam(iActivator) || !IsPlayerAlive(iPly) || CheckCommandAccess(iPly, "entWatch_chat", ADMFLAG_CHAT)))
 									{
 										CPrintToChat(iPly, "\x07%s[entWatch] \x07%s%N \x07%s(\x07%s%s\x07%s) \x07%s%t \x07%s%s", color_tag, color_name, iActivator, color_use, color_steamid, sBuffer_steamid, color_use, color_use, "use", entArray[index][ent_color], entArray[index][ent_name]);
 									}
@@ -2609,7 +2630,7 @@ public Action Timer_DisplayHUD(Handle timer, int client)
 	//if (GameRules_GetProp("m_bWarmupPeriod") == 1)
 	//	return Plugin_Continue;
 	
-	if (GetConVarBool(g_hCvar_DisplayEnabled))
+	if (g_bDispEnabled)
 	{
 		if (g_bConfigLoaded && !g_bRoundTransition)
 		{
@@ -2624,7 +2645,7 @@ public Action Timer_DisplayHUD(Handle timer, int client)
 			{
 				if (entArray[index][ent_hud] && entArray[index][ent_ownerid] != -1)
 				{
-					if (GetConVarBool(g_hCvar_DisplayCooldowns))
+					if (g_bDispCooldowns)
 					{
 						if(GetClientTeam(entArray[index][ent_ownerid])==2 && iIndexZombies < MAXSHOWHUDITEMS-1)//ZM
 						{
@@ -2762,6 +2783,7 @@ public Action Timer_DisplayHUD(Handle timer, int client)
 					if(i!=iIndexHumans)
 						StrCat(sMessageAdmins,sizeof(sMessageAdmins),"\n");
 				}
+				if(iIndexHumans>-1 && iIndexZombies>-1) StrCat(sMessageAdmins,sizeof(sMessageAdmins),"\n");
 				for(int i=0; i <= iIndexZombies; i++)
 				{
 					StrCat(sMessageAdmins,sizeof(sMessageAdmins),buffer_teamtext_zombies[i]);
@@ -2789,21 +2811,22 @@ public Action Timer_DisplayHUD(Handle timer, int client)
 							else 
 								SetHudTextParams(HudPosition[i][0], HudPosition[i][1], 1.1, HudColor[i][0], HudColor[i][1], HudColor[i][2], 255, 0, 0.0, 0.0, 0.0);
 						}
-						if(g_bAdminsSee && CheckCommandAccess(i, "", ADMFLAG_GENERIC, true))
+						int iFlags = GetUserFlagBits(i);
+						if(g_bAdminsSee && (iFlags & ADMFLAG_KICK || iFlags & ADMFLAG_ROOT))
 						{
 							#if defined DYNAMIC_CHANNELS
 							ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMessageAdmins);
 							#else
 							ShowHudText(i, g_iHUDChannel, sMessageAdmins);
 							#endif
-						}else if(GetClientTeam(i)==3 && iIndexHumans>-1)
+						}else if(g_bTeamOnly && GetClientTeam(i)==3 && iIndexHumans>-1)
 						{
 							#if defined DYNAMIC_CHANNELS
 							ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMessageHumans);
 							#else
 							ShowHudText(i, g_iHUDChannel, sMessageHumans);
 							#endif
-						}else if(GetClientTeam(i)==2 && iIndexZombies>-1)
+						}else if(g_bTeamOnly && GetClientTeam(i)==2 && iIndexZombies>-1)
 						{
 							#if defined DYNAMIC_CHANNELS
 							ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMessageZombies);
