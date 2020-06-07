@@ -1,4 +1,5 @@
 #pragma semicolon 1
+#pragma newdecls required
 
 #include <sourcemod>
 #include <csgocolors_fix>
@@ -7,80 +8,94 @@ Database g_DB = null;
 int MainTimer[MAXPLAYERS+1] = 0;
 int AutoRetryTimer[MAXPLAYERS+1] = -1;
 
+bool g_bReady = false;
+
 ArrayList CurrentMapPlayersSteam;
 
-public Plugin:myinfo =
+public Plugin myinfo =
 {
 	name = "AutoRetry",
 	author = "DarkerZ[RUS]",
 	description = "AutoRetry After Download Map",
-	version = "1.4",
+	version = "1.5",
 	url = "dark-skill.ru"
 }
 
 public void OnPluginStart()
 {
 	RegConsoleCmd("sm_retryclear", SMRETRYCLEAR);
-	
 	LoadTranslations("autoretry.phrases");
 	
 	CurrentMapPlayersSteam = new ArrayList(ByteCountToCells(32));
-	
-	char error[256];
-	g_DB = SQLite_UseDatabase("AutoRetryDB", error, 256);
-	if (g_DB == null)
-    {
-		LogError(error);
-		SetFailState("Error SQL connection");
+	Database.Connect(ConnectCallBack, "AutoRetryDB");
+}
+
+public void ConnectCallBack(Database hDatabase, const char[] sError, any data)
+{
+	if (hDatabase == null)
+	{
+		SetFailState("Database failure: %s", sError);
 		return;
 	}
-	
-	SQL_LockDatabase(g_DB);
-	SQL_TQuery(g_DB, SQL_DefCallback, "CREATE TABLE IF NOT EXISTS `AR_UserMaps` (\
-		`steamid` varchar(32) NOT NULL, \
-		`mapname` varchar(64) NOT NULL, \
-		PRIMARY KEY (`steamid`,`mapname`))", 0);
-	SQL_UnlockDatabase(g_DB);
+	g_DB = hDatabase;
+	char sConnectDriverDB[16];
+	g_DB.Driver.GetIdentifier(sConnectDriverDB, sizeof(sConnectDriverDB));
+	if(strcmp(sConnectDriverDB, "mysql") == 0 || strcmp(sConnectDriverDB, "sqlite") == 0)
+	{
+		SQL_LockDatabase(g_DB);
+		g_DB.Query(SQL_Callback_CheckError,	"CREATE TABLE IF NOT EXISTS `AR_UserMaps` (\
+												`steamid` varchar(32) NOT NULL, \
+												`mapname` varchar(64) NOT NULL, \
+												PRIMARY KEY (`steamid`,`mapname`))", _, DBPrio_High);
+		SQL_UnlockDatabase(g_DB);
+	} else
+	{
+		SetFailState("Database failure: Unknown Driver");
+		return;
+	}
 	
 	g_DB.SetCharset("utf8");
 }
 
+public void SQL_Callback_CheckError(Database hDatabase, DBResultSet results, const char[] szError, any data)
+{
+	if(szError[0]) LogError("Database Callback Error: %s", szError);
+}
+
 public void OnMapStart()
 {
+	g_bReady = false;
 	CurrentMapPlayersSteam.Clear();
 	char mapname[64];
 	GetCurrentMap(mapname, sizeof(mapname));
 	char query[255];
-	FormatEx(query, sizeof(query), "SELECT `steamid` FROM AR_UserMaps WHERE mapname='%s'", mapname);  
-	DBResultSet hquery = SQL_Query(g_DB, query);
-	if (hquery != INVALID_HANDLE)
+	FormatEx(query, sizeof(query), "SELECT `steamid` FROM AR_UserMaps WHERE mapname='%s'", mapname); 
+	SQL_TQuery(g_DB, SQLT_Callback_CurrentMapResult, query, _, DBPrio_High);
+}
+
+void SQLT_Callback_CurrentMapResult(Handle hDatabase, Handle hResults, const char[] sError, any data)
+{
+	if(sError[0])
 	{
-		while(hquery.FetchRow())
+		LogError("Database Callback Map Result Error: %s", sError);
+	}
+	else
+	{
+		while(SQL_FetchRow(hResults))
 		{
 			char steamid[32];
-			hquery.FetchString(0, steamid, sizeof(steamid));
+			SQL_FetchString(hResults, 0, steamid, sizeof(steamid));
 			CurrentMapPlayersSteam.PushString(steamid);
-			
 		}
-	}
-
-	/* Handle late load */
-	for(int i = 1; i <= MaxClients; i++)
-	{
-		if(IsClientConnected(i))
+		for(int i = 1; i <= MaxClients; i++)
 		{
-			if(IsClientInGame(i) && IsClientAuthorized(i))
-				OnClientPostAdminCheck(i);
+			CheckClient(i);
 		}
+		g_bReady = true;
 	}
 }
 
-public SQL_DefCallback(Handle owner, Handle hndl, const String:error[], any data)
-{
-    if(hndl == INVALID_HANDLE) LogError(error);
-}
-
-public bool OnClientConnect(client, String:rejectmsg[], maxlen)
+public bool OnClientConnect(int client, char[] rejectmsg, int maxlen)
 {
 	AutoRetryTimer[client]=-1;
 	MainTimer[client] = GetTime();
@@ -93,38 +108,43 @@ public void OnClientDisconnect(int client)
 	AutoRetryTimer[client]=-1;
 }
 
-public OnClientPostAdminCheck(client)
+public void OnClientPostAdminCheck(int client)
 {
-	if((client>0)&&(client<=MaxClients))
+	CheckClient(client);
+}
+
+public void CheckClient(int iClient)
+{
+	if(g_bReady && IsValidClient(iClient))
 	{
-		if(!IsFakeClient(client))
+		ReplyToCommand(iClient, "%T %T", "Auto Retry Tag", iClient,"Auto Retry Connected Time", iClient, GetTime()-MainTimer[iClient]);
+		char steamid[32];
+		GetClientAuthId(iClient, AuthId_Engine, steamid, sizeof(steamid));
+		if (CurrentMapPlayersSteam.FindString(steamid)>-1)
 		{
-			ReplyToCommand(client, "%T %T", "Auto Retry Tag", client,"Auto Retry Connected Time", client, GetTime()-MainTimer[client]);
-			char steamid[32];
-			GetClientAuthId(client, AuthId_Engine, steamid, sizeof(steamid));
-			if (CurrentMapPlayersSteam.FindString(steamid)>-1)
-			{
-				AutoRetryTimer[client]=-1;
-			} else
-			{
-				CurrentMapPlayersSteam.PushString(steamid);
-				AutoRetryTimer[client]=5;
-				CreateTimer(1.0, Timer_To_Retry, client, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
-				char query[255];
-				char mapname[64];
-				GetCurrentMap(mapname, sizeof(mapname));
-				FormatEx(query, sizeof(query), "INSERT INTO AR_UserMaps(steamid, mapname) VALUES('%s', '%s')", steamid, mapname);
-				SQL_LockDatabase(g_DB);
-				SQL_TQuery(g_DB, SQL_DefCallback, query);
-				SQL_UnlockDatabase(g_DB);
-			}
+			AutoRetryTimer[iClient]=-1;
+		} else
+		{
+			CurrentMapPlayersSteam.PushString(steamid);
+			AutoRetryTimer[iClient]=5;
+			CreateTimer(1.0, Timer_To_Retry, iClient, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+			char query[255];
+			char mapname[64];
+			GetCurrentMap(mapname, sizeof(mapname));
+			FormatEx(query, sizeof(query), "INSERT INTO AR_UserMaps(steamid, mapname) VALUES('%s', '%s')", steamid, mapname);
+			SQL_TQuery(g_DB, SQLT_Callback_InsertData, query, _, DBPrio_Normal);
 		}
 	}
 }
 
+void SQLT_Callback_InsertData(Handle hDatabase, Handle hResults, const char[] sError, any data)
+{
+	if(sError[0]) LogError("Database Callback DataEdit Error: %s", sError);
+}
+
 public Action Timer_To_Retry(Handle hTimer, any client)
 {
-	if(IsClientInGame(client) && !IsFakeClient(client) && (AutoRetryTimer[client] >= 0))
+	if(IsValidClient(client) && (AutoRetryTimer[client] >= 0))
 	{
 		if(AutoRetryTimer[client]>0)
 		{
@@ -147,20 +167,27 @@ public Action Timer_To_Retry(Handle hTimer, any client)
 	return Plugin_Stop;
 }
 
-public Action SMRETRYCLEAR(client, args)
+public Action SMRETRYCLEAR(int client, int args)
 {
-	char query[255];
-	char steamid[32];
-	GetClientAuthId(client, AuthId_Engine, steamid, sizeof(steamid));
-	FormatEx(query, sizeof(query), "DELETE FROM AR_UserMaps WHERE steamid='%s'", steamid);
-	SQL_LockDatabase(g_DB);
-	SQL_TQuery(g_DB, SQL_DefCallback, query);
-	SQL_UnlockDatabase(g_DB);
-	int index = CurrentMapPlayersSteam.FindString(steamid);
-	if(index>-1)
+	if(g_bReady && IsValidClient(client))
 	{
-		CurrentMapPlayersSteam.Erase(index);
+		char query[255];
+		char steamid[32];
+		GetClientAuthId(client, AuthId_Engine, steamid, sizeof(steamid));
+		FormatEx(query, sizeof(query), "DELETE FROM AR_UserMaps WHERE steamid='%s'", steamid);
+		SQL_TQuery(g_DB, SQLT_Callback_InsertData, query, _, DBPrio_Normal);
+		int index = CurrentMapPlayersSteam.FindString(steamid);
+		if(index>-1)
+		{
+			CurrentMapPlayersSteam.Erase(index);
+		}
+		CPrintToChat(client, "%t %t", "Auto Retry Tag Color", "Auto Retry Clear DB");
 	}
-	CPrintToChat(client, "%t %t", "Auto Retry Tag Color", "Auto Retry Clear DB");
 	return Plugin_Handled;
+}
+
+stock bool IsValidClient(int iClient) 
+{ 
+	if (iClient > 0 && iClient <= MaxClients && IsValidEdict(iClient) && IsClientInGame(iClient) && !IsFakeClient(iClient) && IsClientConnected(iClient)) return true; 
+	return false; 
 }
