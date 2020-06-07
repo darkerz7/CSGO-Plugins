@@ -5,10 +5,10 @@
 		"name"				""			//String, FullName of Item (Chat)
 		"shortname"			""			//String, ShortName of Item (Hud)
 		"color"				""			//String, One of the colors. (Chat, Glow)
-		"buttonclass"		""			//String, Button Class, May matter "game_ui" for Right Click activation method
-		"filtername"		""			//String, Filter for Activator
-		"blockpickup"		"false"		//Bool, The item cannot be pick up
-		"allowtransfer"		"false"		//Bool, Allow admins to transfer an item
+		"buttonclass"			""			//String, Button Class, May matter "game_ui" for Right Click activation method
+		"filtername"			""			//String, Filter for Activator
+		"blockpickup"			"false"		//Bool, The item cannot be pick up
+		"allowtransfer"			"false"		//Bool, Allow admins to transfer an item
 		"forcedrop"			"false"		//Bool, Upon death or disconnection of the player, the item will be thrown out
 		"chat"				"false"		//Bool, Display chat items
 		"hud"				"false"		//Bool, Display Hud items
@@ -18,6 +18,6 @@
 		"cooldown"			"0"			//Integer, Cooldown of item for modes 2,4,5
 		"buttonid"			"0"			//Integer, NEW! Allows you to set the main button for which the cooldown will be considered. Use HammerID of button
 		"trigger"			"0"			//Integer, Sets a trigger that a restrict player cannot activate
-		"pt_spawner"		""			//String, NEW! Allows admins to spawn items. Can break the gameplay of the game on the map. Indicate Point_Template, which spawn the item
+		"pt_spawner"			""			//String, NEW! Allows admins to spawn items. Can break the gameplay of the game on the map. Indicate Point_Template, which spawn the item
 	}
 }
