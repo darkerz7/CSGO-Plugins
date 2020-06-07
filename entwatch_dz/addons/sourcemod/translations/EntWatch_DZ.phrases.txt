@@ -1,0 +1,396 @@
+"Phrases"
+{
+	"EW_Tag"
+	{
+		"en" 	"[EntWatch]"
+	}
+	"Welcome"
+	{
+		"en" 	"The current map is supported by this plugin."
+	}
+	"Use"
+	{
+		"en" 	"used"
+	}
+	"Pickup"
+	{
+		"en" 	"has picked up"
+	}
+	"Drop"
+	{
+		"en" 	"has dropped"
+	}
+	"Death"
+	{
+		"en" 	"has died with"
+	}
+	"Disconnect"
+	{
+		"en" 	"disconnected with"
+	}
+	"Enabled"
+	{
+		"en" 	"Enabled"
+	}
+	"Disabled"
+	{
+		"en" 	"Disabled"
+	}
+	"Hud"
+	{
+		"en" 	"The hud is now"
+	}
+	"Hud Position"
+	{
+		"en" 	"Hud Position"
+	}
+	"Hud Color"
+	{
+		"en" 	"Hud Color"
+	}
+	"Wrong"
+	{
+		"en" 	"Wrong"
+	}
+	"Saved"
+	{
+		"en" 	"Saved"
+	}
+	"Usage"
+	{
+		"en" 	"Usage"
+	}
+	"Restricted"
+	{
+		"en" 	"restricted"
+	}
+	"Unrestricted"
+	{
+		"en" 	"unrestricted"
+	}
+	"Duration"
+	{
+		"en" 	"Duration"
+	}
+	"EBan Duration for"
+	{
+		"en" 	"EBan Duration for"
+	}
+	"EBan Reason for"
+	{
+		"en" 	"EBan Reason for"
+	}
+	"Temporary"
+	{
+		"en" 	"Temporary"
+	}
+	"Permanently"
+	{
+		"en" 	"Permanently"
+	}
+	"For Minutes"
+	{
+		"#format"	"{1:i}"
+		"en" 	"for {1} minutes"
+	}
+	"Issued"
+	{
+		"en" 	"Issued"
+	}
+	"Reason"
+	{
+		"en" 	"Reason"
+	}
+	"Currently Eban"
+	{
+		"en" 	"Currently e-banned"
+	}
+	"Player"
+	{
+		"en" 	"Player"
+	}
+	"Admin"
+	{
+		"en" 	"Admin"
+	}
+	"No EBans"
+	{
+		"en" 	"No EBans"
+	}
+	"No owner"
+	{
+		"en" 	"No owner"
+	}
+	"No Receivers"
+	{
+		"en" 	"No Receivers"
+	}
+	"No Players"
+	{
+		"en" 	"No Players"
+	}
+	"Already EBanned"
+	{
+		"en" 	"Already EBanned"
+	}
+	"Already UnEBanned"
+	{
+		"en" 	"Already UnEBanned"
+	}
+	"Restricted By"
+	{
+		"en" 	"restricted by"
+	}
+	"Invalid item name"
+	{
+		"en" 	"Invalid item name"
+	}
+	"Has a Restrict"
+	{
+		"en" 	"has a restrict"
+	}
+	"Transfered all items"
+	{
+		"en" 	"transfered all items from"
+	}
+	"Transfered"
+	{
+		"en" 	"transfered"
+	}
+	"Differs team"
+	{
+		"en" 	"The receiver team differs from the target team"
+	}
+	"Already owns"
+	{
+		"en" 	"The receiver already owns this item"
+	}
+	"Target has no items"
+	{
+		"en" 	"Target has no items"
+	}
+	"EW to"
+	{
+		"en" 	"to"
+	}
+	"Item targets"
+	{
+		"en" 	"Item targets"
+	}
+	"Item to Spawn"
+	{
+		"en" 	"Item to Spawn"
+	}
+	"Player is not valid anymore"
+	{
+		"en" 	"Player is not valid anymore"
+	}
+	"Receiver is not valid anymore"
+	{
+		"en" 	"Receiver is not valid anymore"
+	}
+	"The player must be in one of the teams"
+	{
+		"en" 	"The player must be in one of the teams"
+	}
+	"PT configuration not found"
+	{
+		"en" 	"The item has no corresponding configuration"
+	}
+	"PT configuration Error"
+	{
+		"en" 	"Point_Template not found"
+	}
+	"Item not available"
+	{
+		"en" 	"Item is no longer available"
+	}
+	"EntWatch Commands"
+	{
+		"en" 	"EntWatch Commands"
+	}
+	"EntWatch Commands Title"
+	{
+		"en" 	"[EntWatch] Commands"
+	}
+	"List of Items"
+	{
+		"en" 	"List of Items"
+	}
+	"EBan a Player"
+	{
+		"en" 	"EBan a Player"
+	}
+	"List of EBan"
+	{
+		"en" 	"List of EBan"
+	}
+	"Spawn an Item"
+	{
+		"en" 	"Spawn an Item"
+	}
+	"Restrict Player"
+	{
+		"en" 	"Restrict player"
+	}
+	"EBan Info"
+	{
+		"en" 	"EBan Info"
+	}
+	"Transfer Item"
+	{
+		"en" 	"Transfer Item"
+	}
+	"UnEBan a Player"
+	{
+		"en" 	"UnEBan a Player"
+	}
+	"Receiver of the Item"
+	{
+		"en" 	"Receiver of the Item"
+	}
+	"Item Info"
+	{
+		"en" 	"Item Info"
+	}
+	"Owner"
+	{
+		"en" 	"Owner"
+	}
+	"Mode"
+	{
+		"en" 	"Mode"
+	}
+	"CoolDown"
+	{
+		"en" 	"CoolDown"
+	}
+	"Max Uses"
+	{
+		"en" 	"Max Uses"
+	}
+	"Mode Default"
+	{
+		"en" 	"Spam protection only"
+	}
+	"Mode 2"
+	{
+		"en" 	"Cooldowns"
+	}
+	"Mode 3"
+	{
+		"en" 	"Limited uses"
+	}
+	"Mode 4"
+	{
+		"en" 	"Limited uses with cooldowns"
+	}
+	"Mode 5"
+	{
+		"en" 	"Cooldowns after multiple uses"
+	}
+	"Minutes"
+	{
+		"en" 	"Minutes"
+	}
+	"Hour"
+	{
+		"en" 	"Hour"
+	}
+	"Day"
+	{
+		"en" 	"Day"
+	}
+	"Week"
+	{
+		"en" 	"Week"
+	}
+	"Month"
+	{
+		"en" 	"Month"
+	}
+	"Trolling"
+	{
+		"en" 	"Trolling"
+	}
+	"Trimming Team"
+	{
+		"en" 	"Trimming Team"
+	}
+	"Threw an Item"
+	{
+		"en" 	"Threw an Item"
+	}
+	"Not using an Item"
+	{
+		"en" 	"Not using an Item"
+	}
+	"Spam Item"
+	{
+		"en" 	"Spam Item"
+	}
+	"Cannot use Item"
+	{
+		"en" 	"Cannot use Item"
+	}
+	"Not Listening to the Leader"
+	{
+		"en" 	"Not Listening to the Leader"
+	}
+	"Other"
+	{
+		"en" 	"Other"
+	}
+	"Expires"
+	{
+		"en" 	"Expires"
+	}
+	"On Map Change"
+	{
+		"en" 	"On Map Change"
+	}
+	"Never"
+	{
+		"en" 	"Never"
+	}
+	"Spawn Item"
+	{
+		"en" 	"spawn item"
+	}
+	"On Player"
+	{
+		"en" 	"on player"
+	}
+	"List to Spawn"
+	{
+		"en" 	"List to Spawn"
+	}
+	"Strip Weapon"
+	{
+		"en" 	"Strip Weapon"
+	}
+	"Not Strip Weapon"
+	{
+		"en" 	"Not Strip Weapon"
+	}
+	"Recipient of a New Item"
+	{
+		"en" 	"Recipient of a New Item"
+	}
+	"No Items for Spawn"
+	{
+		"en" 	"No Items for Spawn"
+	}
+	"Is not restricted"
+	{
+		"en" 	"is not restricted"
+	}
+	"Status restricted"
+	{
+		"en" 	"You are currently restricted"
+	}
+	"Status unrestricted"
+	{
+		"en" 	"You are currently unrestricted"
+	}
+}
