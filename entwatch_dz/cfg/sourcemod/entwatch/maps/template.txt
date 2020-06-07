@@ -7,11 +7,11 @@
 		"color"				""			//String, One of the colors. (Chat, Glow)
 		"buttonclass"			""			//String, Button Class, May matter "game_ui" for Right Click activation method
 		"filtername"			""			//String, Filter for Activator
-		"blockpickup"			"false"		//Bool, The item cannot be pick up
-		"allowtransfer"			"false"		//Bool, Allow admins to transfer an item
-		"forcedrop"			"false"		//Bool, Upon death or disconnection of the player, the item will be thrown out
-		"chat"				"false"		//Bool, Display chat items
-		"hud"				"false"		//Bool, Display Hud items
+		"blockpickup"			"false"			//Bool, The item cannot be pick up
+		"allowtransfer"			"false"			//Bool, Allow admins to transfer an item
+		"forcedrop"			"false"			//Bool, Upon death or disconnection of the player, the item will be thrown out
+		"chat"				"false"			//Bool, Display chat items
+		"hud"				"false"			//Bool, Display Hud items
 		"hammerid"			"0"			//Integer, Special weapon HammerID
 		"mode"				"0"			//Integer, Mode for Item. 1 = Spam protection only, 2 = Cooldowns, 3 = Limited uses, 4 = Limited uses with cooldowns, 5 = Cooldowns after multiple uses
 		"maxuses"			"0"			//Integer, Maximum uses for modes 3,4,5
