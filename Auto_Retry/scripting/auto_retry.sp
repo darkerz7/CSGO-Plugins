@@ -9,6 +9,7 @@ int MainTimer[MAXPLAYERS+1] = 0;
 int AutoRetryTimer[MAXPLAYERS+1] = -1;
 
 bool g_bReady = false;
+bool g_bSuccessSetDB = false;
 
 ArrayList CurrentMapPlayersSteam;
 
@@ -17,7 +18,7 @@ public Plugin myinfo =
 	name = "AutoRetry",
 	author = "DarkerZ[RUS]",
 	description = "AutoRetry After Download Map",
-	version = "1.5",
+	version = "1.6",
 	url = "dark-skill.ru"
 }
 
@@ -55,6 +56,8 @@ public void ConnectCallBack(Database hDatabase, const char[] sError, any data)
 	}
 	
 	g_DB.SetCharset("utf8");
+	
+	g_bSuccessSetDB = true;
 }
 
 public void SQL_Callback_CheckError(Database hDatabase, DBResultSet results, const char[] szError, any data)
@@ -65,12 +68,24 @@ public void SQL_Callback_CheckError(Database hDatabase, DBResultSet results, con
 public void OnMapStart()
 {
 	g_bReady = false;
-	CurrentMapPlayersSteam.Clear();
-	char mapname[64];
-	GetCurrentMap(mapname, sizeof(mapname));
-	char query[255];
-	FormatEx(query, sizeof(query), "SELECT `steamid` FROM AR_UserMaps WHERE mapname='%s'", mapname); 
-	SQL_TQuery(g_DB, SQLT_Callback_CurrentMapResult, query, _, DBPrio_High);
+	if(g_bSuccessSetDB)
+	{
+		CurrentMapPlayersSteam.Clear();
+		char mapname[64];
+		GetCurrentMap(mapname, sizeof(mapname));
+		char query[255];
+		FormatEx(query, sizeof(query), "SELECT `steamid` FROM AR_UserMaps WHERE mapname='%s'", mapname); 
+		SQL_TQuery(g_DB, SQLT_Callback_CurrentMapResult, query, _, DBPrio_High);
+	}else
+	{
+		CreateTimer(5.0, Timer_RecconectDB, _, TIMER_FLAG_NO_MAPCHANGE);
+	}
+}
+
+public Action Timer_RecconectDB(Handle hTimer, any client)
+{
+	OnMapStart();
+	return Plugin_Stop;
 }
 
 void SQLT_Callback_CurrentMapResult(Handle hDatabase, Handle hResults, const char[] sError, any data)
