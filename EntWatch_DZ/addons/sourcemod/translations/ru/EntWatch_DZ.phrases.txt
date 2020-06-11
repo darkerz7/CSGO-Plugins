@@ -309,37 +309,37 @@
 	{
 		"ru" 	"Месяц"
 	}
-	"Trolling"
+	"Item misuse"
 	{
-		"ru" 	"Троллинг"
+		"ru" 	"Злоупотребление итемом"
 	}
-	"Trimming Team"
+	"Trolling on purpose"
 	{
-		"ru" 	"Тримминг команды"
+		"ru" 	"Умышленный троллинг"
 	}
-	"Threw an Item"
+	"Throwing item away"
 	{
 		"ru" 	"Выбросил итем"
 	}
-	"Not using an Item"
+	"Not using an item"
 	{
-		"ru" 	"Не использует итем"
+		"ru" 	"Не использует предмет"
 	}
-	"Spam Item"
+	"Trimming team"
+	{
+		"ru" 	"Тримминг команды"
+	}
+	"Spamming an item"
 	{
 		"ru" 	"Спам итемом"
 	}
-	"Cannot use Item"
-	{
-		"ru" 	"Использует итем не по назначению"
-	}
-	"Not Listening to the Leader"
+	"Not listening to leader"
 	{
 		"ru" 	"Не слушает лидера"
 	}
 	"Other"
 	{
-		"ru" 	"Другое"
+		"ru" 	"Другая"
 	}
 	"Expires"
 	{
@@ -392,5 +392,9 @@
 	"Status unrestricted"
 	{
 		"ru" 	"Вам разрешено использовать итемы"
+	}
+	"Default"
+	{
+		"ru" 	"По умолчанию"
 	}
 }

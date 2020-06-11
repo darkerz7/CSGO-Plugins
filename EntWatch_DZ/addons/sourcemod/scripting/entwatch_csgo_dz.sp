@@ -63,7 +63,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.1",
+	version = "3.DZ.2",
 	url = "dark-skill.ru"
 };
  
@@ -85,6 +85,7 @@ public void OnPluginStart()
 	RegAdminCmd("sm_setcooldown", EW_Command_Cooldown, ADMFLAG_BAN);
 	RegAdminCmd("sm_setmaxuses", EW_Command_Setmaxuses, ADMFLAG_BAN);
 	RegAdminCmd("sm_addmaxuses", EW_Command_Addmaxuses, ADMFLAG_BAN);
+	RegAdminCmd("sm_ewsetmode", EW_Command_Setmode, ADMFLAG_BAN);
 	
 	//Hook CVARs
 	HookConVarChange(g_hCvar_TeamOnly, Cvar_Main_Changed);
@@ -727,6 +728,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 										if(ItemTest.Chat) EWM_Chat_Use(ItemTest, iActivator);
 										#endif
 										
+										ItemTest.Delay = 1;
 										ItemTest.CoolDownTime = ItemTest.CoolDown;
 										g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 										return Plugin_Changed;
@@ -741,6 +743,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 										if(ItemTest.Chat) EWM_Chat_Use(ItemTest, iActivator);
 										#endif
 										
+										ItemTest.Delay = 1;
 										ItemTest.Uses++;
 										g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 										return Plugin_Changed;
@@ -755,6 +758,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 										if(ItemTest.Chat) EWM_Chat_Use(ItemTest, iActivator);
 										#endif
 										
+										ItemTest.Delay = 1;
 										ItemTest.CoolDownTime = ItemTest.CoolDown;
 										ItemTest.Uses++;
 										g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
@@ -770,6 +774,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 										if(ItemTest.Chat) EWM_Chat_Use(ItemTest, iActivator);
 										#endif
 										
+										ItemTest.Delay = 1;
 										ItemTest.Uses++;
 										if(ItemTest.Uses >= ItemTest.MaxUses)
 										{
@@ -1030,6 +1035,8 @@ public Action EW_Command_Cooldown(int iClient, int iArgs)
 
 	int iHammerID = StringToInt(sHammerID);
 	int iCooldown = StringToInt(sCooldown);
+	
+	if(iCooldown < 0) iCooldown = 0;
 
 	if (g_bConfigLoaded)
 		for(int i = 0; i<g_ItemList.Length; i++)
@@ -1070,6 +1077,8 @@ public Action EW_Command_Setmaxuses(int iClient, int iArgs)
 
 	int iHammerID = StringToInt(sHammerID);
 	int iMaxUses = StringToInt(sMaxUses);
+	
+	if(iMaxUses < 0) iMaxUses = 0;
 
 	if (g_bConfigLoaded)
 		for(int i = 0; i<g_ItemList.Length; i++)
@@ -1122,6 +1131,59 @@ public Action EW_Command_Addmaxuses(int iClient, int iArgs)
 				if(ItemTest.MaxUses > ItemTest.Uses || bOver)
 				{
 					ItemTest.MaxUses++;
+					g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
+				}
+			}
+		}
+
+	return Plugin_Handled;
+}
+
+public Action EW_Command_Setmode(int iClient, int iArgs)
+{
+	if (iArgs < 4)
+	{
+		CReplyToCommand(iClient, "%s%t %s%t: sm_ewsetmode <hammerid> <newmode> <cooldown> <maxuses> [<even if over>]", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Usage");
+		return Plugin_Handled;
+	}
+
+	char sHammerID[32], sNewMode[10], sCooldown[10], sMaxUses[10];
+
+	GetCmdArg(1, sHammerID, sizeof(sHammerID));
+	GetCmdArg(2, sNewMode, sizeof(sNewMode));
+	GetCmdArg(3, sCooldown, sizeof(sCooldown));
+	GetCmdArg(4, sMaxUses, sizeof(sMaxUses));
+	
+	bool bOver = false;
+	if(iArgs >= 5)
+	{
+		char sOver[10];
+		GetCmdArg(5, sOver, sizeof(sOver));
+		int iOver = StringToInt(sOver);
+		if(iOver == 1) bOver = true;
+	}
+
+	int iHammerID = StringToInt(sHammerID);
+	int iNewMode = StringToInt(sNewMode);
+	int iCooldown = StringToInt(sCooldown);
+	int iMaxUses = StringToInt(sMaxUses);
+	
+	if(iNewMode < 1 || iNewMode > 5) iNewMode = 1;
+	if(iCooldown < 0) iCooldown = 0;
+	if(iMaxUses < 0) iMaxUses = 0;
+
+	if (g_bConfigLoaded)
+		for(int i = 0; i<g_ItemList.Length; i++)
+		{
+			class_ItemList ItemTest;
+			g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
+			if(ItemTest.HammerID == iHammerID)
+			{
+				if(ItemTest.MaxUses > ItemTest.Uses || bOver || iNewMode == 2 || iNewMode == 1)
+				{
+					ItemTest.Mode = iNewMode;
+					ItemTest.CoolDown = iCooldown;
+					ItemTest.MaxUses = iMaxUses;
 					g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 				}
 			}

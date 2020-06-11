@@ -37,6 +37,7 @@ Features:
 -Information output in HUD, which can be configured by each player separately
 -Block item pick up on E
 -Allows you to set the channel for the output of the HUD
+-Allows you to completely change the item
 
 List of Modules:
 *Chat		- Responsible for displaying chat special messages to players
@@ -63,6 +64,7 @@ Commands and CVARs for modules:
 	*sm_setcooldown <hammerid> <cooldown>			- Allows you to change the item’s cooldown during the game
 	*sm_setmaxuses <hammerid> <maxuses> [<even if over>]	- Allows you to change the maximum use of the item during the game, depending on whether the item was used to the end
 	*sm_addmaxuses <hammerid> [<even if over>]		- Allows you to add 1 charge to the item, depending on whether the item was used to the end
+	*sm_ewsetmode <hammerid> <newmode> <cooldown> <maxuses> [<even if over>]	- Allows you to completely change the item
 
 %Module Debug
 #Admin CMDs:
@@ -75,6 +77,7 @@ Commands and CVARs for modules:
 	*entwatch_bantime		<0-43200>	- Default ban time. 0 - Permanent. Default 0
 	*entwatch_banreason		<reason>	- Default ban reason. Default "Trolling"
 	*entwatch_keep_expired_ban	<0/1>		- Enable/Disable keep expired bans. Default 1
+	*entwatch_use_reason_menu	<0/1>	- Enable/Disable menu if the admin has not indicated a reason
 #Admin CMDs:
 	*sm_eban <target> [<duration>] [<reason>]	- Allows you to restrict the player to pick up items
 	*sm_eunban <target> [<reason>]			- Allows you to unrestrict the player to pick up items

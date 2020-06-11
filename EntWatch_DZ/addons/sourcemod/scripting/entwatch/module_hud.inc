@@ -379,7 +379,7 @@ public Action EWM_Hud_Command_Hudpos(int iClient, int iArgs)
 	{
 		if (GetCmdArgs() < 2)
 		{
-			CReplyToCommand(iClient, "%s%t %s%t: sm_hudpos <x> <y>", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Usage");
+			CReplyToCommand(iClient, "%s%t %s%t: sm_hudpos <x> <y>. %t: %.3f %.3f", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Usage", "Default", g_SchemeConfig.Pos_HUD_X, g_SchemeConfig.Pos_HUD_Y);
 			return Plugin_Handled;
 		}
 		char sBuffer[128];
@@ -416,7 +416,7 @@ public Action EWM_Hud_Command_HudColor(int iClient, int iArgs)
 	{
 		if (GetCmdArgs() < 4)
 		{
-			CReplyToCommand(iClient, "%s%t %s%t: sm_hudcolor <R> <G> <B> <A>", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Usage");
+			CReplyToCommand(iClient, "%s%t %s%t: sm_hudcolor <R> <G> <B> <A>. %t: %i %i %i %i", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Usage", "Default", g_SchemeConfig.Color_HUD[0], g_SchemeConfig.Color_HUD[1], g_SchemeConfig.Color_HUD[2], g_SchemeConfig.Color_HUD[3]);
 			return Plugin_Handled;
 		}
 		char sBuffer[128];

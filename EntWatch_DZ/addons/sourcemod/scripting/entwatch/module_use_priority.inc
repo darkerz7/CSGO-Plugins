@@ -6,7 +6,7 @@ public Action OnPlayerRunCmd(int iClient, int &iButtons, int &iImpulse, float[3]
 	{
 		if (g_bConfigLoaded)
 		{
-			int iCountButtons = 0, iCurCountButton = 0;
+			int iCountButtons = 0, iCurCountButton = 0, iMode = 0;
 			int iButton = INVALID_ENT_REFERENCE;
 			for(int i = 0; i<g_ItemList.Length; i++)
 			{
@@ -20,11 +20,15 @@ public Action OnPlayerRunCmd(int iClient, int &iButtons, int &iImpulse, float[3]
 					if(iCountButtons == 1 && iCurCountButton == 1)
 					{
 						int iBtnBuff = ItemTest.ButtonsArray.Get(0);
-						if(IsValidEdict(iBtnBuff) && ItemTest.ButtonID == Entity_GetHammerID(iBtnBuff)) iButton = iBtnBuff;
+						if(IsValidEdict(iBtnBuff) && ItemTest.ButtonID == Entity_GetHammerID(iBtnBuff)) 
+						{
+							iButton = iBtnBuff;
+							iMode = ItemTest.Mode;
+						}
 					}
 				}
 			}
-			if(iCountButtons == 1 && IsValidEdict(iButton)) AcceptEntityInput(iButton, "Use", iClient, iClient); 
+			if(iCountButtons == 1 && iMode!=1 && IsValidEdict(iButton)) AcceptEntityInput(iButton, "Use", iClient, iClient); 
 		}
 	}
 	return Plugin_Continue;

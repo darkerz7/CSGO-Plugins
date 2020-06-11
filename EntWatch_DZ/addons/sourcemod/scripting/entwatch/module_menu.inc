@@ -228,32 +228,32 @@ void EWM_Menu_PM_EBanReason(int iClient, int iTarget, int iDuration)
 	
 	int iUserID = GetClientUserId(iTarget);
 	
-	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Trolling");
-	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Trolling", iClient);
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Item misuse");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Item misuse", iClient);
 	hMenu.AddItem(sIndexTemp, sMenuTemp);
 	
-	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Trimming Team");
-	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Trimming Team", iClient);
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Trolling on purpose");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Trolling on purpose", iClient);
 	hMenu.AddItem(sIndexTemp, sMenuTemp);
 	
-	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Threw an Item");
-	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Threw an Item", iClient);
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Throwing item away");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Throwing item away", iClient);
 	hMenu.AddItem(sIndexTemp, sMenuTemp);
 	
-	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Not using an Item");
-	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Not using an Item", iClient);
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Not using an item");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Not using an item", iClient);
 	hMenu.AddItem(sIndexTemp, sMenuTemp);
 	
-	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Spam Item");
-	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Spam Item", iClient);
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Trimming team");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Trimming team", iClient);
 	hMenu.AddItem(sIndexTemp, sMenuTemp);
 	
-	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Cannot use Item");
-	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Cannot use Item", iClient);
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Not listening to leader");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Not listening to leader", iClient);
 	hMenu.AddItem(sIndexTemp, sMenuTemp);
 	
-	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Not Listening to the Leader");
-	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Not Listening to the Leader", iClient);
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Spamming an item");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Spamming an item", iClient);
 	hMenu.AddItem(sIndexTemp, sMenuTemp);
 	
 	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Other");

@@ -309,33 +309,33 @@
 	{
 		"en" 	"Month"
 	}
-	"Trolling"
+	"Item misuse"
 	{
-		"en" 	"Trolling"
+		"en" 	"Item misuse"
 	}
-	"Trimming Team"
+	"Trolling on purpose"
 	{
-		"en" 	"Trimming Team"
+		"en" 	"Trolling on purpose"
 	}
-	"Threw an Item"
+	"Throwing item away"
 	{
-		"en" 	"Threw an Item"
+		"en" 	"Throwing item away"
 	}
-	"Not using an Item"
+	"Not using an item"
 	{
-		"en" 	"Not using an Item"
+		"en" 	"Not using an item"
 	}
-	"Spam Item"
+	"Trimming team"
 	{
-		"en" 	"Spam Item"
+		"en" 	"Trimming team"
 	}
-	"Cannot use Item"
+	"Spamming an item"
 	{
-		"en" 	"Cannot use Item"
+		"en" 	"Spamming an item"
 	}
-	"Not Listening to the Leader"
+	"Not listening to leader"
 	{
-		"en" 	"Not Listening to the Leader"
+		"en" 	"Not listening to leader"
 	}
 	"Other"
 	{
@@ -392,5 +392,9 @@
 	"Status unrestricted"
 	{
 		"en" 	"You are currently unrestricted"
+	}
+	"Default"
+	{
+		"en" 	"Default"
 	}
 }

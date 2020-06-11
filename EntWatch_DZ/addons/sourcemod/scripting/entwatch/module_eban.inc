@@ -7,7 +7,8 @@
 //-------------------------------------------------------
 ConVar	g_hCvar_Default_BanTime,
 		g_hCvar_Default_BanReason,
-		g_hCvar_Keep_Expired_Bans;
+		g_hCvar_Keep_Expired_Bans,
+		g_hCvar_Use_Reason_Menu;
 
 //-------------------------------------------------------
 // Purpose: Plugin Variables
@@ -21,8 +22,9 @@ int g_iDBStatus = 0; // 0 - Def., 1 - Reconnect, 2 - Unknown Driver, 3 - Create 
 stock void EWM_Eban_OnPluginStart()
 {
 	g_hCvar_Default_BanTime		= CreateConVar("entwatch_bantime", "0", "Default ban time (0-43200)", _, true, 0.0, true, 43200.0);
-	g_hCvar_Default_BanReason	= CreateConVar("entwatch_banreason", "Trolling", "Default ban reason.", _);
+	g_hCvar_Default_BanReason	= CreateConVar("entwatch_banreason", "Item misuse", "Default ban reason.", _);
 	g_hCvar_Keep_Expired_Bans	= CreateConVar("entwatch_keep_expired_ban", "1", "Enable/Disable keep expired bans.", _, true, 0.0, true, 1.0);
+	g_hCvar_Use_Reason_Menu		= CreateConVar("entwatch_use_reason_menu", "0", "Enable/Disable menu if the admin has not indicated a reason", _, true, 0.0, true, 1.0);
 
 	HookConVarChange(g_hCvar_Keep_Expired_Bans, Cvar_EBAN_Changed);
 	
@@ -535,12 +537,26 @@ public Action EWM_Eban_Command_Restrict(int iClient, int iArgs)
 		if(GetCmdArgs() == 1)
 		{
 			iDuration = GetConVarInt(g_hCvar_Default_BanTime);
-			GetConVarString(g_hCvar_Default_BanReason, sReason, sizeof(sReason));
+			if(GetConVarBool(g_hCvar_Use_Reason_Menu))
+			{
+				EWM_Eban_Menu_EBanReason(iClient, iTarget, iDuration);
+				return Plugin_Handled;
+			}else
+			{
+				GetConVarString(g_hCvar_Default_BanReason, sReason, sizeof(sReason));
+			}
 		}else if(GetCmdArgs() == 2)
 		{
 			GetCmdArg(2, sTarget_argument, sizeof(sTarget_argument));
 			iDuration = StringToInt(sTarget_argument);
-			GetConVarString(g_hCvar_Default_BanReason, sReason, sizeof(sReason));
+			if(GetConVarBool(g_hCvar_Use_Reason_Menu))
+			{
+				EWM_Eban_Menu_EBanReason(iClient, iTarget, iDuration);
+				return Plugin_Handled;
+			}else
+			{
+				GetConVarString(g_hCvar_Default_BanReason, sReason, sizeof(sReason));
+			}
 		}else
 		{
 			GetCmdArg(2, sTarget_argument, sizeof(sTarget_argument));
@@ -661,4 +677,72 @@ public Action EWM_Eban_Command_Status(int iClient, int iArgs)
 		}else CReplyToCommand(iClient, "%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Enabled, "Status unrestricted");
 	}
 	return Plugin_Handled;
+}
+
+//Menus
+void EWM_Eban_Menu_EBanReason(int iClient, int iTarget, int iDuration)
+{
+	Menu hMenu = CreateMenu(EWM_Eban_Menu_EBanReason_Handler);
+	char sMenuTranslate[128], sMenuTemp[64], sIndexTemp[96];
+	if(iDuration == -1) FormatEx(sMenuTranslate, sizeof(sMenuTranslate), "%T %T %N [%T]", "EW_Tag", iClient, "EBan Reason for", iClient, iTarget, "Temporary", iClient);
+	else if(iDuration == 0) FormatEx(sMenuTranslate, sizeof(sMenuTranslate), "%T %T %N [%T]", "EW_Tag", iClient, "EBan Reason for", iClient, iTarget, "Permanently", iClient);
+		else FormatEx(sMenuTranslate, sizeof(sMenuTranslate), "%T %T %N [%i %T]", "EW_Tag", iClient, "EBan Reason for", iClient, iTarget, iDuration, "Minutes", iClient);
+	hMenu.SetTitle(sMenuTranslate);
+	
+	int iUserID = GetClientUserId(iTarget);
+	
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Item misuse");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Item misuse", iClient);
+	hMenu.AddItem(sIndexTemp, sMenuTemp);
+	
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Trolling on purpose");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Trolling on purpose", iClient);
+	hMenu.AddItem(sIndexTemp, sMenuTemp);
+	
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Throwing item away");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Throwing item away", iClient);
+	hMenu.AddItem(sIndexTemp, sMenuTemp);
+	
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Not using an item");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Not using an item", iClient);
+	hMenu.AddItem(sIndexTemp, sMenuTemp);
+	
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Trimming team");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Trimming team", iClient);
+	hMenu.AddItem(sIndexTemp, sMenuTemp);
+	
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Not listening to leader");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Not listening to leader", iClient);
+	hMenu.AddItem(sIndexTemp, sMenuTemp);
+	
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Spamming an item");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Spamming an item", iClient);
+	hMenu.AddItem(sIndexTemp, sMenuTemp);
+	
+	FormatEx(sIndexTemp, sizeof(sIndexTemp), "%i/%i/%s", iDuration, iUserID, "Other");
+	FormatEx(sMenuTemp, sizeof(sMenuTemp), "%T", "Other", iClient);
+	hMenu.AddItem(sIndexTemp, sMenuTemp);
+	
+	hMenu.Display(iClient, MENU_TIME_FOREVER);
+}
+
+public int EWM_Eban_Menu_EBanReason_Handler(Menu hMenu, MenuAction hAction, int iClient, int iParam2)
+{
+	switch(hAction)
+	{
+		case MenuAction_End: delete hMenu;
+		case MenuAction_Select:
+		{
+			char sSelected[96], Explode_sParam[3][96], sReason[32];
+			hMenu.GetItem(iParam2, sSelected, sizeof(sSelected));
+			ExplodeString(sSelected, "/", Explode_sParam, 3, 96);
+			int iDuration = StringToInt(Explode_sParam[0]);
+			int iTarget = GetClientOfUserId(StringToInt(Explode_sParam[1]));
+			FormatEx(sReason, sizeof(sReason), "%s", Explode_sParam[2]);
+			if(IsValidClient(iTarget))
+				EWM_Eban_BanClient(iTarget, iClient, iDuration, sReason);
+			else
+				CPrintToChat(iClient, "%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Player is not valid anymore");
+		}
+	}
 }
