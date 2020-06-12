@@ -72,6 +72,7 @@ enum struct class_ClientSettings_Hud
 	int			Color[4];
 	float		Pos_X;
 	float		Pos_Y;
+	bool		Name;
 }
 
 enum struct class_ClientSettings_EBan

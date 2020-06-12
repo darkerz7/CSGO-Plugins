@@ -100,6 +100,7 @@ Commands and CVARs for modules:
 	*entwatch_hud_channel		<0-5>		- Change HUD Channel/Group Dynamic channel. Default 5
 #Client CMDs:
 	*sm_hud				- Switches the player’s display of the HUD
+	*sm_hudname			- Switches the display of player names in HUD
 	*sm_hudpos <x> <y>		- Allows you to set the position of the HUD
 	*sm_hudcolor <R> <G> <B> <A>	- Allows you to set the color of the HUD
 

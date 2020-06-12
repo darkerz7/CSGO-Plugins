@@ -38,15 +38,15 @@
 	}
 	"Hud"
 	{
-		"en" 	"The hud is now"
+		"en" 	"The HUD is now"
 	}
 	"Hud Position"
 	{
-		"en" 	"Hud Position"
+		"en" 	"HUD Position"
 	}
 	"Hud Color"
 	{
-		"en" 	"Hud Color"
+		"en" 	"HUD Color"
 	}
 	"Wrong"
 	{
@@ -396,5 +396,9 @@
 	"Default"
 	{
 		"en" 	"Default"
+	}
+	"Hud Names"
+	{
+		"en" 	"Names in HUD are"
 	}
 }
