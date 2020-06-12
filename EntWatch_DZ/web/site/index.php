@@ -111,7 +111,7 @@ function duration_string($input_duration)
 							if($data_duration == 0 && $data_unban_admin_steamid == ""){
 								echo 'data-eban-permanent" eban-data="Issued: Never">';
 							} elseif($data_unban_admin_steamid != ""){
-								echo 'data-eban-expired" eban-data="Removed: '.date('m-d-Y H:i:s', $data_unban_time).' Unbanned by: '.$data_admin_name.' ('.$data_admin_steamid.') Reason: '.$data_unban_reason.'">';
+								echo 'data-eban-expired" eban-data="Removed: '.date('m-d-Y H:i:s', $data_unban_time).' Unbanned by: '.$data_unban_admin_name.' ('.$data_unban_admin_steamid.') Reason: '.$data_unban_reason.'">';
 							} else {
 								echo 'data-eban-active" eban-data="Issued: '.date('m-d-Y H:i:s', $data_issued).'">';
 							}
