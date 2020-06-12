@@ -410,6 +410,7 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 				StrCat(sMessageAdmins_withoutname,sizeof(sMessageAdmins_withoutname),buffer_teamtext_zombies_withoutname[i]);
 				if(i!=iIndexZombies)
 				{
+					StrCat(sMessageAdmins,sizeof(sMessageAdmins),"\n");
 					StrCat(sMessageAdmins_withoutname,sizeof(sMessageAdmins_withoutname),"\n");
 				}
 			}
