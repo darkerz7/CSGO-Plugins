@@ -1,6 +1,7 @@
 #define EW_MODULE_HUD
 
 #define MAXSHOWHUDITEMS 10
+#define MAXSIZESTRINGFORITEM 64
 
 //-------------------------------------------------------
 // Purpose: Plugin settings
@@ -156,10 +157,10 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 {
 	if (g_bDispEnabled && g_bConfigLoaded)
 	{
-		char buffer_teamtext_humans[MAXSHOWHUDITEMS][64];
-		char buffer_teamtext_zombies[MAXSHOWHUDITEMS][64];
-		char buffer_teamtext_humans_withoutname[MAXSHOWHUDITEMS][64];
-		char buffer_teamtext_zombies_withoutname[MAXSHOWHUDITEMS][64];
+		char buffer_teamtext_humans[MAXSHOWHUDITEMS][MAXSIZESTRINGFORITEM];
+		char buffer_teamtext_zombies[MAXSHOWHUDITEMS][MAXSIZESTRINGFORITEM];
+		char buffer_teamtext_humans_withoutname[MAXSHOWHUDITEMS][MAXSIZESTRINGFORITEM];
+		char buffer_teamtext_zombies_withoutname[MAXSHOWHUDITEMS][MAXSIZESTRINGFORITEM];
 		int iIndexHumans = -1;
 		int iIndexZombies = -1;
 		char sMessageHumans[1024];
