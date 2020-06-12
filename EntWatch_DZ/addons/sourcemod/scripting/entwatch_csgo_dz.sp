@@ -461,7 +461,7 @@ stock void LoadScheme()
 		return;
 	}
 	
-	char szBuffer[16];
+	char szBuffer[64];
 	KvConfig.Rewind();
 	
 	KvConfig.GetString("color_tag", szBuffer, sizeof(szBuffer));
