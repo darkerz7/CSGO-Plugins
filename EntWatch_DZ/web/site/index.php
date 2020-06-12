@@ -253,7 +253,7 @@ function duration_string($input_duration)
 								echo '<div class="mobile-data-secondary-permanent"><div key_phrase="Issued" class="mobile-data-left lang">Issued:</div><div key_phrase="Never" class="mobile-data-right lang">Never</div></div>';
 							} elseif($data_unban_admin_steamid != ""){
 								echo '<div class="mobile-data-secondary-expired"><div key_phrase="Removed_2" class="mobile-data-left lang">Removed:</div><div class="mobile-data-right">'.date('m-d-Y H:i:s', $data_unban_time).'</div></div>';
-								echo '<div class="mobile-data-secondary-expired"><div key_phrase="Unbanned by" class="mobile-data-left lang">Unbanned by:</div><div class="mobile-data-right">'.$data_admin_name.' (<span class="data-eban-steamid">'.$data_admin_steamid.'</span>)</div></div>';
+								echo '<div class="mobile-data-secondary-expired"><div key_phrase="Unbanned by" class="mobile-data-left lang">Unbanned by:</div><div class="mobile-data-right">'.$data_unban_admin_name.' (<span class="data-eban-steamid">'.$data_unban_admin_steamid.'</span>)</div></div>';
 								echo '<div class="mobile-data-secondary-expired"><div key_phrase="Reason_2" class="mobile-data-left lang">Reason:</div><div class="mobile-data-right">'.$data_unban_reason.'</div></div>';
 							} else {
 								echo '<div class="mobile-data-secondary-active"><div key_phrase="Issued" class="mobile-data-left lang">Issued:</div><div class="mobile-data-right">'.date('m-d-Y H:i:s', $data_issued).'</div></div>';
