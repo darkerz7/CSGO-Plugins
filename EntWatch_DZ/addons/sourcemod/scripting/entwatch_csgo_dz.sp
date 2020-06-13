@@ -63,7 +63,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.3",
+	version = "3.DZ.4",
 	url = "dark-skill.ru"
 };
  
@@ -461,7 +461,7 @@ stock void LoadScheme()
 		return;
 	}
 	
-	char szBuffer[64];
+	char szBuffer[16];
 	KvConfig.Rewind();
 	
 	KvConfig.GetString("color_tag", szBuffer, sizeof(szBuffer));
@@ -830,7 +830,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 								
 								ItemTest.CoolDownTime = ItemTest.CoolDown;
 								g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-								return Plugin_Changed;
+								return Plugin_Continue;
 							}
 						case 3:
 							if(ItemTest.Uses < ItemTest.MaxUses)
@@ -844,7 +844,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 								
 								ItemTest.Uses++;
 								g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-								return Plugin_Changed;
+								return Plugin_Continue;
 							}
 						case 4:
 							if(ItemTest.Uses < ItemTest.MaxUses && ItemTest.CoolDownTime <= -1)
@@ -859,7 +859,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 								ItemTest.CoolDownTime = ItemTest.CoolDown;
 								ItemTest.Uses++;
 								g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-								return Plugin_Changed;
+								return Plugin_Continue;
 							}
 						case 5:
 							if(ItemTest.CoolDownTime <= -1)
@@ -878,9 +878,9 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 									ItemTest.Uses = 0;
 								}
 								g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-								return Plugin_Changed;
+								return Plugin_Continue;
 							}
-						default: return Plugin_Changed;
+						default: return Plugin_Continue;
 					}
 					return Plugin_Changed;
 				}
