@@ -419,7 +419,7 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 		{
 			for(int i = 1; i <= MaxClients; i++)
 			{
-				if(IsClientInGame(i) && !IsFakeClient(i) && g_CSettings_Hud[i].Display)
+				if(IsClientInGame(i) && !IsFakeClient(i) && g_CSettings_Hud[i].Display && (!IsVoteInProgress() || !IsClientInVotePool(i)) && GetClientMenu(i) == MenuSource_None)
 				{
 					SetHudTextParams(g_CSettings_Hud[i].Pos_X, g_CSettings_Hud[i].Pos_Y, 1.1, g_CSettings_Hud[i].Color[0], g_CSettings_Hud[i].Color[1], g_CSettings_Hud[i].Color[2], g_CSettings_Hud[i].Color[3], 0, 0.0, 0.0, 0.0);
 					

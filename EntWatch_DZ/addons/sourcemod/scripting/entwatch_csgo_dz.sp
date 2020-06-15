@@ -63,7 +63,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.4",
+	version = "3.DZ.5",
 	url = "dark-skill.ru"
 };
  
@@ -575,7 +575,7 @@ public bool RegisterButton(class_ItemList ItemInstance, int iEntity)
 		char Item_Weapon_Targetname[32], Item_Weapon_Parent[32];
 		Entity_GetTargetName(ItemInstance.WeaponID, Item_Weapon_Targetname, sizeof(Item_Weapon_Targetname));
 		Entity_GetParentName(iEntity, Item_Weapon_Parent, sizeof(Item_Weapon_Parent));
-		if (StrEqual(Item_Weapon_Targetname, Item_Weapon_Parent))
+		if (!StrEqual(Item_Weapon_Targetname,"") && StrEqual(Item_Weapon_Targetname, Item_Weapon_Parent))
 		{
 			if(ItemInstance.ButtonID == INVALID_ENT_REFERENCE) ItemInstance.ButtonID = Entity_GetHammerID(iEntity);
 			SDKHookEx(iEntity, SDKHook_Use, OnButtonUse);
