@@ -63,7 +63,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.5",
+	version = "3.DZ.6",
 	url = "dark-skill.ru"
 };
  
@@ -219,11 +219,25 @@ public Action Event_PlayerDeath(Event hEvent, const char[] sName, bool bDontBroa
 				EWM_ELogs_PlayerDeath(ItemTest, iClient);
 				#endif
 				
-				if(ItemTest.ForceDrop && IsValidEdict(ItemTest.WeaponID) && GetSlotCSGO(ItemTest.WeaponID) != -1) CS_DropWeapon(iClient, ItemTest.WeaponID, false);
-				
-				#if defined EW_MODULE_CHAT
-				else if(ItemTest.Chat) EWM_Chat_PlayerDeath(ItemTest, iClient);
-				#endif
+				if(IsValidEdict(ItemTest.WeaponID) && GetSlotCSGO(ItemTest.WeaponID) != -1)
+				{
+					if(ItemTest.ForceDrop) CS_DropWeapon(iClient, ItemTest.WeaponID, false);
+					else
+					{
+						#if defined EW_MODULE_CHAT
+						if(ItemTest.Chat)
+						{
+							ItemTest.Chat = false;
+							g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
+							CS_DropWeapon(iClient, ItemTest.WeaponID, false);
+							ItemTest.Chat = true;
+							g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
+							EWM_Chat_PlayerDeath(ItemTest, iClient);
+						} else
+						#endif
+						CS_DropWeapon(iClient, ItemTest.WeaponID, false);
+					}
+				}
 			}
 		}
 	}
@@ -270,15 +284,30 @@ public void OnClientDisconnect(int iClient)
 				ItemTest.OwnerID = INVALID_ENT_REFERENCE;
 				g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 				
-				#if defined EW_MODULE_GLOW
-				EWM_Glow_GlowWeapon(ItemTest, i, false);
-				#endif
-				
 				#if defined EW_MODULE_ELOGS
 				EWM_ELogs_Disconnect(ItemTest, iClient);
 				#endif
-				#if defined EW_MODULE_CHAT
-				if(ItemTest.Chat) EWM_Chat_Disconnect(ItemTest, iClient);
+				if(IsValidEdict(ItemTest.WeaponID) && GetSlotCSGO(ItemTest.WeaponID) != -1)
+				{
+					if(ItemTest.ForceDrop) CS_DropWeapon(iClient, ItemTest.WeaponID, false);
+					else
+					{
+						#if defined EW_MODULE_CHAT
+						if(ItemTest.Chat)
+						{
+							ItemTest.Chat = false;
+							g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
+							CS_DropWeapon(iClient, ItemTest.WeaponID, false);
+							ItemTest.Chat = true;
+							g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
+							EWM_Chat_Disconnect(ItemTest, iClient);
+						} else
+						#endif
+						CS_DropWeapon(iClient, ItemTest.WeaponID, false);
+					}
+				}
+				#if defined EW_MODULE_GLOW
+				EWM_Glow_GlowWeapon(ItemTest, i, false);
 				#endif
 			}
 		}
