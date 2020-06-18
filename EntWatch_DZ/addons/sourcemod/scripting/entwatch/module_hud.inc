@@ -9,7 +9,8 @@
 ConVar	g_hCvar_DisplayEnabled,
 		g_hCvar_DisplayCooldowns,
 		g_hCvar_Admins_See,
-		g_hCvar_HUD_Channel;
+		g_hCvar_HUD_Channel,
+		g_hCvar_ZM_pry;
 //-------------------------------------------------------
 // Purpose: Client settings
 //-------------------------------------------------------
@@ -22,7 +23,8 @@ Handle	g_hCookie_Display		  = null,
 //-------------------------------------------------------
 bool	g_bDispEnabled = true,
 		g_bDispCooldowns = true,
-		g_bAdminsSee = true;
+		g_bAdminsSee = true,
+		g_bZombieNoItemPry = false;
 
 int		g_iHUDChannel = 5;
 
@@ -34,6 +36,7 @@ stock void EWM_Hud_OnPluginStart()
 	g_hCvar_DisplayCooldowns	= CreateConVar("entwatch_display_cooldowns", "1", "Show/Hide the cooldowns on the display.", _, true, 0.0, true, 1.0);
 	g_hCvar_Admins_See			= CreateConVar("entwatch_admins_see", "1", "Enable/Disable admins see everything Items", _, true, 0.0, true, 1.0);
 	g_hCvar_HUD_Channel			= CreateConVar("entwatch_hud_channel", "5", "Change HUD Channel/Group Dynamic channel.", _, true, 0.0, true, 5.0);
+	g_hCvar_ZM_pry				= CreateConVar("entwatch_zm_noitem_pry", "0", "Enable/Disable zm pry human Items if zms without items", _, true, 0.0, true, 1.0);
 	
 	RegConsoleCmd("sm_hud", EWM_Hud_Command_ToggleHUD);
 	RegConsoleCmd("sm_hudname", EWM_Hud_Command_ToggleHUDName);
@@ -44,6 +47,7 @@ stock void EWM_Hud_OnPluginStart()
 	HookConVarChange(g_hCvar_DisplayCooldowns, Cvar_HUD_Changed);
 	HookConVarChange(g_hCvar_Admins_See, Cvar_HUD_Changed);
 	HookConVarChange(g_hCvar_HUD_Channel, Cvar_HUD_Changed);
+	HookConVarChange(g_hCvar_ZM_pry, Cvar_HUD_Changed);
 	
 	g_hCookie_Display     = RegClientCookie("entwatch_display", "", CookieAccess_Private);
 	g_hCookie_HudName     = RegClientCookie("entwatch_hudname", "", CookieAccess_Private);
@@ -63,6 +67,8 @@ public void Cvar_HUD_Changed(ConVar convar, const char[] oldValue, const char[] 
 		g_bAdminsSee = GetConVarBool(convar);
 	else if(convar==g_hCvar_HUD_Channel)
 		g_iHUDChannel = GetConVarInt(convar);
+	else if(convar==g_hCvar_ZM_pry)
+		g_bZombieNoItemPry = GetConVarBool(convar);
 }
 
 stock void EWM_Hud_OnClientCookiesCached(int iClient)
@@ -440,7 +446,7 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 							ShowHudText(i, g_iHUDChannel, sMessageAdmins_withoutname);
 							#endif
 						}
-					}else if(g_bTeamOnly && GetClientTeam(i)==3)
+					}else if((g_bTeamOnly && GetClientTeam(i)==3) || (g_bZombieNoItemPry && iIndexZombies<=-1 && GetClientTeam(i)==2))
 					{
 						if(iIndexHumans>-1)
 						{
