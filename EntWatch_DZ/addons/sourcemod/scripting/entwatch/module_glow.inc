@@ -16,6 +16,8 @@ bool	g_bGlow = true,
 
 int		g_iGlow_Spawn_Type = 0,
 		g_iGlow_Drop_Type = 0;
+		
+bool g_bMapRunning = false;
 
 stock void EWM_Glow_OnPluginStart()
 {
@@ -28,6 +30,16 @@ stock void EWM_Glow_OnPluginStart()
 	HookConVarChange(g_hCvar_Glow_Spawn, Cvar_GLOW_Changed);
 	HookConVarChange(g_hCvar_Glow_Spawn_Type, Cvar_GLOW_Changed);
 	HookConVarChange(g_hCvar_Glow_Drop_Type, Cvar_GLOW_Changed);
+}
+
+stock void EWM_Glow_OnMapStart()
+{
+	g_bMapRunning = true;
+}
+
+stock void EWM_Glow_OnMapEnd()
+{
+	g_bMapRunning = false;
 }
 
 public void Cvar_GLOW_Changed(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -60,7 +72,7 @@ public void Cvar_GLOW_Changed(ConVar convar, const char[] oldValue, const char[]
 //----------------------------------------------------------------------------------------------------
 stock void EWM_Glow_GlowWeapon(class_ItemList ItemTest, int index, bool bSpawn)
 {
-	if(g_bGlow)
+	if(g_bGlow && g_bMapRunning)
 	{
 		if(ItemTest.GlowEnt == INVALID_ENT_REFERENCE || !IsValidEdict(ItemTest.GlowEnt))
 		{
