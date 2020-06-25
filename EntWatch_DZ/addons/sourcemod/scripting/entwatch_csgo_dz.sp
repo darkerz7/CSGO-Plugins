@@ -51,6 +51,7 @@ bool g_bIsAdmin[MAXPLAYERS+1] = {false,...};
 #include "entwatch/module_glow.inc"
 #include "entwatch/module_use_priority.inc"
 #include "entwatch/module_extended_logs.inc"
+//#include "entwatch/module_physbox.inc" //Heavy module for the server. Not recommended. Need Collision Hook Ext https://forums.alliedmods.net/showthread.php?t=197815
 //#include "entwatch/module_debug.inc"
 //End Section Modules
 
@@ -63,7 +64,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.9",
+	version = "3.DZ.10",
 	url = "dark-skill.ru"
 };
  
@@ -71,8 +72,13 @@ public void OnPluginStart()
 {
 	g_ItemConfig = new ArrayList(512);
 	g_ItemList = new ArrayList(512);
+	
 	#if defined EW_MODULE_EBAN
 	g_TriggerArray = new ArrayList(512);
+	#endif
+	
+	#if defined EW_MODULE_PHYSBOX
+	EWM_Physbox_OnPluginStart();
 	#endif
 	
 	//CVARs
@@ -202,6 +208,9 @@ public Action Event_RoundEnd(Event hEvent, const char[] sName, bool bDontBroadca
 		g_ItemList.Clear();
 		#if defined EW_MODULE_EBAN
 		g_TriggerArray.Clear();
+		#endif
+		#if defined EW_MODULE_PHYSBOX
+		EWM_Physbox_Event_RoundEnd();
 		#endif
 	}
 }
@@ -476,6 +485,9 @@ stock void LoadConfig()
 			KvGetString(hKeyValues, "pt_spawner", sBuffer_temp, sizeof(sBuffer_temp));
 			FormatEx(NewItem.Spawner, sizeof(NewItem.Spawner), "%s", sBuffer_temp);
 			
+			KvGetString(hKeyValues, "physbox", sBuffer_temp, sizeof(sBuffer_temp));
+			NewItem.PhysBox = StrEqual(sBuffer_temp, "true", false);
+			
 			g_ItemConfig.PushArray(NewItem, sizeof(NewItem));
 		} while (KvGotoNextKey(hKeyValues));
 		g_bConfigLoaded = true;
@@ -603,6 +615,8 @@ public bool RegisterItem(class_ItemConfig ItemConfig, int iEntity, int iHammerID
 		
 		NewItem.Delay = g_iDelayUse;
 		NewItem.GlowEnt = INVALID_ENT_REFERENCE;
+		
+		NewItem.PhysBox = ItemConfig.PhysBox;
 		//PrintToServer("[EW]Item Spawned: %s |%i", NewItem.ShortName, iEntity);
 		g_ItemList.PushArray(NewItem, sizeof(NewItem));
 		
@@ -653,6 +667,9 @@ public void OnEntityCreated(int iEntity, const char[] sClassname)
 		#if defined EW_MODULE_EBAN
 		else if(StrContains(sClassname, "trigger_", false) != -1) SDKHook(iEntity, SDKHook_SpawnPost, OnTriggerSpawned);
 		#endif
+		#if defined EW_MODULE_PHYSBOX
+		else if(StrContains(sClassname, "func_physbox", false) != -1) SDKHook(iEntity, SDKHook_SpawnPost, OnPhysboxSpawned);
+		#endif
 	}
 }
 
@@ -677,6 +694,9 @@ public void OnEntityDestroyed(int iEntity)
 				}
 			}
 		}
+		#if defined EW_MODULE_PHYSBOX
+		else if(StrContains(sClassname, "func_physbox", false) != -1) EWM_Physbox_OnEntityDestroyed(iEntity);
+		#endif
 	}
 }
 
@@ -1040,6 +1060,9 @@ public Action OnWeaponEquip(int iClient, int iWeapon)
 				break;
 			}
 		}
+		#if defined EW_MODULE_PHYSBOX
+		EWM_Physbox_Pickedup(iClient, iWeapon);
+		#endif
 	}
 }
 

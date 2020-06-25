@@ -18,6 +18,7 @@ enum struct class_ItemConfig
 	int			GlowColor[4];
 	int			Trigger;
 	char		Spawner[64];
+	bool		PhysBox;
 }
 
 enum struct class_ItemList
@@ -45,6 +46,7 @@ enum struct class_ItemList
 	int			Delay;
 	int			GlowEnt;
 	int			GlowColor[4];
+	bool		PhysBox;
 }
 
 enum struct class_Scheme
