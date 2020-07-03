@@ -43,13 +43,14 @@ public Plugin:myinfo =
 	name = "Button Watcher with BBans",
 	author = "DarkerZ [RUS]",
 	description = "Generates an output when a button is pressed and Bans Clients",
-	version = "2.0",
+	version = "2.0.1",
 	url = ""
 };
 
 public OnPluginStart()
 {
 	LoadTranslations("button_watcher.phrases");
+	LoadTranslations("common.phrases");
 	
 	//Hooks
 	HookEntityOutput("func_button", "OnPressed", PressBTN);
