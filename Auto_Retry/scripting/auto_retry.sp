@@ -10,15 +10,22 @@ int AutoRetryTimer[MAXPLAYERS+1] = -1;
 
 bool g_bReady = false;
 bool g_bSuccessSetDB = false;
+bool g_bValidMaplist = false;
+bool g_bIgnoreMap = false;
+
+ConVar	g_hCvar_MapList,
+		g_hCvar_Mode,
+		g_hCvar_AutoDetect;
 
 ArrayList CurrentMapPlayersSteam;
+ArrayList AutoRetryMapList;
 
 public Plugin myinfo =
 {
 	name = "AutoRetry",
 	author = "DarkerZ[RUS]",
 	description = "AutoRetry After Download Map",
-	version = "1.6",
+	version = "1.7",
 	url = "dark-skill.ru"
 }
 
@@ -27,8 +34,45 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_retryclear", SMRETRYCLEAR);
 	LoadTranslations("autoretry.phrases");
 	
+	g_hCvar_MapList		= CreateConVar("autoretry_maplist", "0", "Enable/Disable using maplist.", _, true, 0.0, true, 1.0);
+	g_hCvar_Mode		= CreateConVar("autoretry_mode", "0", "Mode for maplist. 0 - AutoRetry Only map in list. 1 - Everyone else", _, true, 0.0, true, 1.0);
+	g_hCvar_AutoDetect	= CreateConVar("autoretry_autodetect", "0", "Autodetect map with particles. You need to disable the maplist", _, true, 0.0, true, 1.0);
+	
+	RegAdminCmd("sm_autoretry_reloadmaplist", Reload_Maplist, ADMFLAG_RCON);
+	
 	CurrentMapPlayersSteam = new ArrayList(ByteCountToCells(32));
+	AutoRetryMapList = new ArrayList(ByteCountToCells(64));
+	AutoExecConfig(true, "AutoRetry");
+	AR_UpdateMapList();
 	Database.Connect(ConnectCallBack, "AutoRetryDB");
+}
+
+public void AR_UpdateMapList()
+{
+	g_bValidMaplist = false;
+	AutoRetryMapList.Clear();
+	
+	char sPath[PLATFORM_MAX_PATH], sBuffer[64];
+	BuildPath(Path_SM, sPath, sizeof(sPath),"configs/autoretry_maplist.ini");
+	Handle hFile = OpenFile(sPath,"r");
+	if(!FileExists(sPath) || hFile == INVALID_HANDLE)
+	{
+		LogMessage("[AutoRetry] Can not open the file for reading");
+		return;
+	}
+	while(!IsEndOfFile(hFile) && ReadFileLine(hFile, sBuffer, sizeof(sBuffer)))
+	{
+		TrimString(sBuffer);
+		ReplaceString(sBuffer, sizeof(sBuffer), " ", "");
+		if(!StrEqual(sBuffer,""))
+		{
+			char sMapname[64];
+			FormatEx(sMapname, sizeof(sMapname), "%s", sBuffer);
+			AutoRetryMapList.PushString(sMapname);
+		}
+	}
+	CloseHandle(hFile);
+	if(AutoRetryMapList.Length > 0) g_bValidMaplist = true;
 }
 
 public void ConnectCallBack(Database hDatabase, const char[] sError, any data)
@@ -68,11 +112,58 @@ public void SQL_Callback_CheckError(Database hDatabase, DBResultSet results, con
 public void OnMapStart()
 {
 	g_bReady = false;
+	g_bIgnoreMap = false;
+	char mapname[64];
+	GetCurrentMap(mapname, sizeof(mapname));
+	if(GetConVarBool(g_hCvar_MapList) && g_bValidMaplist)
+	{
+		bool bFound = true;
+		if(GetConVarBool(g_hCvar_Mode))
+		{
+			bFound = false;
+			char sTestMap[64];
+			for(int i = 0; i < AutoRetryMapList.Length; i++)
+			{
+				AutoRetryMapList.GetString(i, sTestMap, sizeof(sTestMap));
+				if(StrEqual(mapname, sTestMap, false))
+				{
+					bFound = true;
+					break;
+				}
+			}
+		} else
+		{
+			char sTestMap[64];
+			for(int i = 0; i < AutoRetryMapList.Length; i++)
+			{
+				AutoRetryMapList.GetString(i, sTestMap, sizeof(sTestMap));
+				if(StrEqual(mapname, sTestMap, false))
+				{
+					bFound = false;
+					break;
+				}
+			}
+		}
+		if(bFound)
+		{
+			g_bIgnoreMap = true;
+			g_bReady = true;
+			return;
+		}
+	}else if(GetConVarBool(g_hCvar_AutoDetect))
+	{
+		char sManifest[PLATFORM_MAX_PATH];
+		FormatEx(sManifest, sizeof(sManifest), "maps/%s_particles.txt", mapname);
+		if (!FileExists(sManifest, true, NULL_STRING))
+		{
+			g_bIgnoreMap = true;
+			g_bReady = true;
+			return;
+		}
+	}
 	if(g_bSuccessSetDB)
 	{
 		CurrentMapPlayersSteam.Clear();
-		char mapname[64];
-		GetCurrentMap(mapname, sizeof(mapname));
 		char query[255];
 		FormatEx(query, sizeof(query), "SELECT `steamid` FROM AR_UserMaps WHERE mapname='%s'", mapname); 
 		SQL_TQuery(g_DB, SQLT_Callback_CurrentMapResult, query, _, DBPrio_High);
@@ -130,7 +221,7 @@ public void OnClientPostAdminCheck(int client)
 
 public void CheckClient(int iClient)
 {
-	if(g_bReady && IsValidClient(iClient))
+	if(g_bReady && !g_bIgnoreMap && IsValidClient(iClient))
 	{
 		ReplyToCommand(iClient, "%T %T", "Auto Retry Tag", iClient,"Auto Retry Connected Time", iClient, GetTime()-MainTimer[iClient]);
 		char steamid[32];
@@ -184,7 +275,7 @@ public Action Timer_To_Retry(Handle hTimer, any client)
 
 public Action SMRETRYCLEAR(int client, int args)
 {
-	if(g_bReady && IsValidClient(client))
+	if((g_bReady || (g_bIgnoreMap && g_bSuccessSetDB)) && IsValidClient(client))
 	{
 		char query[255];
 		char steamid[32];
@@ -198,6 +289,14 @@ public Action SMRETRYCLEAR(int client, int args)
 		}
 		CPrintToChat(client, "%t %t", "Auto Retry Tag Color", "Auto Retry Clear DB");
 	}
+	return Plugin_Handled;
+}
+
+public Action Reload_Maplist(int iClient, int iArgs)
+{
+	AR_UpdateMapList();
+	if(IsValidClient(iClient)) CPrintToChat(iClient, "%t %s", "Auto Retry Tag Color", "Reloading maplist...");
+	LogAction(iClient, -1, "\"%L\" Reloaded Maplist", iClient);
 	return Plugin_Handled;
 }
 
