@@ -13,6 +13,12 @@ My Plugins:
 *Auto_Retry - Remembers which maps the player played(SQLite DB). if the player plays for the first time on the map, then he automatically reconnects
   -Client Command:
     #sm_retryclear - Сleans the DB of maps played by the client
+  -CVARS:
+    #autoretry_maplist <0/1> - Enable/Disable using maplist
+    #autoretry_mode <0/1> - Mode for maplist. 0 - AutoRetry Only map in list. 1 - Everyone else
+    #autoretry_autodetect <0/1> - Autodetect map with particles. You need to disable the maplist
+  -Admin Command:
+    #sm_autoretry_reloadmaplist - Reloads the list of maps
 
 *EntWatch_DZ - Reworked EntWatch 3 for CS:GO
 
