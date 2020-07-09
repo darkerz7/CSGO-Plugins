@@ -1,0 +1,68 @@
+"Phrases"
+{
+	"MM Tag"
+	{
+		"en"	"{lightblue}[{green}MapMusic{lightblue}]{default}"
+	}
+
+	"MM Tag Menu"
+	{
+		"en"	"[Map Music]"
+	}
+	
+	"MM Cookie Menu"
+	{
+		"en"	"Map Music"
+	}
+
+	"MM Text Enable"
+	{
+		"en"	"Map music is {lightgreen}Enabled{default}."
+	}
+
+	"MM Text Disable"
+	{
+		"en"	"Map music is {red}Disabled{default}."
+	}
+
+	"MM Text Volume"
+	{
+		"#format"	"{1:d}"
+
+		"en"	"Map music is {lightgreen}Enabled{default}. Volume: {lightgreen}{1}"
+	}
+
+	"MM Enabled"
+	{
+		"en"	"Enabled"
+	}
+
+	"MM Disabled"
+	{
+		"en"	"Disabled"
+	}
+
+	"MM Menu Title"
+	{
+		"en"	"Music Control Menu"
+	}
+
+	"MM Menu AdjustDesc"
+	{
+		"en"	"You can use volume control instead of fully stopping\nFor adjust volume is \"!music <0-100>\""
+	}
+
+	"MM Menu Music"
+	{
+		"#format"	"{1:T}"
+
+		"en"	"Music: {1}"
+	}
+
+	"MM Menu Vol"
+	{
+		"#format"	"{1:d}"
+
+		"en"	"Volume: {1}"
+	}
+}

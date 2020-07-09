@@ -1,0 +1,68 @@
+"Phrases"
+{
+	"MM Tag"
+	{
+		"ru"	"{lightblue}[{green}MapMusic{lightblue}]{default}"
+	}
+
+	"MM Tag Menu"
+	{
+		"ru"	"[Музыка на карте]"
+	}
+	
+	"MM Cookie Menu"
+	{
+		"ru"	"Музыка на карте"
+	}
+
+	"MM Text Enable"
+	{
+		"ru"	"Музыка на карте {lightgreen}Включена{default}."
+	}
+
+	"MM Text Disable"
+	{
+		"ru"	"Музыка на карте {red}Отключена{default}."
+	}
+
+	"MM Text Volume"
+	{
+		"#format"	"{1:d}"
+
+		"ru"	"Музыка на карте {lightgreen}Включена{default}. Громкость: {lightgreen}{1}"
+	}
+
+	"MM Enabled"
+	{
+		"ru"	"Включена"
+	}
+
+	"MM Disabled"
+	{
+		"ru"	"Отключена"
+	}
+
+	"MM Menu Title"
+	{
+		"ru"	"Меню управления музыкой"
+	}
+
+	"MM Menu AdjustDesc"
+	{
+		"ru"	"Вы можете приглушить или выключить музыку на карте\nИспользуйте \"!music <0-100>\""
+	}
+
+	"MM Menu Music"
+	{
+		"#format"	"{1:T}"
+
+		"ru"	"Музыка: {1}"
+	}
+
+	"MM Menu Vol"
+	{
+		"#format"	"{1:d}"
+
+		"ru"	"Громкость: {1}"
+	}
+}
