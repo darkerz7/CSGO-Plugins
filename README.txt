@@ -33,7 +33,9 @@ My Plugins:
     #sm_hide_enabled <0/1> - Enable/Disable plugin
     #sm_hide_maximum <1000-8000> - The maximum distance a player can choose
 
-*Map Music Dhook SoundLib2 - Disable Map Music with Volume Control + Menus
+*Map Music Dhook SoundLib2 Old - Disable Map Music with Volume Control + Menus
+
+*MapMusic_DZ Dhook SoundLib2 - Reworked MapMusic
 
 *block_use_pickup_weapon - Ignore PickUp Weapons with press E
 
