@@ -40,7 +40,7 @@ public Plugin myinfo = {
 	name = "Map Music Control with Dynamic Volume Control",
 	author = "DarkerZ[RUS]",
 	description = "Allows clients to adjust ambient sounds played by the map",
-	version = "1.DZ.2_win",
+	version = "1.DZ.3_win",
 	url = "dark-skill.ru"
 };
 
@@ -375,7 +375,7 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 		}
 	}else if(strcmp(sCommand, "StopSound", false) == 0 || strcmp(sCommand, "FadeOut", false) == 0 || (strcmp(sCommand, "Volume", false) == 0 && (fVolume < 0.1)))
 	{
-		if(!ItemSample.Common)
+		if(!ItemSample.Common && ItemSample.Playing)
 		{
 			if(ItemSample.EntSource == ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File);
 			else StopSoundEx(ALL_CLIENTS, ItemSample.File, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
@@ -386,8 +386,11 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 	{
 		if(!ItemSample.Common)
 		{
-			if(ItemSample.EntSource == ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File);
-			else StopSoundEx(ALL_CLIENTS, ItemSample.File, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
+			if(ItemSample.Playing)
+			{
+				if(ItemSample.EntSource == ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File);
+				else StopSoundEx(ALL_CLIENTS, ItemSample.File, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
+			}
 			RemoveSample(ItemSample);
 		}else if(ItemSample.EntSource != ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
 	}
