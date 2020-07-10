@@ -4,6 +4,7 @@
 
 #include <sourcemod>
 #include <sdktools>
+#include <sdkhooks>
 #include <dhooks> //only detour edition https://forums.alliedmods.net/showpost.php?p=2588686&postcount=589
 #include <clientprefs>
 #include <csgocolors_fix>
@@ -24,6 +25,7 @@ enum struct class_Sample
 }
 
 ArrayList g_aSample;
+StringMap g_smSourceEnt;
 
 Handle g_hCookie_Disable = INVALID_HANDLE;
 Handle g_hCookie_Volume = INVALID_HANDLE;
@@ -40,7 +42,7 @@ public Plugin myinfo = {
 	name = "Map Music Control with Dynamic Volume Control",
 	author = "DarkerZ[RUS]",
 	description = "Allows clients to adjust ambient sounds played by the map",
-	version = "1.DZ.3",
+	version = "1.DZ.4",
 	url = "dark-skill.ru"
 };
 
@@ -54,6 +56,7 @@ public APLRes AskPluginLoad2(Handle hMyself, bool bLate, char[] sError, int iErr
 public void OnPluginStart()
 {
 	g_aSample = new ArrayList(512);
+	g_smSourceEnt = new StringMap();
 	
 	RegConsoleCmd("sm_mapmusic", Command_Music, "Brings up the music menu");
 	RegConsoleCmd("sm_music", Command_Music, "Brings up the music menu");
@@ -197,6 +200,7 @@ public int MapMusicMenuHandler(Menu hMenu, MenuAction hAction, int iClient, int 
 public void OnMapStart()
 {
 	g_aSample.Clear();
+	g_smSourceEnt.Clear();
 	g_iRoundNum = 0;
 	g_iSTSound = FindStringTable("soundprecache");
 	if(g_iSTSound == INVALID_STRING_TABLE) SetFailState("Failed to find string table \"soundprecache\".");
@@ -205,6 +209,7 @@ public void OnMapStart()
 public void OnMapEnd()
 {
 	g_aSample.Clear();
+	g_smSourceEnt.Clear();
 }
 
 public Action Event_RoundStart(Handle hEvent, const char[] sName, bool dontBroadcast)
@@ -221,6 +226,32 @@ public void OnEntityCreated(int iEntity, const char[] sClassname)
 		{
 			SetEntProp(iEntity, Prop_Data, "m_spawnflags", GetEntProp(iEntity, Prop_Data, "m_spawnflags")|32);
 			DHookEntity(g_hAcceptInput, false, iEntity);
+			SDKHook(iEntity, SDKHook_SpawnPost, OnEntitySpawned);
+		}
+	}
+}
+
+public void OnEntitySpawned(int iEntity)
+{
+	int iFlags = GetEntProp(iEntity, Prop_Data, "m_spawnflags");
+	if(!(iFlags & 1))
+	{
+		char sSourceEntName[64], sEntName[64];
+		GetEntPropString(iEntity, Prop_Data, "m_sSourceEntName", sSourceEntName, sizeof(sSourceEntName));
+		if(sSourceEntName[0])
+		{
+			for (int i = 0; i <= GetEntityCount(); i++)
+			{
+				if (IsValidEntity(i))
+				{
+					GetEntPropString(i, Prop_Data, "m_iName", sEntName, sizeof(sEntName));
+					if(strcmp(sSourceEntName, sEntName, false) == 0)
+					{
+						g_smSourceEnt.SetValue(sSourceEntName, EntIndexToEntRef(i), true);
+						break;
+					}
+				}
+			}
 		}
 	}
 }
@@ -286,26 +317,19 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 		ItemSample.Volume = float(GetEntProp(iEntity, Prop_Data, "m_iHealth"));
 		ItemSample.Playing = false;
 		
-		//Fix SourceEnt
 		ItemSample.EntSource = iIndexEntity;
 		int iFlags = GetEntProp(iEntity, Prop_Data, "m_spawnflags");
 		if(!(iFlags & 1))
 		{
-			char sSourceEntName[64], sEntName[64];
+			char sSourceEntName[64];
 			GetEntPropString(iEntity, Prop_Data, "m_sSourceEntName", sSourceEntName, sizeof(sSourceEntName));
 			if(sSourceEntName[0])
 			{
-				for (int i = 0; i <= GetEntityCount(); i++)
+				int entRef;
+				if(g_smSourceEnt.GetValue(sSourceEntName, entRef))
 				{
-					if (IsValidEntity(i))
-					{
-						GetEntPropString(i, Prop_Data, "m_iName", sEntName, sizeof(sEntName));
-						if(strcmp(sSourceEntName, sEntName, false) == 0)
-						{
-							ItemSample.EntSource = EntIndexToEntRef(i);
-							break;
-						}
-					}
+					int sourceEnt = EntRefToEntIndex(entRef);
+					if(IsValidEntity(sourceEnt)) ItemSample.EntSource = entRef;
 				}
 			}
 		}
@@ -334,6 +358,7 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 					CreateDataTimer(ItemSample.SndLength, Timer_OnSoundEnd, pack, TIMER_FLAG_NO_MAPCHANGE);
 					pack.WriteCell(ItemSample.Entity);
 					pack.WriteString(ItemSample.File);
+					pack.WriteCell(g_iRoundNum);
 				}else SaveSample(ItemSample);
 				
 				PlaySampleAll(ItemSample);
