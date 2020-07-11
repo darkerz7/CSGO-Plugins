@@ -42,7 +42,7 @@ public Plugin myinfo = {
 	name = "Map Music Control with Dynamic Volume Control",
 	author = "DarkerZ[RUS]",
 	description = "Allows clients to adjust ambient sounds played by the map",
-	version = "1.DZ.4",
+	version = "1.DZ.5",
 	url = "dark-skill.ru"
 };
 
@@ -227,6 +227,14 @@ public void OnEntityCreated(int iEntity, const char[] sClassname)
 			SetEntProp(iEntity, Prop_Data, "m_spawnflags", GetEntProp(iEntity, Prop_Data, "m_spawnflags")|32);
 			DHookEntity(g_hAcceptInput, false, iEntity);
 			SDKHook(iEntity, SDKHook_SpawnPost, OnEntitySpawned);
+		}
+		//fix ent spawned after ambient_generic
+		char sEntName[64];
+		GetEntPropString(iEntity, Prop_Data, "m_iName", sEntName, sizeof(sEntName));
+		if(sEntName[0])//have targetname
+		{
+			int entRef;
+			if(g_smSourceEnt.GetValue(sEntName, entRef)) g_smSourceEnt.SetValue(sEntName, EntIndexToEntRef(iEntity), true);
 		}
 	}
 }
@@ -472,14 +480,9 @@ void PlaySample(int iClient, class_Sample ItemSample)
 		}
 		else
 		{
-			if(!ItemSample.Common)
-				EmitSoundToClient(iClient, ItemSample.File, ItemSample.EntSource, SNDCHAN_STATIC,
-						 SNDLEVEL_NORMAL, SND_CHANGEVOL, fPlayVolume, SNDPITCH_NORMAL, -1,
-						 _, _, true);
-			else
-				EmitSoundToClient(iClient, ItemSample.File, ItemSample.EntSource, SNDCHAN_STATIC,
-						 SNDLEVEL_NORMAL, SND_NOFLAGS, fPlayVolume, SNDPITCH_NORMAL, -1,
-						 _, _, true);
+			EmitSoundToClient(iClient, ItemSample.File, ItemSample.EntSource, SNDCHAN_STATIC,
+					SNDLEVEL_NORMAL, SND_CHANGEVOL, fPlayVolume, SNDPITCH_NORMAL, -1,
+					_, _, true);
 		}
 	}
 }
