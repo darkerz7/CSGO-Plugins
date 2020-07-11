@@ -98,6 +98,7 @@ Commands and CVARs for modules:
 	*entwatch_display_cooldowns	<0/1>		- Show/Hide the cooldowns on the display. Default 1
 	*entwatch_admins_see		<0/1>		- Enable/Disable admins see everything Items. Default 1
 	*entwatch_hud_channel		<0-5>		- Change HUD Channel/Group Dynamic channel. Default 5
+	*entwatch_zm_noitem_pry		<0/1>		- Enable/Disable zm pry human Items if zms without items Default 0
 #Client CMDs:
 	*sm_hud				- Switches the player’s display of the HUD
 	*sm_hudname			- Switches the display of player names in HUD
