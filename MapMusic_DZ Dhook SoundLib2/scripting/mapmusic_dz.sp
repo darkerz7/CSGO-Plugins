@@ -42,7 +42,7 @@ public Plugin myinfo = {
 	name = "Map Music Control with Dynamic Volume Control",
 	author = "DarkerZ[RUS]",
 	description = "Allows clients to adjust ambient sounds played by the map",
-	version = "1.DZ.5",
+	version = "1.DZ.6",
 	url = "dark-skill.ru"
 };
 
@@ -428,7 +428,7 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 		}else if(ItemSample.EntSource != ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
 	}
 	
-	return MRES_Ignored;
+	return MRES_Handled;
 }
 
 void SaveSample(class_Sample ItemSample)
@@ -440,9 +440,10 @@ void SaveSample(class_Sample ItemSample)
 		if(ItemTest.Entity == ItemSample.Entity && strcmp(ItemTest.File, ItemSample.File, false) == 0)
 		{
 			g_aSample.SetArray(i, ItemSample, sizeof(ItemSample));
-			break;
+			return;
 		}
 	}
+	g_aSample.PushArray(ItemSample, sizeof(ItemSample)); // not found
 }
 
 void RemoveSample(class_Sample ItemSample)
