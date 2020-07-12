@@ -19,5 +19,6 @@
 		"buttonid"			"0"			//Integer, NEW! Allows you to set the main button for which the cooldown will be considered. Use HammerID of button
 		"trigger"			"0"			//Integer, Sets a trigger that a restrict player cannot activate
 		"pt_spawner"			""			//String, NEW! Allows admins to spawn items. Can break the gameplay of the game on the map. Indicate Point_Template, which spawn the item
+		"physbox"			"false"			//Bool, Need module physbox. May be omitted. If the item has a func_physbox, then teammates can shoot through him. Also the item does not ricochet grenades
 	}
 }
