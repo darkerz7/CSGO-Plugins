@@ -24,9 +24,17 @@
 	{
 		"en" 	"has died with"
 	}
+	"Death and drop"
+	{
+		"en" 	"has died and dropped"
+	}
 	"Disconnect"
 	{
 		"en" 	"disconnected with"
+	}
+	"Disconnect and drop"
+	{
+		"en" 	"disconnected and dropped"
 	}
 	"Enabled"
 	{
@@ -400,5 +408,33 @@
 	"Hud Names"
 	{
 		"en" 	"Names in HUD are"
+	}
+	"Offline EBan"
+	{
+		"en" 	"Offine EBan"
+	}
+	"Offline Restricted"
+	{
+		"en" 	"offline restricted"
+	}
+	"List of Disconnected Players"
+	{
+		"en" 	"List of Disconnected Players"
+	}
+	"Minutes Ago"
+	{
+		"en" 	"minutes ago"
+	}
+	"Info Offline Player"
+	{
+		"en" 	"Info Offline Player"
+	}
+	"Came out"
+	{
+		"en" 	"Came out"
+	}
+	"Last Item"
+	{
+		"en" 	"Last Item"
 	}
 }

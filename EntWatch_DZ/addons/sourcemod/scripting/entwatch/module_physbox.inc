@@ -2,13 +2,6 @@
 
 #include <collisionhook>
 
-enum struct class_Physbox
-{
-	int		Entity;
-	int		Team;
-	int		WeaponID;
-}
-
 ArrayList g_PhysboxArray;
 
 stock void EWM_Physbox_OnPluginStart()

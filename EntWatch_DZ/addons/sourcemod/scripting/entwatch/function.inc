@@ -87,6 +87,23 @@ enum struct class_ClientSettings_EBan
 	char		Reason[64];
 }
 
+enum struct class_Physbox
+{
+	int		Entity;
+	int		Team;
+	int		WeaponID;
+}
+
+enum struct class_Offline_Eban
+{
+	int		UserID;
+	char	PlayerName[32];
+	char	Player_SteamID[64];
+	int		TimeStamp;
+	int		TimeStamp_Start;
+	char	LastItem[32];
+}
+
 stock bool IsValidClient(int iClient) 
 { 
 	if (iClient > 0 && iClient <= MaxClients && IsValidEdict(iClient) && IsClientInGame(iClient)) return true; 

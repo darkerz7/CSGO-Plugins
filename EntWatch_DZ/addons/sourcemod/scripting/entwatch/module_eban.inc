@@ -145,6 +145,7 @@ void EWM_Eban_SQLCreateTables_Success(Database hDatabase, any Data, int iNumQuer
 {
 	g_iDBStatus = 4;
 	LogMessage("[EBan DB] DB Ready");
+	EWM_Eban_CleanData_All();
 }
 
 void EWM_Eban_SQLCreateTables_Error(Database hDatabase, any Data, int iNumQueries, const  char[] sError, int iFailIndex, any[] QueryData)
@@ -207,7 +208,7 @@ public void EWM_Eban_BanClient(int iClient, int iAdmin, int iDuration, const cha
 				SQL_TQuery(g_hEbanDB, EWM_Eban_SQLTCallBackBan, sTQuery,0);
 			}
 			LogAction(iAdmin, iClient, "\"%L\" restricted \"%L\" permanently. Reason: %s", iAdmin, iClient, sReason);
-			CPrintToChatAll("%s%t %s%s %s%t %s%N% %s%t. %s%t: %s", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Name, sAdmin_Name, g_SchemeConfig.Color_Disabled, "Restricted", g_SchemeConfig.Color_Name, iClient, g_SchemeConfig.Color_Disabled, "Permanently", g_SchemeConfig.Color_Warning, "Reason", sReason);
+			CPrintToChatAll("%s%t %s%s %s%t %s%N %s%t. %s%t: %s", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Name, sAdmin_Name, g_SchemeConfig.Color_Disabled, "Restricted", g_SchemeConfig.Color_Name, iClient, g_SchemeConfig.Color_Disabled, "Permanently", g_SchemeConfig.Color_Warning, "Reason", sReason);
 		}else
 		{
 			//Duration
@@ -233,7 +234,7 @@ public void EWM_Eban_BanClient(int iClient, int iAdmin, int iDuration, const cha
 			}
 			
 			LogAction(iAdmin, iClient, "\"%L\" restricted \"%L\" for %d minutes. Reason: %s", iAdmin, iClient, iBanDuration, sReason);
-			CPrintToChatAll("%s%t %s%s %s%t %s%N% %s%t. %s%t: %s", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Name, sAdmin_Name, g_SchemeConfig.Color_Disabled, "Restricted", g_SchemeConfig.Color_Name, iClient, g_SchemeConfig.Color_Enabled, "For Minutes", iBanDuration, g_SchemeConfig.Color_Warning, "Reason", sReason);
+			CPrintToChatAll("%s%t %s%s %s%t %s%N %s%t. %s%t: %s", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Name, sAdmin_Name, g_SchemeConfig.Color_Disabled, "Restricted", g_SchemeConfig.Color_Name, iClient, g_SchemeConfig.Color_Enabled, "For Minutes", iBanDuration, g_SchemeConfig.Color_Warning, "Reason", sReason);
 		}
 		
 		#if defined EW_MODULE_FORWARDS

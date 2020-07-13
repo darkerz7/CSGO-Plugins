@@ -43,6 +43,9 @@ public void OnAdminMenuReady(Handle hAdminMenu)
 	#if defined EW_MODULE_SPAWN
 	AddToTopMenu(g_hAdminMenu, "EntWatch_SpawnItemList", TopMenuObject_Item, EWM_Menu_AM_SpawnItemList_Handler, hMenuObj, "sm_espawnitem", ADMFLAG_BAN);
 	#endif
+	#if defined EW_MODULE_OFFLINE_EBAN
+	AddToTopMenu(g_hAdminMenu, "EntWatch_OfflineEBanList", TopMenuObject_Item, EWM_Menu_AM_EOfflineBanList_Handler, hMenuObj, "sm_eoban", ADMFLAG_RCON);
+	#endif
 }
 
 //-------------------------------------------------------
@@ -93,6 +96,17 @@ public void EWM_Menu_AM_SpawnItemList_Handler(Handle hMenu, TopMenuAction hActio
 	{
 		case TopMenuAction_DisplayOption: FormatEx(sBuffer, iMaxlen, "%T", "Spawn an Item", iClient);
 		case TopMenuAction_SelectOption: EWM_Menu_PM_SpawnItemList(iClient);
+	}
+}
+#endif
+
+#if defined EW_MODULE_OFFLINE_EBAN
+public void EWM_Menu_AM_EOfflineBanList_Handler(Handle hMenu, TopMenuAction hAction, TopMenuObject hObjID, int iClient, char[] sBuffer, int iMaxlen)
+{
+	switch (hAction)
+	{
+		case TopMenuAction_DisplayOption: FormatEx(sBuffer, iMaxlen, "%T", "Offline EBan", iClient);
+		case TopMenuAction_SelectOption: EWM_OfflineEban_PlayerList(iClient);
 	}
 }
 #endif

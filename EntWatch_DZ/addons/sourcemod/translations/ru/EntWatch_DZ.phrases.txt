@@ -22,11 +22,19 @@
 	}
 	"Death"
 	{
+		"ru" 	"умер с"
+	}
+	"Death and drop"
+	{
 		"ru" 	"умер и сбросил"
 	}
 	"Disconnect"
 	{
 		"ru" 	"отключился из игры с"
+	}
+	"Disconnect and drop"
+	{
+		"ru" 	"отключился и сбросил"
 	}
 	"Enabled"
 	{
@@ -400,5 +408,33 @@
 	"Hud Names"
 	{
 		"ru" 	"Информация о именах в HUD теперь"
+	}
+	"Offline EBan"
+	{
+		"ru" 	"ЗаЕбанить оффлайн"
+	}
+	"Offline Restricted"
+	{
+		"ru" 	"запретил подбор итемов оффлайн игроку"
+	}
+	"List of Disconnected Players"
+	{
+		"ru" 	"Список отключившихся"
+	}
+	"Minutes Ago"
+	{
+		"ru" 	"минут назад"
+	}
+	"Info Offline Player"
+	{
+		"ru" 	"Информация об офлайн игроке"
+	}
+	"Came out"
+	{
+		"ru" 	"Вышел"
+	}
+	"Last Item"
+	{
+		"ru" 	"Последний итем"
 	}
 }

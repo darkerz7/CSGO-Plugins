@@ -44,6 +44,7 @@ bool g_bIsAdmin[MAXPLAYERS+1] = {false,...};
 #include "entwatch/module_hud.inc"
 #include "entwatch/module_forwards.inc" //For the include EntWatch.inc to work correctly, use with module_eban
 #include "entwatch/module_eban.inc"
+#include "entwatch/module_offline_eban.inc" // Need module_eban. Experimental
 #include "entwatch/module_natives.inc" //For the include EntWatch.inc to work correctly, use with module_eban
 #include "entwatch/module_transfer.inc"
 #include "entwatch/module_spawn_item.inc"
@@ -64,7 +65,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.10",
+	version = "3.DZ.11",
 	url = "dark-skill.ru"
 };
  
@@ -112,6 +113,9 @@ public void OnPluginStart()
 	
 	#if defined EW_MODULE_EBAN
 	EWM_Eban_OnPluginStart();
+	#endif
+	#if defined EW_MODULE_OFFLINE_EBAN
+	EWM_OffilneEban_OnPluginStart();
 	#endif
 	#if defined EW_MODULE_TRANSFER
 	EWM_Transfer_OnPluginStart();
@@ -240,7 +244,13 @@ public Action Event_PlayerDeath(Event hEvent, const char[] sName, bool bDontBroa
 				
 				if(IsValidEdict(ItemTest.WeaponID) && GetSlotCSGO(ItemTest.WeaponID) != -1)
 				{
-					if(ItemTest.ForceDrop) CS_DropWeapon(iClient, ItemTest.WeaponID, false);
+					if(ItemTest.ForceDrop)
+					{
+						SDKHooks_DropWeapon(iClient, ItemTest.WeaponID);
+						#if defined EW_MODULE_CHAT
+						if(ItemTest.Chat) EWM_Chat_PlayerDeath_Drop(ItemTest, iClient);
+						#endif
+					}
 					else
 					{
 						if(GetSlotCSGO(ItemTest.WeaponID) == 2)
@@ -254,15 +264,11 @@ public Action Event_PlayerDeath(Event hEvent, const char[] sName, bool bDontBroa
 							#if defined EW_MODULE_CHAT
 							if(ItemTest.Chat)
 							{
-								ItemTest.Chat = false;
-								g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-								CS_DropWeapon(iClient, ItemTest.WeaponID, false);
-								ItemTest.Chat = true;
-								g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-								EWM_Chat_PlayerDeath(ItemTest, iClient);
+								SDKHooks_DropWeapon(iClient, ItemTest.WeaponID);
+								EWM_Chat_PlayerDeath_Drop(ItemTest, iClient);
 							} else
 							#endif
-							CS_DropWeapon(iClient, ItemTest.WeaponID, false);
+							SDKHooks_DropWeapon(iClient, ItemTest.WeaponID);
 						}
 					}
 				}
@@ -280,6 +286,9 @@ public void OnClientPutInServer(int iClient)
 	g_bIsAdmin[iClient] = false;
 	#if defined EW_MODULE_EBAN
 	EWM_Eban_OnClientPutInServer(iClient);
+	#endif
+	#if defined EW_MODULE_OFFLINE_EBAN
+	EWM_OffilneEban_OnClientPutInServer(iClient);
 	#endif
 	#if defined EW_MODULE_HUD
 	if(!AreClientCookiesCached(iClient)) EWM_Hud_LoadDefaultClientSettings(iClient);
@@ -317,7 +326,13 @@ public void OnClientDisconnect(int iClient)
 				#endif
 				if(IsValidEdict(ItemTest.WeaponID) && GetSlotCSGO(ItemTest.WeaponID) != -1)
 				{
-					if(ItemTest.ForceDrop) CS_DropWeapon(iClient, ItemTest.WeaponID, false);
+					if(ItemTest.ForceDrop)
+					{
+						SDKHooks_DropWeapon(iClient, ItemTest.WeaponID);
+						#if defined EW_MODULE_CHAT
+						if(ItemTest.Chat) EWM_Chat_Disconnect_Drop(ItemTest, iClient);
+						#endif
+					}
 					else
 					{
 						if(GetSlotCSGO(ItemTest.WeaponID) == 2)
@@ -331,15 +346,11 @@ public void OnClientDisconnect(int iClient)
 							#if defined EW_MODULE_CHAT
 							if(ItemTest.Chat)
 							{
-								ItemTest.Chat = false;
-								g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-								CS_DropWeapon(iClient, ItemTest.WeaponID, false);
-								ItemTest.Chat = true;
-								g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-								EWM_Chat_Disconnect(ItemTest, iClient);
+								SDKHooks_DropWeapon(iClient, ItemTest.WeaponID);
+								EWM_Chat_Disconnect_Drop(ItemTest, iClient);
 							} else
 							#endif
-							CS_DropWeapon(iClient, ItemTest.WeaponID, false);
+							SDKHooks_DropWeapon(iClient, ItemTest.WeaponID);
 						}
 					}
 				}
@@ -353,6 +364,9 @@ public void OnClientDisconnect(int iClient)
 	g_bIsAdmin[iClient] = false;
 	#if defined EW_MODULE_EBAN
 	EWM_Eban_OnClientDisconnect(iClient);
+	#endif
+	#if defined EW_MODULE_OFFLINE_EBAN
+	EWM_OffilneEban_OnClientDisconnect(iClient);
 	#endif
 	#if defined EW_MODULE_HUD
 	EWM_Hud_LoadDefaultClientSettings(iClient);
@@ -1055,6 +1069,9 @@ public Action OnWeaponEquip(int iClient, int iWeapon)
 				#endif
 				#if defined EW_MODULE_CHAT
 				if(ItemTest.Chat) EWM_Chat_PickUp(ItemTest, iClient);
+				#endif
+				#if defined EW_MODULE_OFFLINE_EBAN
+				EWM_OffilneEban_UpdateItemName(iClient, ItemTest.Name);
 				#endif
 				
 				break;
