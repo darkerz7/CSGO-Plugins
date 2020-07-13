@@ -114,6 +114,7 @@ Commands and CVARs for modules:
 %Module Transfer
 #Admin CMDs:
 	*sm_etransfer <owner>/$<itemname> <receiver>	- Allows admin to transfer item
+
 %Module Offline Eban
 #Cvars:
 	*entwatch_offline_clear_time	<1/240>		- Time during which data is stored. Default 30
