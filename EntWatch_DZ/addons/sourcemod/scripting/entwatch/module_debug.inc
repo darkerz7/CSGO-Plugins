@@ -53,9 +53,9 @@ public Action Command_DebugScheme(int iClient, int iArgs)
 {
 	if(IsClientConnected(iClient) && IsClientInGame(iClient))
 	{
-		CPrintToChat(iClient, "\x07%s[DEBUG] \x07%sName \x07%sSteamID \x07%sUse \x07%sPickup \x07%sDrop \x07%sDisconnect \x07%sDeath \x07%sWarning", g_SchemeConfig.Color_Tag, g_SchemeConfig.Color_Name, g_SchemeConfig.Color_SteamID, g_SchemeConfig.Color_Use, g_SchemeConfig.Color_Pickup, g_SchemeConfig.Color_Drop, g_SchemeConfig.Color_Disconnect, g_SchemeConfig.Color_Death, g_SchemeConfig.Color_Warning);
+		CPrintToChat(iClient, "%s[DEBUG] %sName %sSteamID %sUse %sPickup %sDrop %sDisconnect %sDeath %sWarning", g_SchemeConfig.Color_Tag, g_SchemeConfig.Color_Name, g_SchemeConfig.Color_SteamID, g_SchemeConfig.Color_Use, g_SchemeConfig.Color_Pickup, g_SchemeConfig.Color_Drop, g_SchemeConfig.Color_Disconnect, g_SchemeConfig.Color_Death, g_SchemeConfig.Color_Warning);
 		#if defined EW_MODULE_HUD
-		CPrintToChat(iClient, "\x07%s[DEBUG] \x07%sColor: R-%i G-%i B-%i A-%i Pos: X-%.4f Y-%.4f",g_SchemeConfig.Color_Tag, g_SchemeConfig.Color_Warning, g_SchemeConfig.Color_HUD[0], g_SchemeConfig.Color_HUD[1], g_SchemeConfig.Color_HUD[2], g_SchemeConfig.Color_HUD[3], g_SchemeConfig.Pos_HUD_X, g_SchemeConfig.Pos_HUD_Y);
+		CPrintToChat(iClient, "%s[DEBUG] %sColor: R-%i G-%i B-%i A-%i Pos: X-%.4f Y-%.4f",g_SchemeConfig.Color_Tag, g_SchemeConfig.Color_Warning, g_SchemeConfig.Color_HUD[0], g_SchemeConfig.Color_HUD[1], g_SchemeConfig.Color_HUD[2], g_SchemeConfig.Color_HUD[3], g_SchemeConfig.Pos_HUD_X, g_SchemeConfig.Pos_HUD_Y);
 		#endif
 	}
 }
