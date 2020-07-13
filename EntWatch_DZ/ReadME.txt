@@ -38,6 +38,7 @@ Features:
 -Block item pick up on E
 -Allows you to set the channel for the output of the HUD
 -Allows you to completely change the item
+-Allows you to eban a disconnected player
 
 List of Modules:
 *Chat		- Responsible for displaying chat special messages to players
@@ -52,6 +53,7 @@ List of Modules:
 *Spawn Item	- Responsible for the possibility for admins to spawn an item
 *Transfer	- Responsible for transfer items to admins
 *Use Priority	- Responsible for the use of items regardless of the crowd or camera position.
+*Offline Eban	- Responsible for Eban a disconnected player
 
 Commands and CVARs for modules:
 %Main
@@ -112,3 +114,8 @@ Commands and CVARs for modules:
 %Module Transfer
 #Admin CMDs:
 	*sm_etransfer <owner>/$<itemname> <receiver>	- Allows admin to transfer item
+%Module Offline Eban
+#Cvars:
+	*entwatch_offline_clear_time	<1/240>		- Time during which data is stored. Default 30
+#Admin CMDs:
+	*sm_eoban	- Allows admin eban disconnected player
