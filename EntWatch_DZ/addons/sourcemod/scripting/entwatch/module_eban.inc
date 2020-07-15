@@ -186,6 +186,15 @@ public void EWM_Eban_BanClient(int iClient, int iAdmin, int iDuration, const cha
 			CPrintToChatAll("%s%t %s%s %s%t %s%N% %s%t. %s%t: %s", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Name, sAdmin_Name, g_SchemeConfig.Color_Disabled, "Restricted", g_SchemeConfig.Color_Name, iClient, g_SchemeConfig.Color_Enabled, "Temporary", g_SchemeConfig.Color_Warning, "Reason", sReason);
 		}else if(iBanDuration == 0)
 		{
+			//Wesker EDIT -- Restrict perma bans with command override
+			if(iAdmin != 0)
+			{
+				//Check if admin has permission
+				if (!CheckCommandAccess(iAdmin, "sm_eban_perm", ADMFLAG_ROOT)) {
+					CPrintToChat(iAdmin, "{green}[Entwatch] {lightblue}You do not have permission to permanently eBan.");
+					return;
+				}
+			}
 			//Permament
 			g_EbanClients[iClient].Banned = true;
 			FormatEx(g_EbanClients[iClient].Admin_Name, 32, "%s", sAdmin_Name);
@@ -211,6 +220,15 @@ public void EWM_Eban_BanClient(int iClient, int iAdmin, int iDuration, const cha
 			CPrintToChatAll("%s%t %s%s %s%t %s%N %s%t. %s%t: %s", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Name, sAdmin_Name, g_SchemeConfig.Color_Disabled, "Restricted", g_SchemeConfig.Color_Name, iClient, g_SchemeConfig.Color_Disabled, "Permanently", g_SchemeConfig.Color_Warning, "Reason", sReason);
 		}else
 		{
+			//Wesker EDIT -- Restrict longer bans with command override
+			if(iAdmin != 0 && iBanDuration >= 720)
+			{
+				//Check if admin has permission
+				if (!CheckCommandAccess(iAdmin, "sm_eban_long", ADMFLAG_ROOT)) {
+					CPrintToChat(iAdmin, "{green}[Entwatch] {lightblue}You do not have permission to eBan longer than 12 hours.");
+					return;
+				}
+			}
 			//Duration
 			g_EbanClients[iClient].Banned = true;
 			FormatEx(g_EbanClients[iClient].Admin_Name, 32, "%s", sAdmin_Name);
@@ -265,8 +283,19 @@ public void EWM_Eban_UnBanClient(int iClient, int iAdmin, const char[] sReason)
 {
 	char sAdmin_Name[32];
 	char sAdmin_SteamID[64];
-	if(iAdmin != 0)
+	if (iAdmin != 0)
 	{
+		//WESKER EDIT -- Restrict perma unbans with command override
+		int iBanDuration = g_EbanClients[iClient].Duration;
+		if (iBanDuration == 0)
+		{
+				//Check if admin has permission
+				if (!CheckCommandAccess(iAdmin, "sm_eban_perm", ADMFLAG_ROOT)) {
+					CPrintToChat(iAdmin, "{green}[Entwatch] {lightblue}You do not have permission to remove permanent eBans.");
+					return;
+				}
+		}
+		
 		//Admin
 		FormatEx(sAdmin_Name, sizeof(sAdmin_Name), "%N", iAdmin);
 		GetClientAuthId(iAdmin, AuthId_Steam2, sAdmin_SteamID, sizeof(sAdmin_SteamID));

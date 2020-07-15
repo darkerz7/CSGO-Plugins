@@ -52,6 +52,10 @@ bool g_bIsAdmin[MAXPLAYERS+1] = {false,...};
 #include "entwatch/module_glow.inc"
 #include "entwatch/module_use_priority.inc"
 #include "entwatch/module_extended_logs.inc"
+
+//WESKER MODULE
+#include "entwatch/module_clantag.inc"
+
 //#include "entwatch/module_physbox.inc" //Heavy module for the server. Not recommended. Need Collision Hook Ext https://forums.alliedmods.net/showthread.php?t=197815
 //#include "entwatch/module_debug.inc"
 //End Section Modules
@@ -65,7 +69,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.11",
+	version = "3.DZ.12",
 	url = "dark-skill.ru"
 };
  
@@ -136,6 +140,11 @@ public void OnPluginStart()
 	EWM_Debug_OnPluginStart();
 	#endif
 	
+	//WESKER MODULE CLANTAG
+	#if defined EW_MODULE_CLANTAG
+	EWM_Clantag_OnPluginStart();
+	#endif
+	
 	LoadTranslations("EntWatch_DZ.phrases");
 	LoadTranslations("common.phrases");
 	
@@ -175,6 +184,10 @@ public void OnMapEnd()
 {
 	#if defined EW_MODULE_GLOW
 	EWM_Glow_OnMapEnd();
+	#endif
+	
+	#if defined EW_MODULE_CLANTAG
+	EWM_Clantag_OnMapEnd();
 	#endif
 }
 
@@ -216,6 +229,10 @@ public Action Event_RoundEnd(Event hEvent, const char[] sName, bool bDontBroadca
 		#if defined EW_MODULE_PHYSBOX
 		EWM_Physbox_Event_RoundEnd();
 		#endif
+		
+		#if defined EW_MODULE_CLANTAG
+		EWM_Clantag_Event_RoundEnd();
+		#endif
 	}
 }
 
@@ -250,6 +267,10 @@ public Action Event_PlayerDeath(Event hEvent, const char[] sName, bool bDontBroa
 						#if defined EW_MODULE_CHAT
 						if(ItemTest.Chat) EWM_Chat_PlayerDeath_Drop(ItemTest, iClient);
 						#endif
+						
+						#if defined EW_MODULE_CLANTAG
+						EWM_Clantag_PlayerDeath_Drop(ItemTest, iClient);
+						#endif
 					}
 					else
 					{
@@ -257,6 +278,10 @@ public Action Event_PlayerDeath(Event hEvent, const char[] sName, bool bDontBroa
 						{
 							#if defined EW_MODULE_CHAT
 							if(ItemTest.Chat) EWM_Chat_PlayerDeath(ItemTest, iClient);
+							#endif
+							
+							#if defined EW_MODULE_CLANTAG
+							EWM_Clantag_PlayerDeath(ItemTest, iClient);
 							#endif
 							AcceptEntityInput(ItemTest.WeaponID, "Kill");
 						}else
@@ -266,8 +291,13 @@ public Action Event_PlayerDeath(Event hEvent, const char[] sName, bool bDontBroa
 							{
 								SDKHooks_DropWeapon(iClient, ItemTest.WeaponID);
 								EWM_Chat_PlayerDeath_Drop(ItemTest, iClient);
-							} else
+							}
 							#endif
+							
+							#if defined EW_MODULE_CLANTAG
+							EWM_Clantag_PlayerDeath_Drop(ItemTest, iClient);
+							#endif
+							
 							SDKHooks_DropWeapon(iClient, ItemTest.WeaponID);
 						}
 					}
@@ -340,6 +370,7 @@ public void OnClientDisconnect(int iClient)
 							#if defined EW_MODULE_CHAT
 							if(ItemTest.Chat) EWM_Chat_Disconnect(ItemTest, iClient);
 							#endif
+							
 							AcceptEntityInput(ItemTest.WeaponID, "Kill");
 						}else
 						{
@@ -350,6 +381,7 @@ public void OnClientDisconnect(int iClient)
 								EWM_Chat_Disconnect_Drop(ItemTest, iClient);
 							} else
 							#endif
+							
 							SDKHooks_DropWeapon(iClient, ItemTest.WeaponID);
 						}
 					}
@@ -816,7 +848,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 										EWM_ELogs_Use(ItemTest, iActivator);
 										#endif
 										#if defined EW_MODULE_CHAT
-										if(ItemTest.Chat) EWM_Chat_Use(ItemTest, iActivator);
+										EWM_Chat_Use(ItemTest, iActivator);
 										#endif
 										
 										ItemTest.Delay = 1;
@@ -831,7 +863,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 										EWM_ELogs_Use(ItemTest, iActivator);
 										#endif
 										#if defined EW_MODULE_CHAT
-										if(ItemTest.Chat) EWM_Chat_Use(ItemTest, iActivator);
+										EWM_Chat_Use(ItemTest, iActivator);
 										#endif
 										
 										ItemTest.Delay = 1;
@@ -846,7 +878,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 										EWM_ELogs_Use(ItemTest, iActivator);
 										#endif
 										#if defined EW_MODULE_CHAT
-										if(ItemTest.Chat) EWM_Chat_Use(ItemTest, iActivator);
+										EWM_Chat_Use(ItemTest, iActivator);
 										#endif
 										
 										ItemTest.Delay = 1;
@@ -862,7 +894,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 										EWM_ELogs_Use(ItemTest, iActivator);
 										#endif
 										#if defined EW_MODULE_CHAT
-										if(ItemTest.Chat) EWM_Chat_Use(ItemTest, iActivator);
+										EWM_Chat_Use(ItemTest, iActivator);
 										#endif
 										
 										ItemTest.Delay = 1;
@@ -1007,6 +1039,10 @@ public Action OnWeaponDrop(int iClient, int iWeapon)
 				#if defined EW_MODULE_CHAT
 				if(ItemTest.Chat) EWM_Chat_Drop(ItemTest, iClient);
 				#endif
+				
+				#if defined EW_MODULE_CLANTAG
+				EWM_Clantag_Drop(ItemTest, iClient);
+				#endif
 					
 				break;
 			}
@@ -1070,6 +1106,11 @@ public Action OnWeaponEquip(int iClient, int iWeapon)
 				#if defined EW_MODULE_CHAT
 				if(ItemTest.Chat) EWM_Chat_PickUp(ItemTest, iClient);
 				#endif
+				
+				#if defined EW_MODULE_CLANTAG
+				if(ItemTest.Hud) EWM_Clantag_PickUp(ItemTest, iClient);
+				#endif
+				
 				#if defined EW_MODULE_OFFLINE_EBAN
 				EWM_OffilneEban_UpdateItemName(iClient, ItemTest.Name);
 				#endif

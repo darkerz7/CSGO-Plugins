@@ -23,8 +23,8 @@ stock void EWM_Glow_OnPluginStart()
 {
 	g_hCvar_Glow              = CreateConVar("entwatch_glow", "1", "Enable/Disable the glow Global.", _, true, 0.0, true, 1.0);
 	g_hCvar_Glow_Spawn        = CreateConVar("entwatch_glow_spawn", "1", "Enable/Disable the glow after Spawn Items.", _, true, 0.0, true, 1.0);
-	g_hCvar_Glow_Spawn_Type   = CreateConVar("entwatch_glow_spawn_type", "0", "Glow Type after Spawn Items.", _, true, 0.0, true, 3.0);
-	g_hCvar_Glow_Drop_Type    = CreateConVar("entwatch_glow_drop_type", "0", "Glow Type after Drop Items.", _, true, 0.0, true, 3.0);
+	g_hCvar_Glow_Spawn_Type   = CreateConVar("entwatch_glow_spawn_type", "0", "Glow Type after Spawn Items.", _, true, -1.0, true, 3.0);
+	g_hCvar_Glow_Drop_Type    = CreateConVar("entwatch_glow_drop_type", "0", "Glow Type after Drop Items.", _, true, -1.0, true, 3.0);
 
 	HookConVarChange(g_hCvar_Glow, Cvar_GLOW_Changed);
 	HookConVarChange(g_hCvar_Glow_Spawn, Cvar_GLOW_Changed);
@@ -74,6 +74,18 @@ stock void EWM_Glow_GlowWeapon(class_ItemList ItemTest, int index, bool bSpawn)
 {
 	if(g_bGlow && g_bMapRunning)
 	{
+		//WESKER EDIT -- Set drop type negative to disable glow on dropped items
+		if (!bSpawn && g_iGlow_Drop_Type < 0) {
+			if (ItemTest.GlowEnt != INVALID_ENT_REFERENCE && IsValidEdict(ItemTest.GlowEnt))
+			{
+				AcceptEntityInput(ItemTest.GlowEnt, "Kill");
+			}
+			return;
+		} else if (bSpawn && g_iGlow_Spawn_Type < 0) {
+			//WESKER EDIT -- Set spawn type negative to disable glow on new items
+			return;
+		}
+		
 		if(ItemTest.GlowEnt == INVALID_ENT_REFERENCE || !IsValidEdict(ItemTest.GlowEnt))
 		{
 			char sModelPath[PLATFORM_MAX_PATH];
