@@ -11,6 +11,7 @@
 		"allowtransfer"			"false"			//Bool, Allow admins to transfer an item
 		"forcedrop"			"false"			//Bool, Upon death or disconnection of the player, the item will be thrown out
 		"chat"				"false"			//Bool, Display chat items
+		"chat_uses"			"false"			//Bool, Display chat someone is using an item(if disabled chat)
 		"hud"				"false"			//Bool, Display Hud items
 		"hammerid"			"0"			//Integer, Special weapon HammerID
 		"mode"				"0"			//Integer, Mode for Item. 1 = Spam protection only, 2 = Cooldowns, 3 = Limited uses, 4 = Limited uses with cooldowns, 5 = Cooldowns after multiple uses

@@ -56,7 +56,7 @@ bool g_bIsAdmin[MAXPLAYERS+1] = {false,...};
 #include "entwatch/module_extended_logs.inc"
 
 //WESKER MODULE
-#include "entwatch/module_clantag.inc"
+//#include "entwatch/module_clantag.inc"
 
 //#include "entwatch/module_physbox.inc" //Heavy module for the server. Not recommended. Need Collision Hook Ext https://forums.alliedmods.net/showthread.php?t=197815
 //#include "entwatch/module_debug.inc"
@@ -71,7 +71,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.12",
+	version = "3.DZ.13",
 	url = "dark-skill.ru"
 };
  
@@ -517,6 +517,9 @@ stock void LoadConfig()
 			KvGetString(hKeyValues, "chat", sBuffer_temp, sizeof(sBuffer_temp));
 			NewItem.Chat = StrEqual(sBuffer_temp, "true", false);
 			
+			KvGetString(hKeyValues, "chat_uses", sBuffer_temp, sizeof(sBuffer_temp));
+			NewItem.Chat_Uses = StrEqual(sBuffer_temp, "true", false);
+			
 			KvGetString(hKeyValues, "hud", sBuffer_temp, sizeof(sBuffer_temp));
 			NewItem.Hud = StrEqual(sBuffer_temp, "true", false);
 			
@@ -657,6 +660,7 @@ public bool RegisterItem(class_ItemConfig ItemConfig, int iEntity, int iHammerID
 		NewItem.AllowTransfer = ItemConfig.AllowTransfer;
 		NewItem.ForceDrop = ItemConfig.ForceDrop;
 		NewItem.Chat = ItemConfig.Chat;
+		NewItem.Chat_Uses = ItemConfig.Chat_Uses;
 		NewItem.Hud = ItemConfig.Hud;
 		NewItem.HammerID = ItemConfig.HammerID;
 		NewItem.Mode = ItemConfig.Mode;
@@ -864,7 +868,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 										EWM_ELogs_Use(ItemTest, iActivator);
 										#endif
 										#if defined EW_MODULE_CHAT
-										EWM_Chat_Use(ItemTest, iActivator);
+										if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
 										#endif
 										
 										ItemTest.Delay = 1;
@@ -879,7 +883,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 										EWM_ELogs_Use(ItemTest, iActivator);
 										#endif
 										#if defined EW_MODULE_CHAT
-										EWM_Chat_Use(ItemTest, iActivator);
+										if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
 										#endif
 										
 										ItemTest.Delay = 1;
@@ -894,7 +898,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 										EWM_ELogs_Use(ItemTest, iActivator);
 										#endif
 										#if defined EW_MODULE_CHAT
-										EWM_Chat_Use(ItemTest, iActivator);
+										if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
 										#endif
 										
 										ItemTest.Delay = 1;
@@ -910,7 +914,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 										EWM_ELogs_Use(ItemTest, iActivator);
 										#endif
 										#if defined EW_MODULE_CHAT
-										EWM_Chat_Use(ItemTest, iActivator);
+										if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
 										#endif
 										
 										ItemTest.Delay = 1;

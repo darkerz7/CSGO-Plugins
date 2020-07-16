@@ -191,7 +191,7 @@ public void EWM_Eban_BanClient(int iClient, int iAdmin, int iDuration, const cha
 			{
 				//Check if admin has permission
 				if (!CheckCommandAccess(iAdmin, "sm_eban_perm", ADMFLAG_ROOT)) {
-					CPrintToChat(iAdmin, "{green}[Entwatch] {lightblue}You do not have permission to permanently eBan.");
+					CPrintToChat(iAdmin, "%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Not have permission pEBan");
 					return;
 				}
 			}
@@ -225,7 +225,7 @@ public void EWM_Eban_BanClient(int iClient, int iAdmin, int iDuration, const cha
 			{
 				//Check if admin has permission
 				if (!CheckCommandAccess(iAdmin, "sm_eban_long", ADMFLAG_ROOT)) {
-					CPrintToChat(iAdmin, "{green}[Entwatch] {lightblue}You do not have permission to eBan longer than 12 hours.");
+					CPrintToChat(iAdmin, "%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Not have permission lEBan");
 					return;
 				}
 			}
@@ -291,7 +291,7 @@ public void EWM_Eban_UnBanClient(int iClient, int iAdmin, const char[] sReason)
 		{
 				//Check if admin has permission
 				if (!CheckCommandAccess(iAdmin, "sm_eban_perm", ADMFLAG_ROOT)) {
-					CPrintToChat(iAdmin, "{green}[Entwatch] {lightblue}You do not have permission to remove permanent eBans.");
+					CPrintToChat(iAdmin, "%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Not have permission rEBan");
 					return;
 				}
 		}

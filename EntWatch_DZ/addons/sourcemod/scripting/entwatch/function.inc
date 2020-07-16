@@ -9,6 +9,7 @@ enum struct class_ItemConfig
 	bool		AllowTransfer;
 	bool		ForceDrop;
 	bool		Chat;
+	bool		Chat_Uses;
 	bool		Hud;
 	int			HammerID;
 	int			Mode;
@@ -32,6 +33,7 @@ enum struct class_ItemList
 	bool		AllowTransfer;
 	bool		ForceDrop;
 	bool		Chat;
+	bool		Chat_Uses;
 	bool		Hud;
 	int			HammerID;
 	int			Mode;

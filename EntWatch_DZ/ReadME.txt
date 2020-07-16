@@ -86,6 +86,9 @@ Commands and CVARs for modules:
 	*sm_ebanlist					- Displays a list of Ebanned players
 #Client CMDs:
 	*sm_status [<target(only admins)>]		- Allows you to check player status
+#Ovverride Admin Access:
+	*sm_eban_perm					- Allows admins to issue and remove a permanent EBan
+	*sm_eban_long					- Allows admins to issue a EBan for more than 12 hours
 
 %Module Glow
 #Cvars:

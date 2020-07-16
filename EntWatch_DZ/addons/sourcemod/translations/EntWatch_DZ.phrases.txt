@@ -437,4 +437,16 @@
 	{
 		"en" 	"Last Item"
 	}
+	"Not have permission pEBan"
+	{
+		"en" 	"You do not have permission to permanently EBan"
+	}
+	"Not have permission lEBan"
+	{
+		"en" 	"You do not have permission to EBan longer than 12 hours"
+	}
+	"Not have permission rEBan"
+	{
+		"en" 	"You do not have permission to remove permanent EBans"
+	}
 }
