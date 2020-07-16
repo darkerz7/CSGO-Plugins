@@ -7,6 +7,11 @@ stock void EWM_Clantag_OnPluginStart()
 	CreateTimer(1.0, EWM_Clantag_Timer_UpdateClantag, _, TIMER_REPEAT);
 }
 
+stock void EWM_Clantag_OnPluginEnd()
+{
+	EWM_Clantag_Mass_Reset();
+}
+
 stock void EWM_Clantag_OnMapEnd()
 {
 	EWM_Clantag_Mass_Reset();
@@ -17,10 +22,17 @@ stock void EWM_Clantag_Event_RoundEnd()
 	EWM_Clantag_Mass_Reset();
 }
 
+stock void EWM_Clantag_OnClientDisconnect(int client)
+{
+	//Clear stored clantag	
+	Format(g_sClanTag[client], sizeof(g_sClanTag[]), "");	
+}
+
 stock void EWM_Clantag_Mass_Reset()
 {
 	for (int i = 1; i <= MaxClients; i++) {
 		EWM_Clantag_Reset(i);
+		Format(g_sClanTag[i], sizeof(g_sClanTag[]), "");
 	}
 }
 
@@ -157,7 +169,7 @@ stock void EWM_Clantag_Reset(int client)
 		} else {
 			CS_SetClientClanTag(client, g_sClanTag[client]);
 		}			
-	}		
-		
+	}
+	
 	CS_SetClientContributionScore(client, 0);
 }

@@ -19,12 +19,14 @@ class_Scheme g_SchemeConfig;
 //-------------------------------------------------------
 ConVar	g_hCvar_TeamOnly,
 		g_hCvar_Delay_Use,
-		g_hCvar_Scheme;
+		g_hCvar_Scheme,
+		g_hCvar_BlockEPick;
 
 //-------------------------------------------------------
 // Purpose: Plugin Local settings
 //-------------------------------------------------------
-bool	g_bTeamOnly = true;
+bool	g_bTeamOnly = true,
+		g_bBlockEPick = true;
 int		g_iDelayUse = 3;
 
 //-------------------------------------------------------
@@ -90,6 +92,7 @@ public void OnPluginStart()
 	g_hCvar_TeamOnly		= CreateConVar("entwatch_mode_teamonly", "1", "Enable/Disable team only mode.", _, true, 0.0, true, 1.0);
 	g_hCvar_Delay_Use		= CreateConVar("entwatch_delay_use", "3", "Change delay before use", _, true, 0.0, true, 60.0);
 	g_hCvar_Scheme			= CreateConVar("entwatch_scheme", "classic", "The name of the scheme config.", _);
+	g_hCvar_BlockEPick		= CreateConVar("entwatch_blockepick", "1", "Block players from using E key to grab items.", _, true, 0.0, true, 1.0);
 	
 	//Commands
 	RegAdminCmd("sm_ew_reloadconfig", EW_Command_ReloadConfig, ADMFLAG_CONFIG);
@@ -101,6 +104,7 @@ public void OnPluginStart()
 	//Hook CVARs
 	HookConVarChange(g_hCvar_TeamOnly, Cvar_Main_Changed);
 	HookConVarChange(g_hCvar_Delay_Use, Cvar_Main_Changed);
+	HookConVarChange(g_hCvar_BlockEPick, Cvar_Main_Changed);
 	
 	//Hook Events
 	HookEvent("round_start", Event_RoundStart, EventHookMode_Pre);
@@ -119,7 +123,7 @@ public void OnPluginStart()
 	EWM_Eban_OnPluginStart();
 	#endif
 	#if defined EW_MODULE_OFFLINE_EBAN
-	EWM_OffilneEban_OnPluginStart();
+	EWM_OfflineEban_OnPluginStart();
 	#endif
 	#if defined EW_MODULE_TRANSFER
 	EWM_Transfer_OnPluginStart();
@@ -159,12 +163,21 @@ public void OnPluginStart()
 	#endif
 }
 
+public void OnPluginEnd()
+{
+	#if defined EW_MODULE_CLANTAG
+	EWM_Clantag_OnPluginEnd();
+	#endif
+}
+
 public void Cvar_Main_Changed(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	if(convar==g_hCvar_TeamOnly)
 		g_bTeamOnly = GetConVarBool(convar);
 	else if(convar==g_hCvar_Delay_Use)
 		g_iDelayUse = GetConVarInt(convar);
+	else if (convar == g_hCvar_BlockEPick)
+		g_bBlockEPick = GetConVarBool(convar);
 }
 
 public void OnMapStart()
@@ -318,7 +331,7 @@ public void OnClientPutInServer(int iClient)
 	EWM_Eban_OnClientPutInServer(iClient);
 	#endif
 	#if defined EW_MODULE_OFFLINE_EBAN
-	EWM_OffilneEban_OnClientPutInServer(iClient);
+	EWM_OfflineEban_OnClientPutInServer(iClient);
 	#endif
 	#if defined EW_MODULE_HUD
 	if(!AreClientCookiesCached(iClient)) EWM_Hud_LoadDefaultClientSettings(iClient);
@@ -398,10 +411,13 @@ public void OnClientDisconnect(int iClient)
 	EWM_Eban_OnClientDisconnect(iClient);
 	#endif
 	#if defined EW_MODULE_OFFLINE_EBAN
-	EWM_OffilneEban_OnClientDisconnect(iClient);
+	EWM_OfflineEban_OnClientDisconnect(iClient);
 	#endif
 	#if defined EW_MODULE_HUD
 	EWM_Hud_LoadDefaultClientSettings(iClient);
+	#endif
+	#if defined EW_MODULE_CLANTAG
+	EWM_Clantag_OnClientDisconnect(iClient);
 	#endif
 	//SDKHooks automatically handles unhooking on disconnect
 	/*SDKUnhook(iClient, SDKHook_WeaponDropPost, OnWeaponDrop);
@@ -1066,9 +1082,9 @@ public Action OnWeaponCanUse(int iClient, int iWeapon)
 			if(ItemTest.WeaponID == iWeapon)
 			{
 				#if defined EW_MODULE_EBAN
-				if(ItemTest.BlockPickup || g_EbanClients[iClient].Banned || (GetClientButtons(iClient) & IN_USE)) return Plugin_Handled;
+				if(ItemTest.BlockPickup || g_EbanClients[iClient].Banned || ((GetClientButtons(iClient) & IN_USE) && g_bBlockEPick)) return Plugin_Handled;
 				#else
-				if(ItemTest.BlockPickup || (GetClientButtons(iClient) & IN_USE)) return Plugin_Handled;
+				if(ItemTest.BlockPickup || ((GetClientButtons(iClient) & IN_USE) && g_bBlockEPick)) return Plugin_Handled;
 				#endif
 				
 				return Plugin_Continue;
@@ -1112,7 +1128,7 @@ public Action OnWeaponEquip(int iClient, int iWeapon)
 				#endif
 				
 				#if defined EW_MODULE_OFFLINE_EBAN
-				EWM_OffilneEban_UpdateItemName(iClient, ItemTest.Name);
+				EWM_OfflineEban_UpdateItemName(iClient, ItemTest.Name);
 				#endif
 				
 				break;

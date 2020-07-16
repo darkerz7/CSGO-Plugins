@@ -10,7 +10,7 @@ ArrayList g_OfflineArray;
 
 class_Offline_Eban g_aMenuBuffer[MAXPLAYERS+1];
 
-stock void EWM_OffilneEban_OnPluginStart()
+stock void EWM_OfflineEban_OnPluginStart()
 {
 	g_OfflineArray = new ArrayList(512);
 	
@@ -42,7 +42,7 @@ Action EWM_OfflineEban_Timer_Checker(Handle timer)
 	return Plugin_Continue;
 }
 
-public void EWM_OffilneEban_OnClientPutInServer(int iClient)
+public void EWM_OfflineEban_OnClientPutInServer(int iClient)
 {
 	if(IsFakeClient(iClient)) return;
 	
@@ -80,7 +80,7 @@ public void EWM_OffilneEban_OnClientPutInServer(int iClient)
 	}
 }
 
-public void EWM_OffilneEban_OnClientDisconnect(int iClient)
+public void EWM_OfflineEban_OnClientDisconnect(int iClient)
 {
 	if(IsFakeClient(iClient)) return;
 	
@@ -115,7 +115,7 @@ public void EWM_OffilneEban_OnClientDisconnect(int iClient)
 	}
 }
 
-public void EWM_OffilneEban_UpdateItemName(int iClient, const char[] sNameItem)
+public void EWM_OfflineEban_UpdateItemName(int iClient, const char[] sNameItem)
 {
 	if(IsFakeClient(iClient)) return;
 	
@@ -149,7 +149,7 @@ public void EWM_OffilneEban_UpdateItemName(int iClient, const char[] sNameItem)
 	}
 }
 
-public void EWM_OffilneEban_BanClient(class_Offline_Eban cPlayer, int iAdmin, int iDuration, const char[] sReason)
+public void EWM_OfflineEban_BanClient(class_Offline_Eban cPlayer, int iAdmin, int iDuration, const char[] sReason)
 {
 	char sAdmin_Name[32];
 	char sAdmin_SteamID[64];
@@ -414,7 +414,7 @@ public int EWM_OfflineEban_Reason_Handler(Menu hMenu, MenuAction hAction, int iC
 			ExplodeString(sSelected, "/", Explode_sParam, 2, 64);
 			int iDuration = StringToInt(Explode_sParam[0]);
 			FormatEx(sReason, sizeof(sReason), "%s", Explode_sParam[1]);
-			EWM_OffilneEban_BanClient(g_aMenuBuffer[iClient], iClient, iDuration, sReason);
+			EWM_OfflineEban_BanClient(g_aMenuBuffer[iClient], iClient, iDuration, sReason);
 		}
 	}
 }
