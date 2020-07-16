@@ -71,7 +71,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.13",
+	version = "3.DZ.14",
 	url = "dark-skill.ru"
 };
  
@@ -330,9 +330,6 @@ public void OnClientPutInServer(int iClient)
 	#if defined EW_MODULE_EBAN
 	EWM_Eban_OnClientPutInServer(iClient);
 	#endif
-	#if defined EW_MODULE_OFFLINE_EBAN
-	EWM_OfflineEban_OnClientPutInServer(iClient);
-	#endif
 	#if defined EW_MODULE_HUD
 	if(!AreClientCookiesCached(iClient)) EWM_Hud_LoadDefaultClientSettings(iClient);
 	#endif
@@ -347,6 +344,9 @@ public void OnClientCookiesCached(int iClient)
 
 public void OnClientPostAdminCheck(int iClient)
 {
+	#if defined EW_MODULE_OFFLINE_EBAN
+	EWM_OfflineEban_OnClientPostAdminCheck(iClient);
+	#endif
 	int iFlags = GetUserFlagBits(iClient);
 	if(iFlags & ADMFLAG_KICK || iFlags & ADMFLAG_ROOT) g_bIsAdmin[iClient] = true;
 }
