@@ -12,6 +12,7 @@ enum struct class_ItemConfig
 	bool		Chat_Uses;
 	bool		Hud;
 	int			HammerID;
+	int 		EnergyID;
 	int			Mode;
 	int			MaxUses;
 	int			CoolDown;
@@ -36,6 +37,9 @@ enum struct class_ItemList
 	bool		Chat_Uses;
 	bool		Hud;
 	int			HammerID;
+	int 		EnergyID;
+	int 		MathID;
+	int 		MathValue;
 	int			Mode;
 	int			Uses;
 	int			MaxUses;
@@ -106,6 +110,8 @@ enum struct class_Offline_Eban
 	char	LastItem[32];
 }
 
+int g_iOutValueOffset = -1;
+
 stock bool IsValidClient(int iClient) 
 { 
 	if (iClient > 0 && iClient <= MaxClients && IsValidEdict(iClient) && IsClientInGame(iClient)) return true; 
@@ -123,6 +129,20 @@ stock void FixedEquipPlayerWeapon(int iClient, int iWeapon)
 		GetClientAbsOrigin(iClient,iClientOrigin);
 		TeleportEntity(iWeapon, iClientOrigin, NULL_VECTOR, NULL_VECTOR);
 	}
+}
+
+stock int GetCounterValue(int counter) {
+    char szType[64];
+    GetEntityClassname(counter, szType, sizeof(szType));
+
+    if(!StrEqual(szType, "math_counter", false)) {
+        return -1;
+    }
+
+    if(g_iOutValueOffset == -1)
+        g_iOutValueOffset = FindDataMapInfo(counter, "m_OutValue");
+    
+    return RoundFloat(GetEntDataFloat(counter, g_iOutValueOffset));
 }
 
 stock int GetSlotCSGO(int eWeapon)

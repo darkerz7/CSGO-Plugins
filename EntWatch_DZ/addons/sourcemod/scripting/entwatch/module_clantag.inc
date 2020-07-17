@@ -106,6 +106,17 @@ public Action EWM_Clantag_Timer_UpdateClantag(Handle timer, int client)
 								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[%d/%d]:", ItemTest.ShortName, ItemTest.Uses, ItemTest.MaxUses);
 							}
 						}
+						case 6, 7:
+						{
+							if (ItemTest.MathValue > 0)
+							{
+								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[%d]:", ItemTest.ShortName, ItemTest.MathValue);
+							}
+							else
+							{
+								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[E]:", ItemTest.ShortName);
+							}
+						}
 						default:
 						{
 							FormatEx(buffer_temp, sizeof(buffer_temp), "%s[N/A]:", ItemTest.ShortName);

@@ -331,6 +331,19 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 										FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[%d/%d]", ItemTest.ShortName, ItemTest.Uses, ItemTest.MaxUses);
 									}
 								}
+								case 6, 7:
+								{
+									if (ItemTest.MathValue > 0)
+									{
+										FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.MathValue, ItemTest.OwnerID);
+										FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[%d]", ItemTest.ShortName, ItemTest.MathValue);
+									}
+									else
+									{
+										FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[E]: %N", ItemTest.ShortName, ItemTest.OwnerID);
+										FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[E]", ItemTest.ShortName);
+									}
+								}
 								default:
 								{
 									FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[N/A]: %N", ItemTest.ShortName, ItemTest.OwnerID);
