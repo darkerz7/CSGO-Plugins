@@ -679,6 +679,7 @@ public bool RegisterItem(class_ItemConfig ItemConfig, int iEntity, int iHammerID
 			else NewItem.EnergyID = ItemConfig.EnergyID;
 		NewItem.MathID = INVALID_ENT_REFERENCE;
 		NewItem.MathValue = -1;
+		NewItem.MathValueMax = -1;
 		
 		NewItem.Mode = ItemConfig.Mode;
 		NewItem.MaxUses = ItemConfig.MaxUses;
@@ -748,6 +749,17 @@ public bool RegisterMath(class_ItemList ItemInstance, int iEntity)
 		if (ItemInstance.EnergyID == hammerID)
 		{
 			ItemInstance.MathID = iEntity;
+			int max = RoundFloat(GetEntPropFloat(iEntity, Prop_Data, "m_flMax"));
+			int value = GetCounterValue(iEntity);
+			if (ItemInstance.Mode == 6)
+			{
+				ItemInstance.MathValue = value;
+			}
+			else if (ItemInstance.Mode == 7)
+			{
+				ItemInstance.MathValue = (max - value);
+			}
+			ItemInstance.MathValueMax = max;
 			return true;
 		}
 	}
@@ -1019,15 +1031,17 @@ public Action Event_OutValue(const char[] sOutput, int iCaller, int iActivator, 
 		g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
 		if (ItemTest.MathID == iCaller)
 		{
+			int max = RoundFloat(GetEntPropFloat(iCaller, Prop_Data, "m_flMax"));
+			int value = GetCounterValue(iCaller);
 			if (ItemTest.Mode == 6)
 			{
-				ItemTest.MathValue = GetCounterValue(iCaller);
+				ItemTest.MathValue = value;
 			}
 			else if (ItemTest.Mode == 7)
 			{
-				int max = RoundFloat(GetEntPropFloat(iCaller, Prop_Data, "m_flMax"));
-				ItemTest.MathValue = max - GetCounterValue(iCaller);
+				ItemTest.MathValue = (max - value);
 			}
+			ItemTest.MathValueMax = max;
 			g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 			return;
 		}

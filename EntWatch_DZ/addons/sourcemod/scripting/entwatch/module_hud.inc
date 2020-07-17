@@ -335,7 +335,7 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 								{
 									if (ItemTest.MathValue > 0)
 									{
-										FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.MathValue, ItemTest.OwnerID);
+										FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[%d/%d]: %N", ItemTest.ShortName, ItemTest.MathValue, ItemTest.MathValueMax, ItemTest.OwnerID);
 										FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[%d]", ItemTest.ShortName, ItemTest.MathValue);
 									}
 									else

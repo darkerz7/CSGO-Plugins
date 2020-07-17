@@ -40,6 +40,7 @@ enum struct class_ItemList
 	int 		EnergyID;
 	int 		MathID;
 	int 		MathValue;
+	int 		MathValueMax;
 	int			Mode;
 	int			Uses;
 	int			MaxUses;

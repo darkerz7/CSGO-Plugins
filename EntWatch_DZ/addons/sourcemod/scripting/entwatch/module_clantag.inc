@@ -110,7 +110,7 @@ public Action EWM_Clantag_Timer_UpdateClantag(Handle timer, int client)
 						{
 							if (ItemTest.MathValue > 0)
 							{
-								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[%d]:", ItemTest.ShortName, ItemTest.MathValue);
+								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[%d/%d]:", ItemTest.ShortName, ItemTest.MathValue, ItemTest.MathValueMax);
 							}
 							else
 							{
