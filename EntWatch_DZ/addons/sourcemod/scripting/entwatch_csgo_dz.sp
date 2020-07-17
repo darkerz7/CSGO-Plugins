@@ -732,7 +732,6 @@ public bool RegisterButton(class_ItemList ItemInstance, int iEntity)
 		Entity_GetParentName(iEntity, Item_Weapon_Parent, sizeof(Item_Weapon_Parent));
 		if (!StrEqual(Item_Weapon_Targetname,"") && StrEqual(Item_Weapon_Targetname, Item_Weapon_Parent))
 		{
-			if(ItemInstance.ButtonID == INVALID_ENT_REFERENCE) ItemInstance.ButtonID = Entity_GetHammerID(iEntity);
 			SDKHookEx(iEntity, SDKHook_Use, OnButtonUse);
 			ItemInstance.ButtonsArray.Push(iEntity);
 			return true;
@@ -919,6 +918,11 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 {
 	if(g_bConfigLoaded && IsValidEdict(iButton))
 	{
+		//DEBUG SHIT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		//char edebug[32];
+		//Entity_GetTargetName(iButton, edebug, sizeof(edebug));
+		//PrintToConsoleAll("[EntWatch] PRESS Button %s by %N", edebug, iActivator);
+		
 		int iOffset = FindDataMapInfo(iButton, "m_bLocked");
 		if (iOffset != -1 && GetEntData(iButton, iOffset, 1)) return Plugin_Handled;
 
@@ -932,86 +936,101 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 				{
 					if(ItemTest.ButtonsArray.Get(j) == iButton)
 					{
+						//DEBUG SHIT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+						//PrintToConsoleAll("[EntWatch] DEBUG: Name - %s, WeaponID - %i", ItemTest.Name, ItemTest.WeaponID);
+						//PrintToConsoleAll("[EntWatch] DEBUG: Uses - %i", ItemTest.Uses);
+						//PrintToConsoleAll("[EntWatch] DEBUG: CooldownTime - %i", ItemTest.CoolDownTime);
+						//PrintToConsoleAll("[EntWatch] DEBUG: Owner - %N", ItemTest.OwnerID);
+						//PrintToConsoleAll("[EntWatch] DEBUG: Chat - %s", ItemTest.Chat ? "True" : "False");
+						//PrintToConsoleAll("[EntWatch] DEBUG: Mode - %i", ItemTest.Mode);
+						//PrintToConsoleAll("[EntWatch] DEBUG: Delay - %i", ItemTest.Delay);
+						//PrintToConsoleAll("[EntWatch] DEBUG: ButtonID - %i", ItemTest.ButtonID);
+						//PrintToConsoleAll("[EntWatch] DEBUG: iButton - %i", iButton);
+						//PrintToConsoleAll("[EntWatch] DEBUG: HammerID of iButton - %i", Entity_GetHammerID(iButton));
+						
+						
 						if(ItemTest.OwnerID != iActivator && ItemTest.OwnerID != iCaller) return Plugin_Handled;
 							else if(!(StrEqual(ItemTest.FilterName,""))) DispatchKeyValue(iActivator, "targetname", ItemTest.FilterName);
-							
+						
 						if(ItemTest.Delay > 0) return Plugin_Handled;
 						
-						if(ItemTest.ButtonID != INVALID_ENT_REFERENCE && ItemTest.ButtonID == Entity_GetHammerID(iButton))
+						if(ItemTest.ButtonID != INVALID_ENT_REFERENCE && ItemTest.ButtonID != Entity_GetHammerID(iButton))
 						{
-							switch (ItemTest.Mode)
-							{
-								case 2: 
-									if(ItemTest.CoolDownTime <= -1)
-									{
-										#if defined EW_MODULE_ELOGS
-										EWM_ELogs_Use(ItemTest, iActivator);
-										#endif
-										#if defined EW_MODULE_CHAT
-										if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
-										#endif
-										
-										ItemTest.Delay = 1;
-										ItemTest.CoolDownTime = ItemTest.CoolDown;
-										g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-										return Plugin_Changed;
-									}
-								case 3:
-									if(ItemTest.Uses < ItemTest.MaxUses)
-									{
-										#if defined EW_MODULE_ELOGS
-										EWM_ELogs_Use(ItemTest, iActivator);
-										#endif
-										#if defined EW_MODULE_CHAT
-										if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
-										#endif
-										
-										ItemTest.Delay = 1;
-										ItemTest.Uses++;
-										g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-										return Plugin_Changed;
-									}
-								case 4:
-									if(ItemTest.Uses < ItemTest.MaxUses && ItemTest.CoolDownTime <= -1)
-									{
-										#if defined EW_MODULE_ELOGS
-										EWM_ELogs_Use(ItemTest, iActivator);
-										#endif
-										#if defined EW_MODULE_CHAT
-										if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
-										#endif
-										
-										ItemTest.Delay = 1;
-										ItemTest.CoolDownTime = ItemTest.CoolDown;
-										ItemTest.Uses++;
-										g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-										return Plugin_Changed;
-									}
-								case 5:
-									if(ItemTest.CoolDownTime <= -1)
-									{
-										#if defined EW_MODULE_ELOGS
-										EWM_ELogs_Use(ItemTest, iActivator);
-										#endif
-										#if defined EW_MODULE_CHAT
-										if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
-										#endif
-										
-										ItemTest.Delay = 1;
-										ItemTest.Uses++;
-										if(ItemTest.Uses >= ItemTest.MaxUses)
-										{
-											ItemTest.CoolDownTime = ItemTest.CoolDown;
-											ItemTest.Uses = 0;
-										}
-										g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-										return Plugin_Changed;
-									}
-								default: return Plugin_Changed;
-							}
-							return Plugin_Handled;
+							return Plugin_Changed;
 						}
-						return Plugin_Changed;
+						
+						switch (ItemTest.Mode)
+						{
+							case 2: 
+								if(ItemTest.CoolDownTime <= -1)
+								{
+									#if defined EW_MODULE_ELOGS
+									EWM_ELogs_Use(ItemTest, iActivator);
+									#endif
+									#if defined EW_MODULE_CHAT
+									if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
+									#endif
+									
+									ItemTest.Delay = 1;
+									ItemTest.CoolDownTime = ItemTest.CoolDown;
+									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
+									return Plugin_Changed;
+								}
+							case 3:
+								if(ItemTest.Uses < ItemTest.MaxUses)
+								{
+									#if defined EW_MODULE_ELOGS
+									EWM_ELogs_Use(ItemTest, iActivator);
+									#endif
+									#if defined EW_MODULE_CHAT
+									if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
+									#endif
+									
+									ItemTest.Delay = 1;
+									ItemTest.Uses++;
+									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
+									return Plugin_Changed;
+								}
+							case 4:
+								if(ItemTest.Uses < ItemTest.MaxUses && ItemTest.CoolDownTime <= -1)
+								{
+									#if defined EW_MODULE_ELOGS
+									EWM_ELogs_Use(ItemTest, iActivator);
+									#endif
+									#if defined EW_MODULE_CHAT
+									if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
+									#endif
+									
+									ItemTest.Delay = 1;
+									ItemTest.CoolDownTime = ItemTest.CoolDown;
+									ItemTest.Uses++;
+									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
+									return Plugin_Changed;
+								}
+							case 5:
+								if(ItemTest.CoolDownTime <= -1)
+								{
+									#if defined EW_MODULE_ELOGS
+									EWM_ELogs_Use(ItemTest, iActivator);
+									#endif
+									#if defined EW_MODULE_CHAT
+									if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
+									#endif
+									
+									ItemTest.Delay = 1;
+									ItemTest.Uses++;
+									if(ItemTest.Uses >= ItemTest.MaxUses)
+									{
+										ItemTest.CoolDownTime = ItemTest.CoolDown;
+										ItemTest.Uses = 0;
+									}
+									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
+									return Plugin_Changed;
+								}
+							default: return Plugin_Changed;
+						}
+						//~~~~ Is this return needed (?) ~~~~
+						return Plugin_Handled;
 					}
 				}
 			}
