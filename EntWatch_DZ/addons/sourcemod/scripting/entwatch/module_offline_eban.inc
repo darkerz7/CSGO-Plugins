@@ -44,7 +44,7 @@ Action EWM_OfflineEban_Timer_Checker(Handle timer)
 
 public void EWM_OfflineEban_OnClientPostAdminCheck(int iClient)
 {
-	if(IsFakeClient(iClient)) return;
+	if(!IsValidClient(iClient) || IsFakeClient(iClient)) return;
 	
 	char sClient_Name[32], sClient_SteamID[64];
 	int iUserID = GetClientUserId(iClient);
@@ -82,7 +82,7 @@ public void EWM_OfflineEban_OnClientPostAdminCheck(int iClient)
 
 public void EWM_OfflineEban_OnClientDisconnect(int iClient)
 {
-	if(IsFakeClient(iClient) || !IsClientInGame(iClient)) return;
+	if(!IsValidClient(iClient) || IsFakeClient(iClient)) return;
 	
 	char sClient_Name[32], sClient_SteamID[64];
 	GetClientName(iClient, sClient_Name, MAX_NAME_LENGTH);
