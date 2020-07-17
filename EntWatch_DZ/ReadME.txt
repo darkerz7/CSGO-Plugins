@@ -61,6 +61,7 @@ Commands and CVARs for modules:
 	*entwatch_mode_teamonly		<0/1>	- Enable/Disable team only mode. Default 1
 	*entwatch_delay_use		<0-60>	- Change delay before use. Default 3
 	*entwatch_scheme		<name>	- The name of the scheme config. Default "classic"
+	*entwatch_blockepick		<0/1>	- Enable/Disable blocking E-pickup. Default 1
 #Admin CMDs:
 	*sm_ew_reloadconfig					- Allows you to update the configuration
 	*sm_setcooldown <hammerid> <cooldown>			- Allows you to change the item’s cooldown during the game
@@ -94,8 +95,8 @@ Commands and CVARs for modules:
 #Cvars:
 	*entwatch_glow			<0/1>		- Enable/Disable the glow Global. Default 1
 	*entwatch_glow_spawn		<0/1>		- Enable/Disable the glow after Spawn Items. Default 1
-	*entwatch_glow_spawn_type	<0-3>		- Glow Type after Spawn Items. Default 0
-	*entwatch_glow_drop_type	<0-3>		- Glow Type after Drop Items. Default 0
+	*entwatch_glow_spawn_type	<-1 to 3>		- Glow Type after Spawn Items, set -1 to stop glow. Default 0
+	*entwatch_glow_drop_type	<-1 to 3>		- Glow Type after Drop Items, set -1 to stop glow. Default 0
 
 %Module Hud
 #Cvars:
