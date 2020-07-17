@@ -18,6 +18,7 @@ enum struct class_Sample
 	char	File[PLATFORM_MAX_PATH];
 	float	SndLength;
 	float	Volume;
+	float	InitVolume;
 	bool	Playing;
 	bool	Common;
 	float	TimeShtamp;
@@ -42,7 +43,7 @@ public Plugin myinfo = {
 	name = "Map Music Control with Dynamic Volume Control",
 	author = "DarkerZ[RUS]",
 	description = "Allows clients to adjust ambient sounds played by the map",
-	version = "1.DZ.6_win",
+	version = "1.DZ.7_win",
 	url = "dark-skill.ru"
 };
 
@@ -322,7 +323,9 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 		delete hFile;
 		
 		ItemSample.Entity = iIndexEntity;
-		ItemSample.Volume = float(GetEntProp(iEntity, Prop_Data, "m_iHealth"));
+		ItemSample.InitVolume = float(GetEntProp(iEntity, Prop_Data, "m_iHealth"));
+		if(ItemSample.InitVolume < 0.1) ItemSample.InitVolume = 10.0;
+		ItemSample.Volume = ItemSample.InitVolume;
 		ItemSample.Playing = false;
 		
 		ItemSample.EntSource = iIndexEntity;
@@ -464,7 +467,9 @@ void PlaySample(int iClient, class_Sample ItemSample)
 {
 	if(IsClientInGame(iClient))
 	{
-		float fPlayVolume = (ItemSample.Volume*float(g_iVolume[iClient])) / 1000.0;
+		float fSampleVolume = ItemSample.Volume;
+		if(fSampleVolume < 0.1) fSampleVolume = ItemSample.InitVolume;
+		float fPlayVolume = (fSampleVolume*float(g_iVolume[iClient])) / 1000.0;
 		if(FloatCompare(fPlayVolume,0.5)>0) fPlayVolume=0.25+(fPlayVolume-0.5)*1.5;
 			else fPlayVolume*=0.5;
 		int iFlags = GetEntProp(EntRefToEntIndex(ItemSample.Entity), Prop_Data, "m_spawnflags");
