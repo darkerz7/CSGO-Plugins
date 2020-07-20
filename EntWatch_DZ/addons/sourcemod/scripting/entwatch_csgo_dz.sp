@@ -71,7 +71,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.15",
+	version = "3.DZ.16",
 	url = "dark-skill.ru"
 };
  
@@ -308,10 +308,7 @@ public Action Event_PlayerDeath(Event hEvent, const char[] sName, bool bDontBroa
 						}else
 						{
 							#if defined EW_MODULE_CHAT
-							if(ItemTest.Chat)
-							{
-								EWM_Chat_PlayerDeath_Drop(ItemTest, iClient);
-							}
+							if(ItemTest.Chat) EWM_Chat_PlayerDeath_Drop(ItemTest, iClient);
 							#endif
 							
 							#if defined EW_MODULE_CLANTAG
@@ -395,11 +392,7 @@ public void OnClientDisconnect(int iClient)
 						}else
 						{
 							#if defined EW_MODULE_CHAT
-							if(ItemTest.Chat)
-							{
-								SDKHooks_DropWeapon(iClient, ItemTest.WeaponID);
-								EWM_Chat_Disconnect_Drop(ItemTest, iClient);
-							} else
+							if(ItemTest.Chat) EWM_Chat_Disconnect_Drop(ItemTest, iClient);
 							#endif
 							
 							SDKHooks_DropWeapon(iClient, ItemTest.WeaponID);
@@ -749,14 +742,8 @@ public bool RegisterMath(class_ItemList ItemInstance, int iEntity)
 			ItemInstance.MathID = iEntity;
 			int max = RoundFloat(GetEntPropFloat(iEntity, Prop_Data, "m_flMax"));
 			int value = GetCounterValue(iEntity);
-			if (ItemInstance.Mode == 6)
-			{
-				ItemInstance.MathValue = value;
-			}
-			else if (ItemInstance.Mode == 7)
-			{
-				ItemInstance.MathValue = (max - value);
-			}
+			if (ItemInstance.Mode == 6) ItemInstance.MathValue = value;
+			else if (ItemInstance.Mode == 7) ItemInstance.MathValue = (max - value);
 			ItemInstance.MathValueMax = max;
 			return true;
 		}
@@ -901,10 +888,7 @@ public Action Timer_OnTriggerSpawned(Handle timer, int iEntity)
 
 public Action OnTrigger(int iEntity, int iClient)
 {
-    if (IsValidClient(iClient) && IsClientConnected(iClient))
-	{
-		if (g_EbanClients[iClient].Banned) return Plugin_Handled;
-    }
+    if (IsValidClient(iClient) && IsClientConnected(iClient)) if (g_EbanClients[iClient].Banned) return Plugin_Handled;
 
     return Plugin_Continue;
 }
@@ -957,10 +941,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 						
 						if(ItemTest.Delay > 0) return Plugin_Handled;
 						
-						if(ItemTest.ButtonID != INVALID_ENT_REFERENCE && ItemTest.ButtonID != Entity_GetHammerID(iButton))
-						{
-							return Plugin_Changed;
-						}
+						if(ItemTest.ButtonID != INVALID_ENT_REFERENCE && ItemTest.ButtonID != Entity_GetHammerID(iButton)) return Plugin_Changed;
 						
 						switch (ItemTest.Mode)
 						{
@@ -1055,14 +1036,8 @@ public Action Event_OutValue(const char[] sOutput, int iCaller, int iActivator, 
 		{
 			int max = RoundFloat(GetEntPropFloat(iCaller, Prop_Data, "m_flMax"));
 			int value = GetCounterValue(iCaller);
-			if (ItemTest.Mode == 6)
-			{
-				ItemTest.MathValue = value;
-			}
-			else if (ItemTest.Mode == 7)
-			{
-				ItemTest.MathValue = (max - value);
-			}
+			if (ItemTest.Mode == 6) ItemTest.MathValue = value;
+			else if (ItemTest.Mode == 7) ItemTest.MathValue = (max - value);
 			ItemTest.MathValueMax = max;
 			g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 			return;
