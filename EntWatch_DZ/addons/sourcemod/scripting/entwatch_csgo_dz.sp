@@ -310,7 +310,6 @@ public Action Event_PlayerDeath(Event hEvent, const char[] sName, bool bDontBroa
 							#if defined EW_MODULE_CHAT
 							if(ItemTest.Chat)
 							{
-								SDKHooks_DropWeapon(iClient, ItemTest.WeaponID);
 								EWM_Chat_PlayerDeath_Drop(ItemTest, iClient);
 							}
 							#endif
@@ -790,7 +789,7 @@ public void OnEntityDestroyed(int iEntity)
 		GetEdictClassname(iEntity, sClassname, sizeof(sClassname));
 		if(StrContains(sClassname, "weapon_", false) != -1)
 		{
-			for(int i = 0; i<g_ItemList.Length; i++)
+			for(int i = 0; i < g_ItemList.Length; i++)
 			{
 				class_ItemList ItemTest;
 				g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
@@ -921,7 +920,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 		//DEBUG SHIT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		//char edebug[32];
 		//Entity_GetTargetName(iButton, edebug, sizeof(edebug));
-		//PrintToConsoleAll("[EntWatch] PRESS Button %s by %N", edebug, iActivator);
+		//PrintToConsoleAll("[EntWatch] PRESS Button %s by %N - ID %i", edebug, iActivator, iActivator);
 		
 		int iOffset = FindDataMapInfo(iButton, "m_bLocked");
 		if (iOffset != -1 && GetEntData(iButton, iOffset, 1)) return Plugin_Handled;
@@ -940,7 +939,11 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 						//PrintToConsoleAll("[EntWatch] DEBUG: Name - %s, WeaponID - %i", ItemTest.Name, ItemTest.WeaponID);
 						//PrintToConsoleAll("[EntWatch] DEBUG: Uses - %i", ItemTest.Uses);
 						//PrintToConsoleAll("[EntWatch] DEBUG: CooldownTime - %i", ItemTest.CoolDownTime);
-						//PrintToConsoleAll("[EntWatch] DEBUG: Owner - %N", ItemTest.OwnerID);
+						//PrintToConsoleAll("[EntWatch] DEBUG: Owner - %i", ItemTest.OwnerID);
+						//if (!IsValidClient(ItemTest.OwnerID))
+						//{
+						//	LogError("No valid client for %s - %i", ItemTest.Name, ItemTest.OwnerID);
+						//}
 						//PrintToConsoleAll("[EntWatch] DEBUG: Chat - %s", ItemTest.Chat ? "True" : "False");
 						//PrintToConsoleAll("[EntWatch] DEBUG: Mode - %i", ItemTest.Mode);
 						//PrintToConsoleAll("[EntWatch] DEBUG: Delay - %i", ItemTest.Delay);
@@ -1232,7 +1235,7 @@ public Action OnWeaponEquip(int iClient, int iWeapon)
 {
 	if(g_bConfigLoaded && IsValidEdict(iWeapon))
 	{
-		for(int i = 0; i<g_ItemList.Length; i++)
+		for(int i = 0; i < g_ItemList.Length; i++)
 		{
 			class_ItemList ItemTest;
 			g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
