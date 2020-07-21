@@ -1,5 +1,6 @@
 #pragma semicolon 1
 #pragma newdecls required
+#pragma dynamic 131072
 #include <sourcemod>
 #include <sdktools>
 #include <sdkhooks>
@@ -71,7 +72,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.16",
+	version = "3.DZ.17",
 	url = "dark-skill.ru"
 };
  
@@ -348,6 +349,7 @@ public void OnClientCookiesCached(int iClient)
 
 public void OnClientPostAdminCheck(int iClient)
 {
+	if(!IsValidClient(iClient) || IsFakeClient(iClient)) return;
 	#if defined EW_MODULE_OFFLINE_EBAN
 	EWM_OfflineEban_OnClientPostAdminCheck(iClient);
 	#endif
