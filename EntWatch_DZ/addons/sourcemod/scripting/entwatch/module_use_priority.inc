@@ -28,7 +28,7 @@ public Action OnPlayerRunCmd(int iClient, int &iButtons, int &iImpulse, float[3]
 					}
 				}
 			}
-			if(iCountButtons == 1 && iMode!=1 && IsValidEdict(iButton)) AcceptEntityInput(iButton, "Use", iClient, iClient); 
+			if(iCountButtons == 1 && iMode!=1 && iMode!=6 && iMode!=7 && IsValidEdict(iButton)) AcceptEntityInput(iButton, "Use", iClient, iClient); 
 		}
 	}
 	return Plugin_Continue;
