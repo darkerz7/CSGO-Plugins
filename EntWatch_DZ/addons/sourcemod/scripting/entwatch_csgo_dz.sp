@@ -72,7 +72,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.18",
+	version = "3.DZ.19",
 	url = "dark-skill.ru"
 };
  
@@ -838,13 +838,7 @@ public Action Timer_OnMathSpawned(Handle timer, int iEntity)
 	}
 }
 
-public void OnButtonSpawned(int iEntity)
-{
-	//In case the button entity spawns just before the weapon entity (?)
-	CreateTimer(0.5, Timer_OnButtonSpawned, iEntity);
-}
-
-public Action Timer_OnButtonSpawned(Handle timer, int iEntity)
+public void OnButtonSpawned(int iEntity) //Button with parent spawns after weapon entity. With timer button don't register if item spawns with module items_spawn
 {
 	if(!IsValidEntity(iEntity) || !g_bConfigLoaded) return;
 	
