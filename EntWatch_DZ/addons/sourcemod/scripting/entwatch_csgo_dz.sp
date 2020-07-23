@@ -116,6 +116,7 @@ public void OnPluginStart()
 	HookEvent("round_start", Event_RoundStart, EventHookMode_Pre);
 	HookEvent("round_end", Event_RoundEnd, EventHookMode_Pre);
 	HookEvent("player_death", Event_PlayerDeath, EventHookMode_Pre);
+	HookEvent("player_team", Event_PlayerTeam, EventHookMode_Pre);
 	
 	//Hook Output Right-Click
 	HookEntityOutput("game_ui", "PressedAttack2", Event_GameUI_RightClick);
@@ -258,7 +259,24 @@ public Action Event_RoundEnd(Event hEvent, const char[] sName, bool bDontBroadca
 	}
 }
 
+public Action Event_PlayerTeam(Event hEvent, const char[] sName, bool bDontBroadcast)
+{
+	int team = GetEventInt(hEvent, "team");
+	
+	if (team != 1) return Plugin_Continue;
+	
+	EWM_Drop_Forward(hEvent); //Re-use code for death and team changes
+	
+	return Plugin_Continue;
+}
+
 public Action Event_PlayerDeath(Event hEvent, const char[] sName, bool bDontBroadcast)
+{
+	EWM_Drop_Forward(hEvent); //Re-use code for death and team changes
+	return Plugin_Continue;
+}
+
+stock void EWM_Drop_Forward(Handle hEvent)
 {
 	int iClient = GetClientOfUserId(GetEventInt(hEvent, "userid"));
 
@@ -291,7 +309,7 @@ public Action Event_PlayerDeath(Event hEvent, const char[] sName, bool bDontBroa
 						#endif
 						
 						#if defined EW_MODULE_CLANTAG
-						EWM_Clantag_PlayerDeath_Drop(ItemTest, iClient);
+						EWM_Clantag_PlayerDeath_Drop(iClient);
 						#endif
 					}
 					else
@@ -303,7 +321,7 @@ public Action Event_PlayerDeath(Event hEvent, const char[] sName, bool bDontBroa
 							#endif
 							
 							#if defined EW_MODULE_CLANTAG
-							EWM_Clantag_PlayerDeath(ItemTest, iClient);
+							EWM_Clantag_PlayerDeath(iClient);
 							#endif
 							AcceptEntityInput(ItemTest.WeaponID, "Kill");
 						}else
@@ -313,7 +331,7 @@ public Action Event_PlayerDeath(Event hEvent, const char[] sName, bool bDontBroa
 							#endif
 							
 							#if defined EW_MODULE_CLANTAG
-							EWM_Clantag_PlayerDeath_Drop(ItemTest, iClient);
+							EWM_Clantag_PlayerDeath_Drop(iClient);
 							#endif
 							
 							SDKHooks_DropWeapon(iClient, ItemTest.WeaponID);
@@ -842,6 +860,14 @@ public void OnButtonSpawned(int iEntity) //Button with parent spawns after weapo
 {
 	if(!IsValidEntity(iEntity) || !g_bConfigLoaded) return;
 	
+	char sClassname[32];
+	GetEdictClassname(iEntity, sClassname, sizeof(sClassname));
+	if (StrEqual(sClassname,"func_door") || StrEqual(sClassname,"func_door_rotating"))
+	{
+		int spawnflags = GetEntProp(iEntity, Prop_Data, "m_spawnflags");
+		if (!(spawnflags & 256))return; //The entity cannot be pressed so don't register it as a button
+	}
+	
 	for(int i = 0; i < g_ItemList.Length; i++)
 	{
 		class_ItemList ItemTest;
@@ -1163,7 +1189,7 @@ public Action OnWeaponDrop(int iClient, int iWeapon)
 				#endif
 				
 				#if defined EW_MODULE_CLANTAG
-				EWM_Clantag_Drop(ItemTest, iClient);
+				EWM_Clantag_Drop(iClient);
 				#endif
 					
 				break;
