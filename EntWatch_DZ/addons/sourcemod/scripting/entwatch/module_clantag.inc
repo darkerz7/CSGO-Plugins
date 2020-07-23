@@ -153,17 +153,17 @@ stock void EWM_Clantag_PickUp(class_ItemList ItemTest, int iClient)
 	CS_SetClientContributionScore(iClient, 9999);
 }
 
-stock void EWM_Clantag_Drop(class_ItemList ItemTest, int iClient)
+stock void EWM_Clantag_Drop(int iClient)
 {
 	EWM_Clantag_Reset(iClient);
 }
 
-stock void EWM_Clantag_PlayerDeath(class_ItemList ItemTest, int iClient)
+stock void EWM_Clantag_PlayerDeath(int iClient)
 {
 	EWM_Clantag_Reset(iClient);
 }
 
-stock void EWM_Clantag_PlayerDeath_Drop(class_ItemList ItemTest, int iClient)
+stock void EWM_Clantag_PlayerDeath_Drop(int iClient)
 {
 	EWM_Clantag_Reset(iClient);
 }
