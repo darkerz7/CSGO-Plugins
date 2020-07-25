@@ -394,7 +394,25 @@ public int EWM_OfflineEban_Duration_Handler(Menu hMenu, MenuAction hAction, int 
 			char sSelected[64];
 			hMenu.GetItem(iParam2, sSelected, sizeof(sSelected));
 			int iDuration = StringToInt(sSelected);
-			EWM_OfflineEban_Reason(iClient, iDuration);
+			bool bAccessDuration = true;
+			if (iDuration == 0)
+			{
+				//Check if admin has permission
+				if (!CheckCommandAccess(iClient, "sm_eban_perm", ADMFLAG_ROOT))
+				{
+					CPrintToChat(iClient, "%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Not have permission rEBan");
+					bAccessDuration = false;
+				}
+			}else if(iDuration >= 720)
+			{
+				//Check if admin has permission
+				if (!CheckCommandAccess(iClient, "sm_eban_long", ADMFLAG_ROOT))
+				{
+					CPrintToChat(iClient, "%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Not have permission lEBan");
+					bAccessDuration = false;
+				}
+			}
+			if(bAccessDuration) EWM_OfflineEban_Reason(iClient, iDuration);
 		}
 	}
 }
