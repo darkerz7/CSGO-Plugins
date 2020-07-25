@@ -73,11 +73,11 @@ $start = ($cur_page - 1) * $per_page;
 
 if($searchby_steamid == true)
 {
-	$sql = $conn->prepare('(SELECT * FROM EntWatch_Current_Eban WHERE client_steamid="'.$buff_steamid.'") UNION ALL (SELECT * FROM EntWatch_Old_Eban WHERE client_steamid="'.$buff_steamid.'") ORDER BY id DESC LIMIT :start, :perpage');
+	$sql = $conn->prepare('(SELECT * FROM EntWatch_Current_Eban WHERE client_steamid="'.$buff_steamid.'") UNION ALL (SELECT * FROM EntWatch_Old_Eban WHERE client_steamid="'.$buff_steamid.'") ORDER BY timestamp_issued-duration*60 DESC LIMIT :start, :perpage');
 	$sql->execute(array(':start' => $start, ':perpage' => $per_page));
 } else
 {
-	$sql = $conn->prepare('(SELECT * FROM EntWatch_Current_Eban) UNION ALL (SELECT * FROM EntWatch_Old_Eban) ORDER BY id DESC LIMIT :start, :perpage');
+	$sql = $conn->prepare('(SELECT * FROM EntWatch_Current_Eban) UNION ALL (SELECT * FROM EntWatch_Old_Eban) ORDER BY timestamp_issued-duration*60 DESC LIMIT :start, :perpage');
 	$sql->execute(array(':start' => $start, ':perpage' => $per_page));
 }
 

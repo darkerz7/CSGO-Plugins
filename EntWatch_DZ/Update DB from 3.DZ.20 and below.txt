@@ -1,0 +1,11 @@
+Update 3.DZ.21 - Database structure changed
+You need to run the following queries:
+
+MYSQL:
+ALTER TABLE `EntWatch_Old_Eban` MODIFY COLUMN `id` int(10) unsigned NOT NULL auto_increment;
+
+SQLITE:
+ALTER TABLE `EntWatch_Old_Eban` RENAME TO `EntWatch_tmp`;
+CREATE TABLE IF NOT EXISTS `EntWatch_Old_Eban`(	`id` INTEGER PRIMARY KEY AUTOINCREMENT, `client_name` varchar(32) NOT NULL, `client_steamid` varchar(64) NOT NULL, `admin_name` varchar(32) NOT NULL, `admin_steamid` varchar(64) NOT NULL, `server` varchar(64), `duration` INTEGER NOT NULL, `timestamp_issued` INTEGER NOT NULL, `reason` varchar(64), `reason_unban` varchar(64), `admin_name_unban` varchar(32), `admin_steamid_unban` varchar(64), `timestamp_unban` INTEGER);
+INSERT INTO `EntWatch_Old_Eban` SELECT * FROM `EntWatch_tmp`;
+DROP TABLE `EntWatch_tmp`;

@@ -72,7 +72,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.20",
+	version = "3.DZ.21",
 	url = "dark-skill.ru"
 };
  
