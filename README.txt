@@ -24,6 +24,11 @@ My Plugins:
 
 *EntWatch Old - Entwatch 3 for CS:GO with Hud + HudPos + HudColor + Glow + Transfer of discarded items(Give) + Menus + Block Pick up items with E+Change HUD Channel
 
+*ForceInputs - Allows admins to force inputs on entities. (ent_fire)
+ -Admin Command:
+     #sm_forceinput <classname/targetname/!self/!target/#hammerid> <input> [parameter] - Perform an action on a specific entity
+     #sm_forceinputplayer <target> <input> [parameter] - Perform an action on a specific player
+
 *Hide_Teammates - Hides Teammates on the entire map or distance
   -Client Command:
     #sm_hide [<-1-CVAR_MAX_Distance>] (-1 - Disable, 0 - Enable on the entire map, 1-CVAR_MAX_Distance - Enable ont the Distance)
