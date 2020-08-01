@@ -75,7 +75,7 @@ public Action EWM_Clantag_Timer_UpdateClantag(Handle timer, int client)
 							}
 							else
 							{
-								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[D]:", ItemTest.ShortName);
+								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[E]:", ItemTest.ShortName);
 							}
 						}
 						case 4:
@@ -92,7 +92,7 @@ public Action EWM_Clantag_Timer_UpdateClantag(Handle timer, int client)
 								}
 								else
 								{
-									FormatEx(buffer_temp, sizeof(buffer_temp), "%s[D]:", ItemTest.ShortName);
+									FormatEx(buffer_temp, sizeof(buffer_temp), "%s[E]:", ItemTest.ShortName);
 								}
 						}
 						case 5:
@@ -119,7 +119,7 @@ public Action EWM_Clantag_Timer_UpdateClantag(Handle timer, int client)
 						}
 						default:
 						{
-							FormatEx(buffer_temp, sizeof(buffer_temp), "%s[N/A]:", ItemTest.ShortName);
+							FormatEx(buffer_temp, sizeof(buffer_temp), "%s[+]:", ItemTest.ShortName);
 						}
 					}
 				}
