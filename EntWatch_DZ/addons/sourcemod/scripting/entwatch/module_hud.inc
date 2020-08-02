@@ -217,8 +217,8 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 									}
 									else
 									{
-										FormatEx(buffer_teamtext_zombies[iIndexZombies], sizeof(buffer_teamtext_zombies[]), "%s[D]: %N", ItemTest.ShortName, ItemTest.OwnerID);
-										FormatEx(buffer_teamtext_zombies_withoutname[iIndexZombies], sizeof(buffer_teamtext_zombies_withoutname[]), "%s[D]", ItemTest.ShortName);
+										FormatEx(buffer_teamtext_zombies[iIndexZombies], sizeof(buffer_teamtext_zombies[]), "%s[E]: %N", ItemTest.ShortName, ItemTest.OwnerID);
+										FormatEx(buffer_teamtext_zombies_withoutname[iIndexZombies], sizeof(buffer_teamtext_zombies_withoutname[]), "%s[E]", ItemTest.ShortName);
 									}
 								}
 								case 4:
@@ -236,8 +236,8 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 										}
 										else
 										{
-											FormatEx(buffer_teamtext_zombies[iIndexZombies], sizeof(buffer_teamtext_zombies[]), "%s[D]: %N", ItemTest.ShortName, ItemTest.OwnerID);
-											FormatEx(buffer_teamtext_zombies_withoutname[iIndexZombies], sizeof(buffer_teamtext_zombies_withoutname[]), "%s[D]", ItemTest.ShortName);
+											FormatEx(buffer_teamtext_zombies[iIndexZombies], sizeof(buffer_teamtext_zombies[]), "%s[E]: %N", ItemTest.ShortName, ItemTest.OwnerID);
+											FormatEx(buffer_teamtext_zombies_withoutname[iIndexZombies], sizeof(buffer_teamtext_zombies_withoutname[]), "%s[E]", ItemTest.ShortName);
 										}
 								}
 								case 5:
@@ -295,8 +295,8 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 									}
 									else
 									{
-										FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[D]: %N", ItemTest.ShortName, ItemTest.OwnerID);
-										FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[D]", ItemTest.ShortName);
+										FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[E]: %N", ItemTest.ShortName, ItemTest.OwnerID);
+										FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[E]", ItemTest.ShortName);
 									}
 								}
 								case 4:
@@ -314,8 +314,8 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 										}
 										else
 										{
-											FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[D]: %N", ItemTest.ShortName, ItemTest.OwnerID);
-											FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[D]", ItemTest.ShortName);
+											FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[E]: %N", ItemTest.ShortName, ItemTest.OwnerID);
+											FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[E]", ItemTest.ShortName);
 										}
 								}
 								case 5:
