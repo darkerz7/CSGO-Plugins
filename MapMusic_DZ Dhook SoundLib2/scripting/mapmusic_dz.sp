@@ -23,6 +23,7 @@ enum struct class_Sample
 	bool	Common;
 	float	TimeShtamp;
 	int		EntSource;
+	int		Channel;
 }
 
 ArrayList g_aSample;
@@ -31,19 +32,25 @@ StringMap g_smSourceEnt;
 Handle g_hCookie_Disable = INVALID_HANDLE;
 Handle g_hCookie_Volume = INVALID_HANDLE;
 
+ConVar g_hCvar_ShortMusicLenght;
+
 static Handle g_hAcceptInput;
 static int g_iSTSound;
 
 bool	g_bDisabled[MAXPLAYERS + 1] = {false, ...};
 int		g_iVolume[MAXPLAYERS + 1] = {100, ...};
 
+int 	g_iChannel;
+
 int g_iRoundNum = 0;
+
+float g_fShortMusicLenght = 4.0;
 
 public Plugin myinfo = {
 	name = "Map Music Control with Dynamic Volume Control",
 	author = "DarkerZ[RUS]",
 	description = "Allows clients to adjust ambient sounds played by the map",
-	version = "1.DZ.7",
+	version = "1.DZ.8",
 	url = "dark-skill.ru"
 };
 
@@ -65,6 +72,10 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_stopmusic", Command_StopMusic, "Toggles map music");
 	RegConsoleCmd("sm_startmusic", Command_StartMusic, "Toggles map music");
 	RegConsoleCmd("sm_playmusic", Command_StartMusic, "Toggles map music");
+	
+	g_hCvar_ShortMusicLenght = CreateConVar("sm_stopmusic_music_length", "4.0", "How long required length for it will be music files (2.0-20.0).", _, true, 2.0, true, 20.0);
+	HookConVarChange(g_hCvar_ShortMusicLenght, Cvar_Changed);
+	g_fShortMusicLenght = GetConVarFloat(g_hCvar_ShortMusicLenght);
 	
 	LoadTranslations("MapMusic_DZ.phrases");
 	
@@ -99,6 +110,11 @@ public void OnPluginStart()
 	DHookAddParam(g_hAcceptInput, HookParamType_Int);
 
 	delete hGameConf;
+}
+
+public void Cvar_Changed(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	g_fShortMusicLenght = GetConVarFloat(convar);
 }
 
 public void OnClientCookiesCached(int iClient)
@@ -203,6 +219,7 @@ public void OnMapStart()
 	g_aSample.Clear();
 	g_smSourceEnt.Clear();
 	g_iRoundNum = 0;
+	g_iChannel = SNDCHAN_USER_BASE - 75;
 	g_iSTSound = FindStringTable("soundprecache");
 	if(g_iSTSound == INVALID_STRING_TABLE) SetFailState("Failed to find string table \"soundprecache\".");
 }
@@ -227,7 +244,7 @@ public void OnEntityCreated(int iEntity, const char[] sClassname)
 		{
 			SetEntProp(iEntity, Prop_Data, "m_spawnflags", GetEntProp(iEntity, Prop_Data, "m_spawnflags")|32);
 			DHookEntity(g_hAcceptInput, false, iEntity);
-			SDKHook(iEntity, SDKHook_SpawnPost, OnEntitySpawned);
+			SDKHook(iEntity, SDKHook_SpawnPost, OnMusicEntSpawned);
 		}
 		//fix ent spawned after ambient_generic
 		char sEntName[64];
@@ -240,7 +257,7 @@ public void OnEntityCreated(int iEntity, const char[] sClassname)
 	}
 }
 
-public void OnEntitySpawned(int iEntity)
+public void OnMusicEntSpawned(int iEntity)
 {
 	int iFlags = GetEntProp(iEntity, Prop_Data, "m_spawnflags");
 	if(!(iFlags & 1))
@@ -345,7 +362,9 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 			}
 		}
 		
-		if(ItemSample.SndLength >= 4.0)
+		ItemSample.Channel = -5;
+		
+		if(ItemSample.SndLength >= g_fShortMusicLenght)
 		{
 			ItemSample.Common = false;
 			g_aSample.PushArray(ItemSample, sizeof(ItemSample));
@@ -385,7 +404,7 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 				{
 					ItemSample.Playing = false;
 					SaveSample(ItemSample);
-					StopSoundEx(ALL_CLIENTS, ItemSample.File);
+					StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel);
 				}
 				DHookSetReturn(hReturn, false);
 				return MRES_Supercede;
@@ -413,22 +432,22 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 	{
 		if(!ItemSample.Common && ItemSample.Playing)
 		{
-			if(ItemSample.EntSource == ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File);
-			else StopSoundEx(ALL_CLIENTS, ItemSample.File, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
+			if(ItemSample.EntSource == ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel);
+			else StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
 			ItemSample.Playing = false;
 			SaveSample(ItemSample);
-		}else if(ItemSample.EntSource != ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
+		}else if(ItemSample.EntSource != ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
 	}else if(strcmp(sCommand, "Kill", false) == 0)
 	{
 		if(!ItemSample.Common)
 		{
 			if(ItemSample.Playing)
 			{
-				if(ItemSample.EntSource == ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File);
-				else StopSoundEx(ALL_CLIENTS, ItemSample.File, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
+				if(ItemSample.EntSource == ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel);
+				else StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
 			}
 			RemoveSample(ItemSample);
-		}else if(ItemSample.EntSource != ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
+		}else if(ItemSample.EntSource != ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
 	}
 	
 	return MRES_Handled;
@@ -476,11 +495,11 @@ void PlaySample(int iClient, class_Sample ItemSample)
 		if(iFlags & 1)
 		{
 			if(!ItemSample.Common)
-				EmitSoundToClient(iClient, ItemSample.File, SOUND_FROM_PLAYER, SNDCHAN_STATIC,
+				EmitSoundToClient(iClient, ItemSample.File, iClient, ItemSample.Channel,
 						 SNDLEVEL_NONE, SND_CHANGEVOL, fPlayVolume, SNDPITCH_NORMAL, -1,
 						 _, _, true);
 			else
-				EmitSoundToClient(iClient, ItemSample.File, SOUND_FROM_PLAYER, SNDCHAN_STATIC,
+				EmitSoundToClient(iClient, ItemSample.File, iClient, ItemSample.Channel,
 						 SNDLEVEL_NONE, SND_NOFLAGS, fPlayVolume, SNDPITCH_NORMAL, -1,
 						 _, _, true);
 		}
@@ -495,18 +514,27 @@ void PlaySample(int iClient, class_Sample ItemSample)
 
 void PlaySampleAll(class_Sample ItemSample)
 {
+	if(ItemSample.Channel == -5)
+	{
+		ItemSample.Channel = g_iChannel;
+		SaveSample(ItemSample);
+		g_iChannel++;
+		if(g_iChannel >= SNDCHAN_USER_BASE) g_iChannel = SNDCHAN_USER_BASE - 75;
+	}
 	for(int i = 1; i <= MaxClients; i++) if(!g_bDisabled[i]) PlaySample(i, ItemSample);
 }
 
-stock void StopSoundEx(int iClient, const char[] sSample, bool bForAll = true, int iSourceEntity = -1)
+stock void StopSoundEx(int iClient, const char[] sSample, int iCustomChannel, bool bForAll = true, int iSourceEntity = -1)
 {
+	int iChannelBuf = iCustomChannel;
+	if(iChannelBuf == -5) iChannelBuf = SNDCHAN_USER_BASE;
 	if(iClient == ALL_CLIENTS)
 	{
 		for(int i = 1; i<= MaxClients; i++)
 		{
 			if(IsClientInGame(i))
 			{
-				if(bForAll) StopSound(i, SNDCHAN_STATIC, sSample);
+				if(bForAll) StopSound(i, iChannelBuf, sSample);
 				else EmitSoundToClient(i, sSample, iSourceEntity, SNDCHAN_STATIC,
 						 SNDLEVEL_NORMAL, SND_CHANGEVOL, 0.0, SNDPITCH_NORMAL, -1,
 						 _, _, true);
@@ -514,7 +542,7 @@ stock void StopSoundEx(int iClient, const char[] sSample, bool bForAll = true, i
 		}
 	}else if(IsClientInGame(iClient))
 	{
-		if(bForAll) StopSound(iClient, SNDCHAN_STATIC, sSample);
+		if(bForAll) StopSound(iClient, iChannelBuf, sSample);
 		else EmitSoundToClient(iClient, sSample, iSourceEntity, SNDCHAN_STATIC,
 					 SNDLEVEL_NORMAL, SND_CHANGEVOL, 0.0, SNDPITCH_NORMAL, -1,
 					 _, _, true);
