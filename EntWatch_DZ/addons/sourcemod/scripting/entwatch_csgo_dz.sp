@@ -217,6 +217,10 @@ public void OnMapEnd()
 public Action Event_RoundStart(Event hEvent, const char[] sName, bool bDontBroadcast)
 {
 	if(g_bConfigLoaded) CPrintToChatAll("%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Welcome");
+	
+	#if defined EW_MODULE_CLANTAG
+	EWM_Clantag_Event_RoundStart();
+	#endif
 }
 
 public Action Event_RoundEnd(Event hEvent, const char[] sName, bool bDontBroadcast)
@@ -251,10 +255,6 @@ public Action Event_RoundEnd(Event hEvent, const char[] sName, bool bDontBroadca
 		#endif
 		#if defined EW_MODULE_PHYSBOX
 		EWM_Physbox_Event_RoundEnd();
-		#endif
-		
-		#if defined EW_MODULE_CLANTAG
-		EWM_Clantag_Event_RoundEnd();
 		#endif
 	}
 }
@@ -1298,7 +1298,11 @@ public Action Timer_Cooldowns(Handle timer)
 
 // Handlers Commands
 public Action EW_Command_ReloadConfig(int iClient, int iArgs)
-{
+{	
+	#if defined EW_MODULE_CLANTAG
+	EWM_Clantag_OnReloadConfig();
+	#endif
+	
 	CleanData();
 	LoadConfig();
 	LoadScheme();
