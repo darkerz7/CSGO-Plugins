@@ -377,11 +377,11 @@ void EWM_Eban_Update_Client(int iClient)
 		GetClientAuthId(iClient, AuthId_Steam2, sClient_SteamID, sizeof(sClient_SteamID));
 		FormatEx(sTQuery, sizeof(sTQuery), "SELECT `admin_name`, `admin_steamid`, `duration`, `timestamp_issued`, `reason` FROM `EntWatch_Current_Eban` \
 												WHERE `client_steamid`='%s' and `server`='%s'", sClient_SteamID, g_SchemeConfig.Server_Name);
-		SQL_TQuery(g_hEbanDB, EWM_Eban_SQLTCallBackUpdate, sTQuery, iClient);
+		SQL_TQuery(g_hEbanDB, EWM_Eban_SQLTCallBackUpdate, sTQuery, GetClientUserId(iClient));
 	}
 }
 
-void EWM_Eban_SQLTCallBackUpdate(Handle hDatabase, Handle hResults, const char[] sError, any iClient)
+void EWM_Eban_SQLTCallBackUpdate(Handle hDatabase, Handle hResults, const char[] sError, any iUserID)
 {
 	if(sError[0])
 	{
@@ -389,7 +389,8 @@ void EWM_Eban_SQLTCallBackUpdate(Handle hDatabase, Handle hResults, const char[]
 	}
 	else
 	{
-		if(IsClientInGame(iClient))
+		int iClient = GetClientOfUserId(iUserID);
+		if(iClient && IsClientInGame(iClient))
 		{
 			bool bBanFound = false;
 			class_ClientSettings_EBan ClientBuffer, ClientSet;
