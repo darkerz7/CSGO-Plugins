@@ -153,7 +153,7 @@ stock void EWM_Clantag_PickUp(class_ItemList ItemTest, int iClient)
 	}	
 	
 	char buffer_temp[128];
-	FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[N/A]:", ItemTest.ShortName);
+	FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[+]:", ItemTest.ShortName);
 	CS_SetClientClanTag(iClient, buffer_temp);
 	CS_SetClientContributionScore(iClient, 9999);
 }

@@ -44,6 +44,7 @@ Action EWM_OfflineEban_Timer_Checker(Handle timer)
 
 public void EWM_OfflineEban_OnClientPostAdminCheck(int iClient)
 {
+	if(IsClientSourceTV(iClient)) return; //ignore SourceTV
 	char sClient_Name[32], sClient_SteamID[64];
 	int iUserID = GetClientUserId(iClient);
 	GetClientName(iClient, sClient_Name, MAX_NAME_LENGTH);
@@ -80,7 +81,7 @@ public void EWM_OfflineEban_OnClientPostAdminCheck(int iClient)
 
 public void EWM_OfflineEban_OnClientDisconnect(int iClient)
 {
-	if(!IsValidClient(iClient) || IsFakeClient(iClient)) return;
+	if(!IsValidClient(iClient) || !IsClientConnected(iClient) || IsClientSourceTV(iClient) || IsFakeClient(iClient)) return;
 	
 	char sClient_Name[32], sClient_SteamID[64];
 	GetClientName(iClient, sClient_Name, MAX_NAME_LENGTH);

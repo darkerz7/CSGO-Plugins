@@ -72,7 +72,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.21",
+	version = "3.DZ.22",
 	url = "dark-skill.ru"
 };
  
@@ -367,7 +367,7 @@ public void OnClientCookiesCached(int iClient)
 
 public void OnClientPostAdminCheck(int iClient)
 {
-	if(!IsValidClient(iClient) || IsFakeClient(iClient)) return;
+	if(!IsValidClient(iClient) || !IsClientConnected(iClient) || IsFakeClient(iClient)) return;
 	#if defined EW_MODULE_OFFLINE_EBAN
 	EWM_OfflineEban_OnClientPostAdminCheck(iClient);
 	#endif
