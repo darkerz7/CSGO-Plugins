@@ -105,8 +105,8 @@ stock void EWM_Hud_OnClientCookiesCached(int iClient)
 		g_CSettings_Hud[iClient].Color[3] = g_SchemeConfig.Color_HUD[3];
 	}else 
 	{
-		char Explode_HudColor[4][8];
-		ExplodeString(sBuffer_cookie, "/", Explode_HudColor, 4, 8);
+		char Explode_HudColor[4][32];
+		ExplodeString(sBuffer_cookie, "/", Explode_HudColor, 4, 32);
 		
 		int Color_validate = StringToInt(Explode_HudColor[0]);
 		if(Color_validate >= 0 && Color_validate <= 255) g_CSettings_Hud[iClient].Color[0] = Color_validate;
