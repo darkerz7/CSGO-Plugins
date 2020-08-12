@@ -1,0 +1,11 @@
+Compile with:
+-CentOS 7 x64
+-Taglib 1.11.1
+-Sourcemod 1.10
+-cmake 3.12.3
+-glibc 2.17
+-clang 3.4.2
+-gcc 4.8.5
+-python 2.7.5
+-zlib-devel 1.2.7
+-build only x32
