@@ -124,8 +124,6 @@ public void OnPluginStart()
 	//Hook Output OutValue
 	HookEntityOutput("math_counter", "OutValue", Event_OutValue);
 	
-	CreateTimer(1.0, Timer_Cooldowns, _, TIMER_REPEAT);
-	
 	//Load Scheme
 	LoadScheme();
 	
@@ -705,11 +703,12 @@ public bool RegisterItem(class_ItemConfig ItemConfig, int iEntity, int iHammerID
 		NewItem.ButtonsArray = new ArrayList();
 		
 		NewItem.OwnerID = INVALID_ENT_REFERENCE;
-		NewItem.CoolDownTime = -1;
+		NewItem.CoolDownTime = -1.0;
 		if(ItemConfig.ButtonID==0) NewItem.ButtonID = INVALID_ENT_REFERENCE;
 			else NewItem.ButtonID = ItemConfig.ButtonID;
 		
-		NewItem.Delay = g_iDelayUse;
+		NewItem.UpdateTime();
+		NewItem.SetDelay(g_iDelayUse);
 		NewItem.GlowEnt = INVALID_ENT_REFERENCE;
 		
 		NewItem.PhysBox = ItemConfig.PhysBox;
@@ -938,6 +937,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 			g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
 			if(IsValidEdict(ItemTest.WeaponID))
 			{
+				ItemTest.UpdateTime();
 				for(int j = 0; j < ItemTest.ButtonsArray.Length; j++)
 				{
 					if(ItemTest.ButtonsArray.Get(j) == iButton)
@@ -962,14 +962,17 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 						if(ItemTest.OwnerID != iActivator && ItemTest.OwnerID != iCaller) return Plugin_Handled;
 							else if(!(StrEqual(ItemTest.FilterName,""))) DispatchKeyValue(iActivator, "targetname", ItemTest.FilterName);
 						
-						if(ItemTest.Delay > 0) return Plugin_Handled;
+						if(ItemTest.CheckDelay() > 0) return Plugin_Handled;
+						
+						//Base delay on the wait time of the button (button is locked for this duration)
+						int waitTime = RoundToFloor(GetEntPropFloat(iButton, Prop_Data, "m_flWait"));
 						
 						if(ItemTest.ButtonID != INVALID_ENT_REFERENCE && ItemTest.ButtonID != Entity_GetHammerID(iButton)) return Plugin_Changed;
 						
 						switch (ItemTest.Mode)
 						{
 							case 2: 
-								if(ItemTest.CoolDownTime <= -1)
+								if(ItemTest.CheckCoolDown() <= 0)
 								{
 									#if defined EW_MODULE_ELOGS
 									EWM_ELogs_Use(ItemTest, iActivator);
@@ -978,8 +981,8 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 									if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
 									#endif
 									
-									ItemTest.Delay = 1;
-									ItemTest.CoolDownTime = ItemTest.CoolDown;
+									ItemTest.SetDelay(waitTime);
+									ItemTest.SetCoolDown(ItemTest.CoolDown);
 									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 									return Plugin_Changed;
 								}
@@ -993,13 +996,14 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 									if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
 									#endif
 									
-									ItemTest.Delay = 1;
+									waitTime++; //For safety
+									ItemTest.SetDelay(waitTime);
 									ItemTest.Uses++;
 									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 									return Plugin_Changed;
 								}
 							case 4:
-								if(ItemTest.Uses < ItemTest.MaxUses && ItemTest.CoolDownTime <= -1)
+								if(ItemTest.Uses < ItemTest.MaxUses && ItemTest.CheckCoolDown() <= 0)
 								{
 									#if defined EW_MODULE_ELOGS
 									EWM_ELogs_Use(ItemTest, iActivator);
@@ -1008,14 +1012,14 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 									if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
 									#endif
 									
-									ItemTest.Delay = 1;
-									ItemTest.CoolDownTime = ItemTest.CoolDown;
+									ItemTest.SetDelay(waitTime);
+									ItemTest.SetCoolDown(ItemTest.CoolDown);
 									ItemTest.Uses++;
 									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 									return Plugin_Changed;
 								}
 							case 5:
-								if(ItemTest.CoolDownTime <= -1)
+								if(ItemTest.CheckCoolDown() <= 0)
 								{
 									#if defined EW_MODULE_ELOGS
 									EWM_ELogs_Use(ItemTest, iActivator);
@@ -1024,11 +1028,11 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 									if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
 									#endif
 									
-									ItemTest.Delay = 1;
+									ItemTest.SetDelay(waitTime);
 									ItemTest.Uses++;
 									if(ItemTest.Uses >= ItemTest.MaxUses)
 									{
-										ItemTest.CoolDownTime = ItemTest.CoolDown;
+										ItemTest.SetCoolDown(ItemTest.CoolDown);
 										ItemTest.Uses = 0;
 									}
 									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
@@ -1082,15 +1086,17 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 			
 			if(ItemTest.ButtonID==-5 && IsValidEdict(ItemTest.WeaponID))
 			{
+				ItemTest.UpdateTime();
+				
 				if(ItemTest.OwnerID==iActivator)
 				{
 					if(!(StrEqual(ItemTest.FilterName,""))) DispatchKeyValue(iActivator, "targetname", ItemTest.FilterName);
-					if(ItemTest.Delay > 0) return Plugin_Handled;
+					if(ItemTest.CheckDelay() > 0) return Plugin_Handled;
 					
 					switch (ItemTest.Mode)
 					{
 						case 2: 
-							if(ItemTest.CoolDownTime <= -1)
+							if(ItemTest.CheckCoolDown() <= 0)
 							{
 								#if defined EW_MODULE_ELOGS
 								EWM_ELogs_Use(ItemTest, iActivator);
@@ -1099,7 +1105,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 								if(ItemTest.Chat) EWM_Chat_Use(ItemTest, iActivator);
 								#endif
 								
-								ItemTest.CoolDownTime = ItemTest.CoolDown;
+								ItemTest.SetCoolDown(ItemTest.CoolDown);
 								g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 								return Plugin_Continue;
 							}
@@ -1118,7 +1124,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 								return Plugin_Continue;
 							}
 						case 4:
-							if(ItemTest.Uses < ItemTest.MaxUses && ItemTest.CoolDownTime <= -1)
+							if(ItemTest.Uses < ItemTest.MaxUses && ItemTest.CheckCoolDown() <= 0)
 							{
 								#if defined EW_MODULE_ELOGS
 								EWM_ELogs_Use(ItemTest, iActivator);
@@ -1127,13 +1133,13 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 								if(ItemTest.Chat) EWM_Chat_Use(ItemTest, iActivator);
 								#endif
 								
-								ItemTest.CoolDownTime = ItemTest.CoolDown;
+								ItemTest.SetCoolDown(ItemTest.CoolDown);
 								ItemTest.Uses++;
 								g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 								return Plugin_Continue;
 							}
 						case 5:
-							if(ItemTest.CoolDownTime <= -1)
+							if(ItemTest.CheckCoolDown() <= 0)
 							{
 								#if defined EW_MODULE_ELOGS
 								EWM_ELogs_Use(ItemTest, iActivator);
@@ -1145,7 +1151,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 								ItemTest.Uses++;
 								if(ItemTest.Uses >= ItemTest.MaxUses)
 								{
-									ItemTest.CoolDownTime = ItemTest.CoolDown;
+									ItemTest.SetCoolDown(ItemTest.CoolDown);
 									ItemTest.Uses = 0;
 								}
 								g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
@@ -1240,7 +1246,8 @@ public Action OnWeaponEquip(int iClient, int iWeapon)
 			if(ItemTest.WeaponID == iWeapon)
 			{
 				ItemTest.OwnerID = iClient;
-				ItemTest.Delay = g_iDelayUse;
+				ItemTest.UpdateTime();
+				ItemTest.SetDelay(g_iDelayUse);
 				
 				#if defined EW_MODULE_GLOW
 				EWM_Glow_DisableGlow(ItemTest);
@@ -1270,30 +1277,6 @@ public Action OnWeaponEquip(int iClient, int iWeapon)
 		EWM_Physbox_Pickedup(iClient, iWeapon);
 		#endif
 	}
-}
-
-//-------------------------------------------------------
-// Purpose: Calculate cooldown time
-//-------------------------------------------------------
-public Action Timer_Cooldowns(Handle timer)
-{
-	if (g_bConfigLoaded)
-		for(int i = 0; i<g_ItemList.Length; i++)
-		{
-			class_ItemList ItemTest;
-			g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
-			if(ItemTest.CoolDownTime >= 0)
-			{
-				ItemTest.CoolDownTime--;
-				g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-			}
-			if(ItemTest.Delay > 0)
-			{
-				ItemTest.Delay--;
-				g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-			}
-		}
-	return Plugin_Continue;
 }
 
 // Handlers Commands
