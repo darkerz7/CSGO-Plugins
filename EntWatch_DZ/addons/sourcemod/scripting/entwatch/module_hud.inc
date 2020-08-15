@@ -181,15 +181,16 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 			g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
 			if(ItemTest.Hud && ItemTest.OwnerID != INVALID_ENT_REFERENCE && IsValidEdict(ItemTest.WeaponID))
 			{
+				ItemTest.UpdateTime();
 				if(g_bDispCooldowns)
 				{
 					if(GetClientTeam(ItemTest.OwnerID)==2 && iIndexZombies < MAXSHOWHUDITEMS-1)//ZM
 					{
 						iIndexZombies++;
-						if(ItemTest.Delay > 0)
+						if(ItemTest.CheckDelay() > 0)
 						{
-							FormatEx(buffer_teamtext_zombies[iIndexZombies], sizeof(buffer_teamtext_zombies[]), "%s[-%d]: %N", ItemTest.ShortName, ItemTest.Delay, ItemTest.OwnerID);
-							FormatEx(buffer_teamtext_zombies_withoutname[iIndexZombies], sizeof(buffer_teamtext_zombies_withoutname[]), "%s[-%d]", ItemTest.ShortName, ItemTest.Delay);
+							FormatEx(buffer_teamtext_zombies[iIndexZombies], sizeof(buffer_teamtext_zombies[]), "%s[-%d]: %N", ItemTest.ShortName, ItemTest.RoundDelay(), ItemTest.OwnerID);
+							FormatEx(buffer_teamtext_zombies_withoutname[iIndexZombies], sizeof(buffer_teamtext_zombies_withoutname[]), "%s[-%d]", ItemTest.ShortName, ItemTest.RoundDelay());
 						}
 						else
 						{
@@ -197,10 +198,10 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 							{
 								case 2:
 								{
-									if (ItemTest.CoolDownTime > 0)
+									if (ItemTest.CheckCoolDown() > 0)
 									{
-										FormatEx(buffer_teamtext_zombies[iIndexZombies], sizeof(buffer_teamtext_zombies[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.CoolDownTime, ItemTest.OwnerID);
-										FormatEx(buffer_teamtext_zombies_withoutname[iIndexZombies], sizeof(buffer_teamtext_zombies_withoutname[]), "%s[%d]", ItemTest.ShortName, ItemTest.CoolDownTime);
+										FormatEx(buffer_teamtext_zombies[iIndexZombies], sizeof(buffer_teamtext_zombies[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.RoundCoolDown(), ItemTest.OwnerID);
+										FormatEx(buffer_teamtext_zombies_withoutname[iIndexZombies], sizeof(buffer_teamtext_zombies_withoutname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
 									}
 									else
 									{
@@ -223,10 +224,10 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 								}
 								case 4:
 								{
-									if (ItemTest.CoolDownTime > 0)
+									if (ItemTest.CheckCoolDown() > 0)
 									{
-										FormatEx(buffer_teamtext_zombies[iIndexZombies], sizeof(buffer_teamtext_zombies[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.CoolDownTime, ItemTest.OwnerID);
-										FormatEx(buffer_teamtext_zombies_withoutname[iIndexZombies], sizeof(buffer_teamtext_zombies_withoutname[]), "%s[%d]", ItemTest.ShortName, ItemTest.CoolDownTime);
+										FormatEx(buffer_teamtext_zombies[iIndexZombies], sizeof(buffer_teamtext_zombies[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.RoundCoolDown(), ItemTest.OwnerID);
+										FormatEx(buffer_teamtext_zombies_withoutname[iIndexZombies], sizeof(buffer_teamtext_zombies_withoutname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
 									}
 									else
 										if (ItemTest.Uses < ItemTest.MaxUses)
@@ -242,10 +243,10 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 								}
 								case 5:
 								{
-									if (ItemTest.CoolDownTime > 0)
+									if (ItemTest.CheckCoolDown() > 0)
 									{
-										FormatEx(buffer_teamtext_zombies[iIndexZombies], sizeof(buffer_teamtext_zombies[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.CoolDownTime, ItemTest.OwnerID);
-										FormatEx(buffer_teamtext_zombies_withoutname[iIndexZombies], sizeof(buffer_teamtext_zombies_withoutname[]), "%s[%d]", ItemTest.ShortName, ItemTest.CoolDownTime);
+										FormatEx(buffer_teamtext_zombies[iIndexZombies], sizeof(buffer_teamtext_zombies[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.RoundCoolDown(), ItemTest.OwnerID);
+										FormatEx(buffer_teamtext_zombies_withoutname[iIndexZombies], sizeof(buffer_teamtext_zombies_withoutname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
 									}
 									else
 									{
@@ -264,10 +265,10 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 					else if(GetClientTeam(ItemTest.OwnerID)==3 && iIndexHumans < MAXSHOWHUDITEMS-1)//Humans
 					{
 						iIndexHumans++;
-						if(ItemTest.Delay > 0)
+						if(ItemTest.CheckDelay() > 0)
 						{
-							FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[-%d]: %N", ItemTest.ShortName, ItemTest.Delay, ItemTest.OwnerID);
-							FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[-%d]", ItemTest.ShortName, ItemTest.Delay);
+							FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[-%d]: %N", ItemTest.ShortName, ItemTest.RoundDelay(), ItemTest.OwnerID);
+							FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[-%d]", ItemTest.ShortName, ItemTest.RoundDelay());
 						}
 						else
 						{
@@ -275,10 +276,10 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 							{
 								case 2:
 								{
-									if (ItemTest.CoolDownTime > 0)
+									if (ItemTest.CheckCoolDown() > 0)
 									{
-										FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.CoolDownTime, ItemTest.OwnerID);
-										FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[%d]", ItemTest.ShortName, ItemTest.CoolDownTime);
+										FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.RoundCoolDown(), ItemTest.OwnerID);
+										FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
 									}
 									else
 									{
@@ -301,10 +302,10 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 								}
 								case 4:
 								{
-									if (ItemTest.CoolDownTime > 0)
+									if (ItemTest.CheckCoolDown() > 0)
 									{
-										FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.CoolDownTime, ItemTest.OwnerID);
-										FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[%d]", ItemTest.ShortName, ItemTest.CoolDownTime);
+										FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.RoundCoolDown(), ItemTest.OwnerID);
+										FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
 									}
 									else
 										if (ItemTest.Uses < ItemTest.MaxUses)
@@ -320,10 +321,10 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 								}
 								case 5:
 								{
-									if (ItemTest.CoolDownTime > 0)
+									if (ItemTest.CheckCoolDown() > 0)
 									{
-										FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.CoolDownTime, ItemTest.OwnerID);
-										FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[%d]", ItemTest.ShortName, ItemTest.CoolDownTime);
+										FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.RoundCoolDown(), ItemTest.OwnerID);
+										FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
 									}
 									else
 									{
@@ -357,10 +358,10 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 					if(GetClientTeam(ItemTest.OwnerID)==2 && iIndexZombies < MAXSHOWHUDITEMS-1)//ZM
 					{
 						iIndexZombies++;
-						if(ItemTest.Delay > 0)
+						if(ItemTest.CheckDelay() > 0)
 						{
-							FormatEx(buffer_teamtext_zombies[iIndexZombies], sizeof(buffer_teamtext_zombies[]), "%s[-%d]: %N", ItemTest.ShortName, ItemTest.Delay, ItemTest.OwnerID);
-							FormatEx(buffer_teamtext_zombies_withoutname[iIndexZombies], sizeof(buffer_teamtext_zombies_withoutname[]), "%s[-%d]", ItemTest.ShortName, ItemTest.Delay);
+							FormatEx(buffer_teamtext_zombies[iIndexZombies], sizeof(buffer_teamtext_zombies[]), "%s[-%d]: %N", ItemTest.ShortName, ItemTest.RoundDelay(), ItemTest.OwnerID);
+							FormatEx(buffer_teamtext_zombies_withoutname[iIndexZombies], sizeof(buffer_teamtext_zombies_withoutname[]), "%s[-%d]", ItemTest.ShortName, ItemTest.RoundDelay());
 						}
 						else
 						{
@@ -370,10 +371,10 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 					}else if(GetClientTeam(ItemTest.OwnerID)==3 && iIndexHumans < MAXSHOWHUDITEMS-1)//Humans
 					{
 						iIndexHumans++;
-						if(ItemTest.Delay > 0)
+						if(ItemTest.CheckDelay() > 0)
 						{
-							FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[-%d]: %N", ItemTest.ShortName, ItemTest.Delay, ItemTest.OwnerID);
-							FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[-%d]", ItemTest.ShortName, ItemTest.Delay);
+							FormatEx(buffer_teamtext_humans[iIndexHumans], sizeof(buffer_teamtext_humans[]), "%s[-%d]: %N", ItemTest.ShortName, ItemTest.RoundDelay(), ItemTest.OwnerID);
+							FormatEx(buffer_teamtext_humans_withoutname[iIndexHumans], sizeof(buffer_teamtext_humans_withoutname[]), "%s[-%d]", ItemTest.ShortName, ItemTest.RoundDelay());
 						}
 						else
 						{

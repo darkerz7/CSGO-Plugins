@@ -53,9 +53,14 @@ public Action EWM_Clantag_Timer_UpdateClantag(Handle timer, int client)
 			g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
 			if (ItemTest.Hud && ItemTest.OwnerID != INVALID_ENT_REFERENCE && IsValidEdict(ItemTest.WeaponID))
 			{
-				if(ItemTest.Delay > 0)
+				char clanName[11];
+				FormatEx(clanName, sizeof(clanName), "%s", ItemTest.ShortName);
+				
+				ItemTest.UpdateTime();
+				
+				if(ItemTest.CheckDelay() > 0)
 				{
-					FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[-%d]:", ItemTest.ShortName, ItemTest.Delay);					
+					FormatEx(buffer_temp, sizeof(buffer_temp), "%s[-%d]:", clanName, ItemTest.RoundDelay());					
 				}
 				else
 				{
@@ -63,68 +68,68 @@ public Action EWM_Clantag_Timer_UpdateClantag(Handle timer, int client)
 					{
 						case 2:
 						{
-							if (ItemTest.CoolDownTime > 0)
+							if (ItemTest.CheckCoolDown() > 0)
 							{
-								FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[%d]:", ItemTest.ShortName, ItemTest.CoolDownTime);
+								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[%d]:", clanName, ItemTest.RoundCoolDown());
 							}
 							else
 							{
-								FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[R]:", ItemTest.ShortName);
+								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[R]:", clanName);
 							}
 						}
 						case 3:
 						{
 							if (ItemTest.Uses < ItemTest.MaxUses)
 							{
-								FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[%d/%d]:", ItemTest.ShortName, ItemTest.Uses, ItemTest.MaxUses);
+								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[%d/%d]:", clanName, ItemTest.Uses, ItemTest.MaxUses);
 							}
 							else
 							{
-								FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[E]:", ItemTest.ShortName);
+								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[E]:", clanName);
 							}
 						}
 						case 4:
 						{
-							if (ItemTest.CoolDownTime > 0)
+							if (ItemTest.CheckCoolDown() > 0)
 							{
 
-								FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[%d]:", ItemTest.ShortName, ItemTest.CoolDownTime);
+								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[%d]:", clanName, ItemTest.RoundCoolDown());
 							}
 							else
 								if (ItemTest.Uses < ItemTest.MaxUses)
 								{
-									FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[%d/%d]:", ItemTest.ShortName, ItemTest.Uses, ItemTest.MaxUses);
+									FormatEx(buffer_temp, sizeof(buffer_temp), "%s[%d/%d]:", clanName, ItemTest.Uses, ItemTest.MaxUses);
 								}
 								else
 								{
-									FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[E]:", ItemTest.ShortName);
+									FormatEx(buffer_temp, sizeof(buffer_temp), "%s[E]:", clanName);
 								}
 						}
 						case 5:
 						{
-							if (ItemTest.CoolDownTime > 0)
+							if (ItemTest.CheckCoolDown() > 0)
 							{
-								FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[%d]:", ItemTest.ShortName, ItemTest.CoolDownTime);
+								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[%d]:", clanName, ItemTest.RoundCoolDown());
 							}
 							else
 							{
-								FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[%d/%d]:", ItemTest.ShortName, ItemTest.Uses, ItemTest.MaxUses);
+								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[%d/%d]:", clanName, ItemTest.Uses, ItemTest.MaxUses);
 							}
 						}
 						case 6, 7:
 						{
 							if (ItemTest.MathValue > 0)
 							{
-								FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[%d/%d]:", ItemTest.ShortName, ItemTest.MathValue, ItemTest.MathValueMax);
+								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[%d/%d]:", clanName, ItemTest.MathValue, ItemTest.MathValueMax);
 							}
 							else
 							{
-								FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[E]:", ItemTest.ShortName);
+								FormatEx(buffer_temp, sizeof(buffer_temp), "%s[E]:", clanName);
 							}
 						}
 						default:
 						{
-							FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[+]:", ItemTest.ShortName);
+							FormatEx(buffer_temp, sizeof(buffer_temp), "%s[+]:", clanName);
 						}
 					}
 				}
@@ -153,7 +158,8 @@ stock void EWM_Clantag_PickUp(class_ItemList ItemTest, int iClient)
 	}	
 	
 	char buffer_temp[128];
-	FormatEx(buffer_temp, sizeof(buffer_temp), "%10s[+]:", ItemTest.ShortName);
+	FormatEx(buffer_temp, 10, "%s", ItemTest.ShortName);
+	Format(buffer_temp, sizeof(buffer_temp), "%s[+]:", buffer_temp);
 	CS_SetClientClanTag(iClient, buffer_temp);
 	CS_SetClientContributionScore(iClient, 9999);
 }

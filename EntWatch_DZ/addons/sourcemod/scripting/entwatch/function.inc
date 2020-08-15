@@ -1,3 +1,9 @@
+//-------------------------------------------------------
+// Purpose: Global Function Variables
+//-------------------------------------------------------
+float g_fGameTime;
+int g_iOutValueOffset = -1;
+
 enum struct class_ItemConfig
 {
 	char		Name[32];
@@ -49,11 +55,42 @@ enum struct class_ItemList
 	int			WeaponID;
 	ArrayList	ButtonsArray;
 	int			OwnerID;
-	int			CoolDownTime;
-	int			Delay;
+	float		CoolDownTime;
+	float		Delay;
 	int			GlowEnt;
 	int			GlowColor[4];
 	bool		PhysBox;
+	
+	//Purpose: Update cached GameTime
+	void UpdateTime()
+	{
+		g_fGameTime = GetGameTime();
+	}
+	//Purpose: Base cooldowns on GameTime rather than Timer
+	void SetCoolDown(int time)
+	{
+		this.CoolDownTime = g_fGameTime + time;
+	}
+	float CheckCoolDown()
+	{
+		return this.CoolDownTime - g_fGameTime;
+	}
+	int RoundCoolDown()
+	{
+		return RoundToCeil(this.CoolDownTime - g_fGameTime);
+	}
+	void SetDelay(int time)
+	{
+		this.Delay = g_fGameTime + time;
+	}
+	float CheckDelay()
+	{
+		return this.Delay - g_fGameTime;
+	}
+	int RoundDelay()
+	{
+		return RoundToCeil(this.Delay - g_fGameTime);
+	}
 }
 
 enum struct class_Scheme
@@ -110,8 +147,6 @@ enum struct class_Offline_Eban
 	int		TimeStamp_Start;
 	char	LastItem[32];
 }
-
-int g_iOutValueOffset = -1;
 
 stock bool IsValidClient(int iClient) 
 { 
