@@ -47,7 +47,7 @@ public void EWM_OfflineEban_OnClientPostAdminCheck(int iClient)
 	if(IsClientSourceTV(iClient)) return; //ignore SourceTV
 	char sClient_Name[32], sClient_SteamID[64];
 	int iUserID = GetClientUserId(iClient);
-	GetClientName(iClient, sClient_Name, MAX_NAME_LENGTH);
+	GetClientName(iClient, sClient_Name, sizeof(sClient_Name));
 	GetClientAuthId(iClient, AuthId_Steam2, sClient_SteamID, sizeof(sClient_SteamID));
 	bool bNotFound = true;
 	for(int i = 0; i < g_OfflineArray.Length; i++)
@@ -84,7 +84,7 @@ public void EWM_OfflineEban_OnClientDisconnect(int iClient)
 	if(!IsValidClient(iClient) || !IsClientConnected(iClient) || IsClientSourceTV(iClient) || IsFakeClient(iClient)) return;
 	
 	char sClient_Name[32], sClient_SteamID[64];
-	GetClientName(iClient, sClient_Name, MAX_NAME_LENGTH);
+	GetClientName(iClient, sClient_Name, sizeof(sClient_Name));
 	GetClientAuthId(iClient, AuthId_Steam2, sClient_SteamID, sizeof(sClient_SteamID));
 	bool bNotFound = true;
 	for(int i = 0; i < g_OfflineArray.Length; i++)
@@ -119,7 +119,7 @@ public void EWM_OfflineEban_UpdateItemName(int iClient, const char[] sNameItem)
 	if(IsFakeClient(iClient)) return;
 	
 	char sClient_Name[32], sClient_SteamID[64];
-	GetClientName(iClient, sClient_Name, MAX_NAME_LENGTH);
+	GetClientName(iClient, sClient_Name, sizeof(sClient_Name));
 	GetClientAuthId(iClient, AuthId_Steam2, sClient_SteamID, sizeof(sClient_SteamID));
 	bool bNotFound = true;
 	for(int i = 0; i < g_OfflineArray.Length; i++)

@@ -209,7 +209,7 @@ public void EWM_Eban_BanClient(int iClient, int iAdmin, int iDuration, const cha
 				char sTQuery[1024], szAdmin_Name[32], sClient_Name[32], szClient_Name[32], sClient_SteamID[64], szReason[64];
 				
 				g_hEbanDB.Escape(sAdmin_Name, szAdmin_Name, sizeof(szAdmin_Name));//Admin Name to DB
-				GetClientName(iClient, sClient_Name, MAX_NAME_LENGTH);//Get Client Name
+				GetClientName(iClient, sClient_Name, sizeof(sClient_Name));//Get Client Name
 				g_hEbanDB.Escape(sClient_Name, szClient_Name, sizeof(szClient_Name));//Client Name to DB
 				GetClientAuthId(iClient, AuthId_Steam2, sClient_SteamID, sizeof(sClient_SteamID));//Client SteamId to DB
 				g_hEbanDB.Escape(sReason, szReason, sizeof(szReason));//Reason to DB
@@ -244,7 +244,7 @@ public void EWM_Eban_BanClient(int iClient, int iAdmin, int iDuration, const cha
 				char sTQuery[1024], szAdmin_Name[32], sClient_Name[32], szClient_Name[32], sClient_SteamID[64], szReason[64];
 				
 				g_hEbanDB.Escape(sAdmin_Name, szAdmin_Name, sizeof(szAdmin_Name));//Admin Name to DB
-				GetClientName(iClient, sClient_Name, MAX_NAME_LENGTH);//Get Client Name
+				GetClientName(iClient, sClient_Name, sizeof(sClient_Name));//Get Client Name
 				g_hEbanDB.Escape(sClient_Name, szClient_Name, sizeof(szClient_Name));//Client Name to DB
 				GetClientAuthId(iClient, AuthId_Steam2, sClient_SteamID, sizeof(sClient_SteamID));//Client SteamId to DB
 				g_hEbanDB.Escape(sReason, szReason, sizeof(szReason));//Reason to DB
