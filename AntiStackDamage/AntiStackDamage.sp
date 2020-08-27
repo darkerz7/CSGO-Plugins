@@ -1,32 +1,38 @@
 #pragma semicolon 1
+#pragma newdecls required
 #include <sdkhooks>
 
 bool g_IgnoreDamage[MAXPLAYERS+1] = false;
 
-public Plugin:myinfo =
+public Plugin myinfo =
 {
 	name = "[ZR] Anti Stack Damage",
 	author = "DarkerZ[RUS]",
 	description = "CS:GO Fix trigger_hurt that has Parent",
-	version = "1.0",
+	version = "1.1",
 	url = "dark-skill.ru"
 }
 
-public OnClientPutInServer(client)
+public void OnClientPutInServer(int iClient)
 {
-	SDKHook(client, SDKHook_OnTakeDamage, OnTakeDamage);
-	g_IgnoreDamage[client] = false;
+	SDKHook(iClient, SDKHook_OnTakeDamage, OnTakeDamage);
+	g_IgnoreDamage[iClient] = false;
 }
 
-public Action:OnTakeDamage(iClient, &iAttacker, &Inflictor, &Float:Damage, &Damagetype)
+public void OnClientDisconnect(int iClient)
+{
+	SDKUnhook(iClient, SDKHook_OnTakeDamage, OnTakeDamage);
+}
+
+public Action OnTakeDamage(int iClient, int &iAttacker, int &Inflictor, float &iDamage, int &Damagetype)
 {
 	if(GetClientTeam(iClient)==3)//Check CTs
 	{
-		char c_DamageEntity[32];
-		GetEdictClassname(iAttacker, c_DamageEntity, sizeof(c_DamageEntity));
-		if(StrEqual(c_DamageEntity, "trigger_hurt")) //Who Damage
+		char cDamageEntity[32];
+		GetEntityClassname(iAttacker, cDamageEntity, sizeof(cDamageEntity));
+		if(StrEqual(cDamageEntity, "trigger_hurt")) //Who Damage
 		{
-			if(Damage<500.0)//Check damage
+			if(iDamage<500.0)//Check damage
 			{
 				if(g_IgnoreDamage[iClient] == true)
 				{
@@ -42,7 +48,7 @@ public Action:OnTakeDamage(iClient, &iAttacker, &Inflictor, &Float:Damage, &Dama
 	return Plugin_Continue;
 }
 
-public Action:Timer_Ignore_Damage(Handle:timer, any:iClient)
+public Action Timer_Ignore_Damage(Handle timer, any iClient)
 {
 	g_IgnoreDamage[iClient] = false;
 	KillTimer(timer);
