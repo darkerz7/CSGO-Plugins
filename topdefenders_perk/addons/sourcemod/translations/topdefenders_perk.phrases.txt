@@ -7,8 +7,8 @@
 	}
 	"HUD Top Defenders"
 	{
-		"en"		"~~~~~TOP Defenders~~~~~"
-		"ru"		"~~~~~ТОП Дефующих~~~~~"
+		"en"		"<b><font class='fontSize-xl' color='#0f0'>~~~~~TOP Defenders~~~~~</font></b>"
+		"ru"		"<b><font class='fontSize-xl' color='#0f0'>~~~~~ТОП Дефующих~~~~~</font></b>"
 	}
 	"Chat Top DefFirst"
 	{
@@ -40,17 +40,35 @@
 		"en"		"{blue}{1}. {lightblue} None"
 		"ru"		"{blue}{1}. {lightblue} Пусто"
 	}
-	"HUD Top DefPosition"
+	"HUD Top DefPosition First"
+	{
+		"#format"	"{1:N},{2:i}"
+		"en"		"<b><font class='fontSize-l'><span color='#0f0'>1.</span> <span color='#a00'>{1}</span> - <span color='#808'>{2} DMG</span></font></b>"
+		"ru"		"<b><font class='fontSize-l'><span color='#0f0'>1.</span> <span color='#a00'>{1}</span> - <span color='#808'>{2} Урона</span></font></b>"
+	}
+	"HUD Top DefPosition Second"
+	{
+		"#format"	"{1:N},{2:i}"
+		"en"		"<b><font class='fontSize-l'><span color='#f00'>2.</span> <span color='#44f'>{1}</span> - <span color='#808'>{2} DMG</span></font></b>"
+		"ru"		"<b><font class='fontSize-l'><span color='#f00'>2.</span> <span color='#44f'>{1}</span> - <span color='#808'>{2} Урона</span></font></b>"
+	}
+	"HUD Top DefPosition Third"
+	{
+		"#format"	"{1:N},{2:i}"
+		"en"		"<b><font class='fontSize-l'><span color='#44f'>3.</span> <span color='#0f0'>{1}</span> - <span color='#808'>{2} DMG</span></font></b>"
+		"ru"		"<b><font class='fontSize-l'><span color='#44f'>3.</span> <span color='#0f0'>{1}</span> - <span color='#808'>{2} Урона</span></font></b>"
+	}
+	"HUD Top DefPosition Other"
 	{
 		"#format"	"{1:i},{2:N},{3:i}"
-		"en"		"{1}. {2} - {3} DMG"
-		"ru"		"{1}. {2} - {3} Урона"
+		"en"		"<b><font class='fontSize-l'><span color='#ccc'>{1}.</span> <span color='#bf0'>{2}</span> - <span color='#808'>{3} DMG</span></font></b>"
+		"ru"		"<b><font class='fontSize-l'><span color='#ccc'>{1}.</span> <span color='#bf0'>{2}</span> - <span color='#808'>{3} DMG</span></font></b>"
 	}
 	"HUD Top DefNone"
 	{
 		"#format"	"{1:i}"
-		"en"		"{1}. None"
-		"ru"		"{1}. Пусто"
+		"en"		"<b><font class='fontSize-l'><span color='#44f'>{1}.</span> <span color='#88f'>None</span></font></b>"
+		"ru"		"<b><font class='fontSize-l'><span color='#44f'>{1}.</span> <span color='#88f'>Пусто</span></font></b>"
 	}
 	"Chat Top Infectors"
 	{
@@ -59,8 +77,8 @@
 	}
 	"HUD Top Infectors"
 	{
-		"en"		"~~~~~TOP Infectors~~~~~"
-		"ru"		"~~~~~ТОП Заражающих~~~~~"
+		"en"		"<b><font class='fontSize-xl' color='#f00'>~~~~~TOP Infectors~~~~~</font></b>"
+		"ru"		"<b><font class='fontSize-xl' color='#f00'>~~~~~ТОП Заражающих~~~~~</font></b>"
 	}
 	"Chat Top InfFirst"
 	{
@@ -92,17 +110,35 @@
 		"en"		"{blue}{1}. {lightblue} None"
 		"ru"		"{blue}{1}. {lightblue} Пусто"
 	}
-	"HUD Top InfPosition"
+	"HUD Top InfPosition First"
+	{
+		"#format"	"{1:N},{2:i}"
+		"en"		"<b><font class='fontSize-l'><span color='#0f0'>1.</span> <span color='#a00'>{1}</span> - <span color='#808'>{2} Infections</span></font></b>"
+		"ru"		"<b><font class='fontSize-l'><span color='#0f0'>1.</span> <span color='#a00'>{1}</span> - <span color='#808'>{2} Заражений</span></font></b>"
+	}
+	"HUD Top InfPosition Second"
+	{
+		"#format"	"{1:N},{2:i}"
+		"en"		"<b><font class='fontSize-l'><span color='#f00'>2.</span> <span color='#44f'>{1}</span> - <span color='#808'>{2} Infections</span></font></b>"
+		"ru"		"<b><font class='fontSize-l'><span color='#f00'>2.</span> <span color='#44f'>{1}</span> - <span color='#808'>{2} Заражений</span></font></b>"
+	}
+	"HUD Top InfPosition Third"
+	{
+		"#format"	"{1:N},{2:i}"
+		"en"		"<b><font class='fontSize-l'><span color='#44f'>3.</span> <span color='#0f0'>{1}</span> - <span color='#808'>{2} Infections</span></font></b>"
+		"ru"		"<b><font class='fontSize-l'><span color='#44f'>3.</span> <span color='#0f0'>{1}</span> - <span color='#808'>{2} Заражений</span></font></b>"
+	}
+	"HUD Top InfPosition Other"
 	{
 		"#format"	"{1:i},{2:N},{3:i}"
-		"en"		"{1}. {2} - {3} Infections"
-		"ru"		"{1}. {2} - {3} Заражений"
+		"en"		"<b><font class='fontSize-l'><span color='#ccc'>{1}.</span> <span color='#bf0'>{2}</span> - <span color='#808'>{3} Infections</span></font></b>"
+		"ru"		"<b><font class='fontSize-l'><span color='#ccc'>{1}.</span> <span color='#bf0'>{2}</span> - <span color='#808'>{3} Заражений</span></font></b>"
 	}
 	"HUD Top InfNone"
 	{
 		"#format"	"{1:i}"
-		"en"		"{1}. None"
-		"ru"		"{1}. Пусто"
+		"en"		"<b><font class='fontSize-l'><span color='#44f'>{1}.</span> <span color='#88f'>None</span></font></b>"
+		"ru"		"<b><font class='fontSize-l'><span color='#44f'>{1}.</span> <span color='#88f'>Пусто</span></font></b>"
 	}
 	"Hint Damage"
 	{
@@ -123,8 +159,8 @@
 	}
 	"Perk Remove"
 	{
-		"en"			"{lightblue}[{green}Top Defenders{lightblue}] {purple}You have removed the perk"
-		"ru"			"{lightblue}[{green}Топ Дефующих{lightblue}] {purple}У вас удалён перк"
+		"en"			"{lightblue}[{green}Top Defenders{lightblue}] {purple}You have removed the perk and the color of the skin"
+		"ru"			"{lightblue}[{green}Топ Дефующих{lightblue}] {purple}У вас удалён перк и цвет скина"
 	}
 	"No Perk"
 	{

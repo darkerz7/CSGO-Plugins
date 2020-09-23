@@ -18,95 +18,150 @@
 #define CS_TEAM_T 2
 #define CS_TEAM_CT 3
 
-//cvars
-ConVar	cvar_Enable,
-		cvar_TopCount,
-		cvar_Perk,
-		cvar_CashDiv,
-		cvar_TopInfector,
-		cvar_InfectorCount,
-		cvar_InfectorPerk,
-		cvar_Immunity,
-		cvar_MinPlayers,
-		cvar_MaxMoney,
-		cvar_ShowDamage,
-		cvar_MinPlPerk;
+//classes
+enum struct class_Config
+{
+	#if defined SHOP
+	int				Shop[4];
+	#endif
+	bool			Immunity[3];
+	float			Speed[4];
+	float			Gravity[4];
+	int				Perk_Type[4]; //0 - None, 1 - Sprite, 2 - Trail, 3 - Model
+	int				Perk_Color_Red[4];
+	int				Perk_Color_Green[4];
+	int				Perk_Color_Blue[4];
+	int				Perk_Color_Alpha[4];
+	int				RMode[4]; //Rendermode
+	float			Trail_LifeTime[4];
+	float			Trail_WidthStart[4];
+	float			Trail_WidthEnd[4];
+	Handle			Perk_List[4];
+	
+	void InitConfig()
+	{
+		for(int i=0; i<4;i++) this.Perk_List[i] = CreateArray(PLATFORM_MAX_PATH);
+	}
+	void ClearData()
+	{
+		for(int i=0; i<4;i++)
+		{
+			#if defined SHOP
+			this.Shop[i] = 0;
+			#endif
+			this.Speed[i] = 0.0;
+			this.Gravity[i] = 0.0;
+			this.Perk_Type[i] = 0;
+			this.Perk_Color_Red[i] = 0;
+			this.Perk_Color_Green[i] = 0;
+			this.Perk_Color_Blue[i] = 0;
+			this.Perk_Color_Alpha[i] = 0;
+			this.RMode[i] = 0;
+			this.Trail_LifeTime[i] = 0.0;
+			this.Trail_WidthStart[i] = 0.0;
+			this.Trail_WidthEnd[i] = 0.0;
+			ClearArray(this.Perk_List[i]);
+		}
+		this.Immunity[0] = false;
+		this.Immunity[1] = false;
+		this.Immunity[2] = false;
+	}
+}
 
-float	g_fCashDiv = 20.0;
-int		g_iMaxMoney = 16000;
+enum struct class_Player
+{
+	int		Damage;
+	int		Kills;
+	int		Infects;
+	int		TopNextRound;
+	int		CurrentDamage;
+	int		Perk;
+	bool	BlockTimer;
+	bool	Immunity;
+	
+	void Wipe()
+	{
+		this.Damage			= 0;
+		this.Kills			= 0;
+		this.Infects		= 0;
+		this.TopNextRound	= 0;
+		this.CurrentDamage	= 0;
+		this.Perk			= -1;
+		this.BlockTimer		= false;
+		this.Immunity		= false;
+	}
+	void WipeInGame()
+	{
+		this.Damage = 0;
+		this.Kills = 0;
+		this.Infects = 0;
+		this.TopNextRound = 0;
+	}
+}
 
-bool	g_bEnable = true;
-bool	g_bShowDamage = true;
-int		g_iTopCount = 3;
-bool	g_bPerk = true;
+enum struct class_ConVar
+{
+	ConVar		cvEnable;
+	ConVar		cvTopCount;
+	ConVar		cvPerk;
+	ConVar		cvTopInfector;
+	ConVar		cvInfectorCount;
+	ConVar		cvInfectorPerk;
+	ConVar		cvShowDamage;
+	ConVar		cvCashDiv;
+	ConVar		cvImmunity;
+	ConVar		cvMinPlayers;
+	ConVar		cvMinPlPerk;
+	ConVar		cvMaxMoney;
+	
+	bool		Defender_Enable;
+	int			Defender_TopCount;
+	bool		Defender_Perk;
+	bool		Infector_Enable;
+	int			Infector_TopCount;
+	bool		Infector_Perk;
+	bool		ShowDamage;
+	float		CashDiv;
+	int			Chance;
+	int			MP_Immunity;
+	int			MP_Perk;
+	int			MaxMoney;
+	
+	void Init()
+	{
+		this.Defender_Enable = true;
+		this.Defender_TopCount = 3;
+		this.Defender_Perk = true;
+		this.Infector_Enable = true;
+		this.Infector_TopCount = 3;
+		this.Infector_Perk = true;
+		this.ShowDamage = true;
+		this.CashDiv = 20.0;
+		this.Chance = 100;
+		this.MP_Immunity = 15;
+		this.MP_Perk = 10;
+		this.MaxMoney = 16000;
+	}
+}
 
-bool	g_bInfectorEnable = true;
-int		g_iInfectorTopCount = 3;
-bool	g_bInfectorPerk = true;
+class_ConVar g_cConVar;
 
-int g_iCash = -1;
+class_Config cDefender;
+class_Config cInfector;
 
-int g_iPlayerDamage[MAXPLAYERS+1] = 0;
-int g_iPlayerKill[MAXPLAYERS+1] = 0;
-int g_iPlayerInfect[MAXPLAYERS+1] = 0;
+class_Player cPlayers[MAXPLAYERS+1];
 
-int g_iTopNextRound[MAXPLAYERS+1] = 0;
-int g_iPlayerCurrentDamage[MAXPLAYERS+1] = 0;
-bool g_bBlockTimer[MAXPLAYERS+1] = {false,...};
-
-#if defined SHOP
-int Config_Defender_Shop[4];
-#endif
-bool Config_Defender_Immunity[3];
-float Config_Defender_Speed[4];
-float Config_Defender_Gravity[4];
-int Config_Defender_Perk_Type[4]; //0 - None, 1 - Sprite, 2 - Trail, 3 - Model
-int Config_Defender_Perk_Color[4][4];
-int Config_Defender_RenderMode[4];
-float Config_Defender_Trail_Config[4][3];
-Handle Config_Defender_Perk_List[4];
-
-#if defined SHOP
-int Config_Infector_Shop[4];
-#endif
-bool Config_Infector_Immunity[3];
-float Config_Infector_Speed[4];
-float Config_Infector_Gravity[4];
-int Config_Infector_Perk_Type[4]; //0 - None, 1 - Sprite, 2 - Trail, 3 - Model
-int Config_Infector_Perk_Color[4][4];
-int Config_Infector_RenderMode[4];
-float Config_Infector_Trail_Config[4][3];
-Handle Config_Infector_Perk_List[4];
-
-int Config_HUD_Defender_Color[4] = {50,205,50,255};
-float Config_HUD_Defender_x = -1.0;
-float Config_HUD_Defender_y = 0.35;
-
-int Config_HUD_Infector_Color[4] = {255,100,50,255};
-float Config_HUD_Infector_x = -1.0;
-float Config_HUD_Infector_y = 0.55;
-
-Handle 	g_hHudDefender,
-		g_hHudInfector;
-
-int g_iEntityPerk[MAXPLAYERS+1] = -1;
-
-bool Cfg_Loaded = false;
-
-bool g_bImmunity[MAXPLAYERS+1] = {false,...};
-int g_iChance = 100;
-int g_iMinPlayersImmunity = 15;
-int g_iInfectedChance = 0;
-int g_iMinPlayersPerk = 10;
-
-bool g_bWarmUp = false;
+int		g_iInfectedChance = 0;
+int		g_iCash = -1;
+bool	g_bCfg_Loaded = false;
+bool	g_bWarmUp = false;
 
 public Plugin myinfo = 
 {
 	name = "[ZR] TopDefenders with Perk CS:GO",
 	author = "DarkerZ [RUS]",
 	description = "Shows damage by zombies and gives perk for the top",
-	version = "2.3.1",
+	version = "2.4.0",
 	url = "dark-skill.ru"
 }
 
@@ -115,30 +170,25 @@ public void OnPluginStart()
 	LoadTranslations("topdefenders_perk.phrases");
 	
 	g_iCash = FindSendPropInfo("CCSPlayer", "m_iAccount");
-	if (g_iCash == -1)
-	{
-		SetFailState("[CS:GO] Give Cash - Failed to find offset for m_iAccount!");
-	}
+	if (g_iCash == -1) SetFailState("[CS:GO] Give Cash - Failed to find offset for m_iAccount!");
 	
-	for(int i=0; i<4;i++)
-	{
-		Config_Defender_Perk_List[i] = CreateArray(PLATFORM_MAX_PATH);
-		Config_Infector_Perk_List[i] = CreateArray(PLATFORM_MAX_PATH);
-	}
+	cDefender.InitConfig();
+	cInfector.InitConfig();
 	
-	cvar_Enable = CreateConVar("sm_topdefenders_enable", "1", "[TopDefenders] Enable plugin", _, true, 0.0, true, 1.0);
-	cvar_TopCount = CreateConVar("sm_topdefenders_topcount", "3", "[TopDefenders] Count top on round end (min 3/max 15)", _, true, 3.0, true, 15.0);
-	cvar_Perk = CreateConVar("sm_topdefenders_perk", "1", "[TopDefenders] Gives perk for the top", _, true, 0.0, true, 1.0);
-	cvar_CashDiv = CreateConVar("sm_topdefenders_cashdiv", "20", "[TopDefenders] Divider (min 0/max 50; 0 - Disable)", _, true, 0.0, true, 50.0);
-	cvar_ShowDamage = CreateConVar("sm_topdefenders_showdamage", "1", "[TopDefenders] Enable Show Damage Addon", _, true, 0.0, true, 1.0);
+	g_cConVar.Init();
+	g_cConVar.cvEnable			= CreateConVar("sm_topdefenders_enable", "1", "[TopDefenders] Enable plugin", _, true, 0.0, true, 1.0);
+	g_cConVar.cvTopCount		= CreateConVar("sm_topdefenders_topcount", "3", "[TopDefenders] Count top on round end (min 3/max 15)", _, true, 3.0, true, 15.0);
+	g_cConVar.cvPerk			= CreateConVar("sm_topdefenders_perk", "1", "[TopDefenders] Gives perk for the top", _, true, 0.0, true, 1.0);
+	g_cConVar.cvTopInfector		= CreateConVar("sm_topdefenders_infectors_enable", "1", "[TopDefenders] Enable Top Infector Addon", _, true, 0.0, true, 1.0);
+	g_cConVar.cvInfectorCount	= CreateConVar("sm_topdefenders_infectors_topcount", "3", "[TopDefenders] Count top Infector on round end (min 3/max 15)", _, true, 3.0, true, 15.0);
+	g_cConVar.cvInfectorPerk	= CreateConVar("sm_topdefenders_infectors_perk", "1", "[TopDefenders] Gives Infector perk for the top", _, true, 0.0, true, 1.0);
 	
-	cvar_TopInfector = CreateConVar("sm_topdefenders_infectors_enable", "1", "[TopDefenders] Enable Top Infector Addon", _, true, 0.0, true, 1.0);
-	cvar_InfectorCount = CreateConVar("sm_topdefenders_infectors_topcount", "3", "[TopDefenders] Count top Infector on round end (min 3/max 15)", _, true, 3.0, true, 15.0);
-	cvar_InfectorPerk = CreateConVar("sm_topdefenders_infectors_perk", "1", "[TopDefenders] Gives Infector perk for the top", _, true, 0.0, true, 1.0);
-	cvar_Immunity = CreateConVar("sm_topdefenders_immunity_chance", "100", "[TopDefenders] Immunity Chance", _, true, 0.0, true, 100.0);
-	cvar_MinPlayers = CreateConVar("sm_topdefenders_immunity_minplayers", "15", "[TopDefenders] Minimum players for immunity", _, true, 10.0, true, 64.0);
-	cvar_MinPlPerk = CreateConVar("sm_topdefenders_perk_minplayers", "10", "[TopDefenders] Minimum players for give Perk and Credits", _, true, 1.0, true, 64.0);
-	cvar_MaxMoney = FindConVar("mp_maxmoney");
+	g_cConVar.cvShowDamage		= CreateConVar("sm_topdefenders_showdamage", "1", "[TopDefenders] Enable Show Damage Addon", _, true, 0.0, true, 1.0);
+	g_cConVar.cvCashDiv			= CreateConVar("sm_topdefenders_cashdiv", "20", "[TopDefenders] Divider (min 0/max 50; 0 - Disable)", _, true, 0.0, true, 50.0);
+	g_cConVar.cvImmunity		= CreateConVar("sm_topdefenders_immunity_chance", "100", "[TopDefenders] Immunity Chance", _, true, 0.0, true, 100.0);
+	g_cConVar.cvMinPlayers		= CreateConVar("sm_topdefenders_immunity_minplayers", "15", "[TopDefenders] Minimum players for immunity", _, true, 10.0, true, 64.0);
+	g_cConVar.cvMinPlPerk		= CreateConVar("sm_topdefenders_perk_minplayers", "10", "[TopDefenders] Minimum players for give Perk and Credits", _, true, 1.0, true, 64.0);
+	g_cConVar.cvMaxMoney		= FindConVar("mp_maxmoney");
 	
 	HookEvent("player_hurt", Event_PlayerHurt);
 	HookEvent("player_death", Event_PlayerDeath);
@@ -146,20 +196,33 @@ public void OnPluginStart()
 	HookEvent("round_start", Event_RoundStart);
 	HookEvent("player_spawn", Event_PlayerSpawn, EventHookMode_Post);
 	
-	HookConVarChange(cvar_Enable, Cvar_Changed);
-	HookConVarChange(cvar_TopCount, Cvar_Changed);
-	HookConVarChange(cvar_Perk, Cvar_Changed);
-	HookConVarChange(cvar_CashDiv, Cvar_Changed);
-	HookConVarChange(cvar_ShowDamage, Cvar_Changed);
+	g_cConVar.Defender_Enable		= g_cConVar.cvEnable.BoolValue;
+	g_cConVar.Defender_TopCount		= g_cConVar.cvTopCount.IntValue;
+	g_cConVar.Defender_Perk			= g_cConVar.cvPerk.BoolValue;
+	g_cConVar.Infector_Enable		= g_cConVar.cvTopInfector.BoolValue;
+	g_cConVar.Infector_TopCount		= g_cConVar.cvInfectorCount.IntValue;
+	g_cConVar.Infector_Perk			= g_cConVar.cvInfectorPerk.BoolValue;
+	g_cConVar.ShowDamage			= g_cConVar.cvShowDamage.BoolValue;
+	g_cConVar.CashDiv				= g_cConVar.cvCashDiv.FloatValue;
+	g_cConVar.Chance				= g_cConVar.cvImmunity.IntValue;
+	g_cConVar.MP_Immunity			= g_cConVar.cvMinPlayers.IntValue;
+	g_cConVar.MP_Perk				= g_cConVar.cvMinPlPerk.IntValue;
+	g_cConVar.MaxMoney				= g_cConVar.cvMaxMoney.IntValue;
 	
-	HookConVarChange(cvar_TopInfector, Cvar_Changed);
-	HookConVarChange(cvar_InfectorCount, Cvar_Changed);
-	HookConVarChange(cvar_InfectorPerk, Cvar_Changed);
-	HookConVarChange(cvar_Immunity, Cvar_Changed);
-	HookConVarChange(cvar_MinPlayers, Cvar_Changed);
-	HookConVarChange(cvar_MaxMoney, Cvar_Changed);
-	HookConVarChange(cvar_MinPlPerk, Cvar_Changed);
+	HookConVarChange(g_cConVar.cvEnable,		Cvar_Changed);
+	HookConVarChange(g_cConVar.cvTopCount,		Cvar_Changed);
+	HookConVarChange(g_cConVar.cvPerk,			Cvar_Changed);
+	HookConVarChange(g_cConVar.cvTopInfector,	Cvar_Changed);
+	HookConVarChange(g_cConVar.cvInfectorCount,	Cvar_Changed);
+	HookConVarChange(g_cConVar.cvInfectorPerk,	Cvar_Changed);
 	
+	HookConVarChange(g_cConVar.cvShowDamage,	Cvar_Changed);
+	HookConVarChange(g_cConVar.cvCashDiv,		Cvar_Changed);
+	HookConVarChange(g_cConVar.cvImmunity,		Cvar_Changed);
+	HookConVarChange(g_cConVar.cvMinPlayers,	Cvar_Changed);
+	HookConVarChange(g_cConVar.cvMinPlPerk,		Cvar_Changed);
+	HookConVarChange(g_cConVar.cvMaxMoney,		Cvar_Changed);
+		
 	RegConsoleCmd("sm_pr", PerkRemove, "[TopDefender] Remove Perk from yourself");
 	
 	RegAdminCmd("sm_topdefenders_config_test1", ConfigTest_Defenders, ADMFLAG_ROOT, "[TopDefenders] Config Test Defenders");
@@ -167,75 +230,57 @@ public void OnPluginStart()
 	RegAdminCmd("sm_topdefenders_refresh", ConfigRefresh, ADMFLAG_CONVARS, "[TopDefenders] Refresh Config");
 	
 	AutoExecConfig(true, "topdefenders_perk");
-	
-	g_hHudDefender = CreateHudSynchronizer();
-	g_hHudInfector = CreateHudSynchronizer();
 }
 
 public void Cvar_Changed(ConVar convar, const char[] oldValue, const char[] newValue)
 {
-	if(convar==cvar_Enable)
-		g_bEnable = GetConVarBool(convar);
-	if(convar==cvar_TopCount)
-		g_iTopCount = GetConVarInt(convar);
-	if(convar==cvar_Perk)
-		g_bPerk = GetConVarBool(convar);
-	if(convar==cvar_CashDiv)
-		g_fCashDiv = GetConVarFloat(convar);
-	if(convar==cvar_TopInfector)
-		g_bInfectorEnable = GetConVarBool(convar);
-	if(convar==cvar_InfectorCount)
-		g_iInfectorTopCount = GetConVarInt(convar);
-	if(convar==cvar_InfectorPerk)
-		g_bInfectorPerk = GetConVarBool(convar);
-	if(convar==cvar_Immunity)
-		g_iChance = GetConVarInt(convar);
-	if(convar==cvar_MinPlayers)
-		g_iMinPlayersImmunity = GetConVarInt(convar);
-	if(convar==cvar_MaxMoney)
-		g_iMaxMoney = GetConVarInt(convar);
-	if(convar==cvar_ShowDamage)
-		g_bShowDamage = GetConVarBool(convar);
-	if(convar==cvar_MinPlPerk)
-		g_iMinPlayersPerk = GetConVarInt(convar);
+	if(convar==g_cConVar.cvEnable)
+		g_cConVar.Defender_Enable = GetConVarBool(convar);
+	else if(convar==g_cConVar.cvTopCount)
+		g_cConVar.Defender_TopCount = GetConVarInt(convar);	
+	else if(convar==g_cConVar.cvPerk)
+		g_cConVar.Defender_Perk = GetConVarBool(convar);
+	else if(convar==g_cConVar.cvTopInfector)
+		g_cConVar.Infector_Enable = GetConVarBool(convar);
+	else if(convar==g_cConVar.cvInfectorCount)
+		g_cConVar.Infector_TopCount = GetConVarInt(convar);
+	else if(convar==g_cConVar.cvInfectorPerk)
+		g_cConVar.Infector_Perk = GetConVarBool(convar);		
+	else if(convar==g_cConVar.cvShowDamage)
+		g_cConVar.ShowDamage = GetConVarBool(convar);	
+	else if(convar==g_cConVar.cvCashDiv)
+		g_cConVar.CashDiv = GetConVarFloat(convar);	
+	else if(convar==g_cConVar.cvImmunity)
+		g_cConVar.Chance = GetConVarInt(convar);
+	else if(convar==g_cConVar.cvMinPlayers)
+		g_cConVar.MP_Immunity = GetConVarInt(convar);
+	else if(convar==g_cConVar.cvMinPlPerk)
+		g_cConVar.MP_Perk = GetConVarInt(convar);
+	else if(convar==g_cConVar.cvMaxMoney)
+		g_cConVar.MaxMoney = GetConVarInt(convar);
 }
 
 public void OnMapStart()
 {
 	AddToDownload();
-	Cfg_Loaded = false;
+	g_bCfg_Loaded = false;
 	ReloadCfgFile();
 	CreateTimer(5.0, Check_Human_Alive, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public void OnClientConnected(int client)
 {
-	if(!g_bEnable) return;
-	//wipe client
-	g_iPlayerDamage[client] = 0;
-	g_iPlayerKill[client] = 0;
-	g_iPlayerInfect[client] = 0;
-	g_bBlockTimer[client] = false;
-	g_iTopNextRound[client] = 0;
-	g_iEntityPerk[client] = -1;
-	g_bImmunity[client] = false;
+	if(g_cConVar.Defender_Enable) cPlayers[client].Wipe();
 }
 
 public void OnClientDisconnect(int client)
 {
-	if(!g_bEnable) return;
-	//wipe client
-	g_iPlayerDamage[client] = 0;
-	g_iPlayerKill[client] = 0;
-	g_iPlayerInfect[client] = 0;
-	g_iTopNextRound[client] = 0;
-	g_iEntityPerk[client] = -1;
-	g_bImmunity[client] = false;
+	if(g_cConVar.Defender_Enable) cPlayers[client].Wipe();
 }
 
 public Action Event_RoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
-	if(!g_bEnable) return;
+	if(!g_cConVar.Defender_Enable) return;
 	
 	if (GameRules_GetProp("m_bWarmupPeriod") == 1) g_bWarmUp = true;
 	else if (GameRules_GetProp("m_bWarmupPeriod") == 0) g_bWarmUp = false;
@@ -244,61 +289,47 @@ public Action Event_RoundStart(Handle event, const char[] name, bool dontBroadca
 	
 	g_iInfectedChance = 0;
 	
-	for (int client = 1; client <= MaxClients; client++)
-	{
-		g_bImmunity[client] = false;
-	}
+	for (int client = 1; client <= MaxClients; client++) cPlayers[client].Immunity = false;
 	int iIngamePlayers = GetIngamePlayers();
-	if(g_bPerk && iIngamePlayers >= g_iMinPlayersPerk) GivePerk_TopDefender();
-	if(g_bInfectorEnable && g_bInfectorPerk && iIngamePlayers >= g_iMinPlayersPerk) GivePerk_TopInfector();
+	if(g_cConVar.Defender_Perk && iIngamePlayers >= g_cConVar.MP_Perk) GivePerk_TopDefender();
+	if(g_cConVar.Infector_Enable && g_cConVar.Infector_Perk && iIngamePlayers >= g_cConVar.MP_Perk) GivePerk_TopInfector();
 	
 	//wipe clients
 	for (int client = 1; client <= MaxClients; client++)
 	{
-		if(IsValidEdict(client) && IsClientInGame(client))
-			SetEntProp(client, Prop_Data, "m_iDeaths", 0);
-		g_iPlayerDamage[client] = 0;
-		g_iPlayerKill[client] = 0;
-		g_iPlayerInfect[client] = 0;
-		g_iTopNextRound[client] = 0;
+		if(IsValidEdict(client) && IsClientInGame(client)) SetEntProp(client, Prop_Data, "m_iDeaths", 0);
+		cPlayers[client].WipeInGame();
 	}
 }
 
 public Action Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast)
 {
-	if(!g_bEnable) return;
+	if(!g_cConVar.Defender_Enable) return;
 	
 	if(g_bWarmUp)
 	{
 		//wipe clients
 		for (int client = 1; client <= MaxClients; client++)
 		{
-			if(IsValidEdict(client) && IsClientInGame(client))
-				SetEntProp(client, Prop_Data, "m_iDeaths", 0);
-			g_iPlayerDamage[client] = 0;
-			g_iPlayerKill[client] = 0;
-			g_iPlayerInfect[client] = 0;
-			g_iTopNextRound[client] = 0;
+			if(IsValidEdict(client) && IsClientInGame(client)) SetEntProp(client, Prop_Data, "m_iDeaths", 0);
+			cPlayers[client].WipeInGame();
 		}
 		return;
 	}
 	
-	char sHUD[4096] = "";
-	CPrintToChatAll("%t", "Chat Top Defenders");
-	FormatEx(sHUD, sizeof(sHUD), "%t", "HUD Top Defenders");
+	int iDefenderIndex[15] = {-1,...};
+	int iInfectorIndex[15] = {-1,...};
+	
 	//copy
 	int iSortDamage[MAXPLAYERS + 1];
-	for (int i = 1; i <= MaxClients; i++)
-	{
-		iSortDamage[i] = g_iPlayerDamage[i];
-	}
+	for (int i = 1; i <= MaxClients; i++) iSortDamage[i] = cPlayers[i].Damage;
 	//sort
 	SortIntegers(iSortDamage, MaxClients+1, Sort_Descending);
 	int iCount = 0;
 	int iSDindex = 0;
 	int iIgnoreLast = 0;
 	bool bMasNoEnd = true;
-	while(iCount<g_iTopCount)
+	while(iCount < g_cConVar.Defender_TopCount)
 	{
 		if(iSortDamage[iSDindex]!=0 && bMasNoEnd)
 		{
@@ -307,70 +338,31 @@ public Action Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast
 				iIgnoreLast = iSortDamage[iSDindex];
 				for (int i = 1; i <= MaxClients; i++)
 				{
-					if (g_iPlayerDamage[i]==iSortDamage[iSDindex])
+					if (cPlayers[i].Damage == iSortDamage[iSDindex])
 					{
 						iCount++;
-						char clientname[32];
-						GetClientName(i, clientname, sizeof(clientname));
-						if(iCount==1) CPrintToChatAll("%t", "Chat Top DefFirst",iCount, i, g_iPlayerDamage[i]);
-						if(iCount==2) CPrintToChatAll("%t", "Chat Top DefSecond",iCount, i, g_iPlayerDamage[i]);
-						if(iCount==3) CPrintToChatAll("%t", "Chat Top DefThird",iCount, i, g_iPlayerDamage[i]);
-						if((iCount!=1)&&(iCount!=2)&&(iCount!=3)) CPrintToChatAll("%t", "Chat Top DefOther",iCount, i, g_iPlayerDamage[i]);
-						Format(sHUD, sizeof(sHUD), "%s\n%t", sHUD, "HUD Top DefPosition", iCount, i, g_iPlayerDamage[i]);
-						g_iTopNextRound[i]=iCount;
+						iDefenderIndex[iCount-1] = i;
+						cPlayers[i].TopNextRound = iCount;
 					}
-					if(iCount==g_iTopCount) break;
+					if(iCount == g_cConVar.Defender_TopCount) break;
 				}
 			}
 			if(iSDindex<MaxClients) iSDindex++;
 			else bMasNoEnd = false;
-		}else
-		{
-			iCount++;
-			CPrintToChatAll("%t", "Chat Top DefNone", iCount);
-			Format(sHUD, sizeof(sHUD), "%s\n%t", sHUD, "HUD Top DefNone", iCount);
-		}
-	}
-	SetHudTextParams(Config_HUD_Defender_x, Config_HUD_Defender_y, 10.0, Config_HUD_Defender_Color[0], Config_HUD_Defender_Color[1], Config_HUD_Defender_Color[2], Config_HUD_Defender_Color[3], 0, 1.0, 0.02, 0.05);
-	#if defined SHOP
-	int iPlayers = GetIngamePlayers();
-	#endif
-	for (int i = 1; i <= MaxClients; i++)
-	{
-		if (IsValidClient(i) && IsClientInGame(i) && (IsFakeClient(i) == false))
-		{
-			#if defined SHOP
-			if(iPlayers>=g_iMinPlayersPerk && g_iTopNextRound[i]>0)
-			{
-				int iPlace=g_iTopNextRound[i]-1;
-				if(iPlace>3) iPlace=3;
-				if(Config_Defender_Shop[iPlace]>0)
-				{
-					CPrintToChat(i, "%t", "Chat Give Credits Defenders", Config_Defender_Shop[iPlace], g_iTopNextRound[i]);
-					SHOP_SET_CREDITS_FUNC(i, SHOP_GET_CREDITS_FUNC(i)+Config_Defender_Shop[iPlace]);
-				}
-			}
-			#endif
-			ShowSyncHudText(i, g_hHudDefender, sHUD);
-		}
+		}else iCount++;
 	}
 	
-	if(g_bInfectorEnable)
+	if(g_cConVar.Infector_Enable)
 	{
-		CPrintToChatAll("%t", "Chat Top Infectors");
-		FormatEx(sHUD, sizeof(sHUD), "%t", "HUD Top Infectors");
 		//copy
-		for (int i = 1; i <= MaxClients; i++)
-		{
-			iSortDamage[i] = g_iPlayerInfect[i];
-		}
+		for (int i = 1; i <= MaxClients; i++) iSortDamage[i] = cPlayers[i].Infects;
 		//sort
 		SortIntegers(iSortDamage, MaxClients+1, Sort_Descending);
 		iCount = 0;
 		iSDindex = 0;
 		iIgnoreLast = 0;
 		bMasNoEnd = true;
-		while(iCount<g_iInfectorTopCount)
+		while(iCount < g_cConVar.Infector_TopCount)
 		{
 			if(iSortDamage[iSDindex]!=0 && bMasNoEnd)
 			{
@@ -379,131 +371,189 @@ public Action Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast
 					iIgnoreLast = iSortDamage[iSDindex];
 					for (int i = 1; i <= MaxClients; i++)
 					{
-						if (g_iPlayerInfect[i]==iSortDamage[iSDindex])
+						if (cPlayers[i].Infects == iSortDamage[iSDindex])
 						{
 							iCount++;
-							char clientname[32];
-							GetClientName(i, clientname, sizeof(clientname));
-							if(iCount==1) CPrintToChatAll("%t", "Chat Top InfFirst", iCount, i, g_iPlayerInfect[i]);
-							if(iCount==2) CPrintToChatAll("%t", "Chat Top InfSecond", iCount, i, g_iPlayerInfect[i]);
-							if(iCount==3) CPrintToChatAll("%t", "Chat Top InfThird", iCount, i, g_iPlayerInfect[i]);
-							if((iCount!=1)&&(iCount!=2)&&(iCount!=3)) CPrintToChatAll("%t", "Chat Top InfOther", iCount, i, g_iPlayerInfect[i]);
-							Format(sHUD, sizeof(sHUD), "%s\n%t", sHUD, "HUD Top InfPosition", iCount, i, g_iPlayerInfect[i]);
-							g_iTopNextRound[i]=-iCount;
+							iInfectorIndex[iCount-1] = i;
+							cPlayers[i].TopNextRound = -iCount;
 						}
-						if(iCount==g_iInfectorTopCount) break;
+						if(iCount == g_cConVar.Infector_TopCount) break;
 					}
 				}
 				if(iSDindex<MaxClients) iSDindex++;
 				else bMasNoEnd = false;
-			}else
+			}else iCount++;
+		}
+	}
+	
+	//show
+	CPrintToChatAll("%t", "Chat Top Defenders");
+	for(int j = 0; j < g_cConVar.Defender_TopCount; j++)
+	{
+		if(iDefenderIndex[j] != -1)
+		{
+			if(j==0) CPrintToChatAll("%t", "Chat Top DefFirst", j+1, iDefenderIndex[j], cPlayers[iDefenderIndex[j]].Damage);
+			else if(j==1) CPrintToChatAll("%t", "Chat Top DefSecond", j+1, iDefenderIndex[j], cPlayers[iDefenderIndex[j]].Damage);
+			else if(j==2) CPrintToChatAll("%t", "Chat Top DefThird", j+1, iDefenderIndex[j], cPlayers[iDefenderIndex[j]].Damage);
+			else CPrintToChatAll("%t", "Chat Top DefOther", j+1, iDefenderIndex[j], cPlayers[iDefenderIndex[j]].Damage);
+		}else CPrintToChatAll("%t", "Chat Top DefNone", j+1);
+	}
+	if(g_cConVar.Infector_Enable)
+	{
+		CPrintToChatAll("%t", "Chat Top Infectors");
+		for(int j = 0; j < g_cConVar.Infector_TopCount; j++)
+		{
+			if(iInfectorIndex[j] != -1)
 			{
-				iCount++;
-				CPrintToChatAll("%t", "Chat Top InfNone", iCount);
-				Format(sHUD, sizeof(sHUD), "%s\n%t", sHUD, "HUD Top InfNone", iCount);
+				if(j==0) CPrintToChatAll("%t", "Chat Top InfFirst",j+1, iInfectorIndex[j], cPlayers[iInfectorIndex[j]].Infects);
+				else if(j==1) CPrintToChatAll("%t", "Chat Top InfSecond",j+1, iInfectorIndex[j], cPlayers[iInfectorIndex[j]].Infects);
+				else if(j==2) CPrintToChatAll("%t", "Chat Top InfThird",j+1, iInfectorIndex[j], cPlayers[iInfectorIndex[j]].Infects);
+				else CPrintToChatAll("%t", "Chat Top InfOther",j+1, iInfectorIndex[j], cPlayers[iInfectorIndex[j]].Infects);
+			}else CPrintToChatAll("%t", "Chat Top InfNone", j+1);
+		}
+	}
+	//hud
+	for(int z = 1; z <= MaxClients; z++)
+		if(IsClientInGame(z) && !IsFakeClient(z))
+		{
+			char sHUD[16384];
+			FormatEx(sHUD, sizeof(sHUD), "%T<br>", "HUD Top Defenders", z);
+			for(int j = 0; j < g_cConVar.Defender_TopCount; j++)
+			{
+				if(iDefenderIndex[j] != -1)
+				{
+					if(j==0) Format(sHUD, sizeof(sHUD), "%s%T<br>", sHUD, "HUD Top DefPosition First", z, iDefenderIndex[j], cPlayers[iDefenderIndex[j]].Damage);
+					else if(j==1) Format(sHUD, sizeof(sHUD), "%s%T<br>", sHUD, "HUD Top DefPosition Second", z, iDefenderIndex[j], cPlayers[iDefenderIndex[j]].Damage);
+					else if(j==2) Format(sHUD, sizeof(sHUD), "%s%T<br>", sHUD, "HUD Top DefPosition Third", z, iDefenderIndex[j], cPlayers[iDefenderIndex[j]].Damage);
+					else Format(sHUD, sizeof(sHUD), "%s%T<br>", sHUD, "HUD Top DefPosition Other", z, j+1, iDefenderIndex[j], cPlayers[iDefenderIndex[j]].Damage);
+				}else Format(sHUD, sizeof(sHUD), "%s%T<br>", sHUD, "HUD Top DefNone", z, j+1);
+			}
+			if(g_cConVar.Infector_Enable)
+			{
+				Format(sHUD, sizeof(sHUD), "%s<br>%T<br>", sHUD, "HUD Top Infectors", z);
+				for(int j = 0; j < g_cConVar.Infector_TopCount; j++)
+				{
+					if(iInfectorIndex[j] != -1)
+					{
+						if(j==0) Format(sHUD, sizeof(sHUD), "%s%T<br>", sHUD, "HUD Top InfPosition First", z, iInfectorIndex[j], cPlayers[iInfectorIndex[j]].Infects);
+						else if(j==1) Format(sHUD, sizeof(sHUD), "%s%T<br>", sHUD, "HUD Top InfPosition Second", z, iInfectorIndex[j], cPlayers[iInfectorIndex[j]].Infects);
+						else if(j==2) Format(sHUD, sizeof(sHUD), "%s%T<br>", sHUD, "HUD Top InfPosition Third", z, iInfectorIndex[j], cPlayers[iInfectorIndex[j]].Infects);
+						else Format(sHUD, sizeof(sHUD), "%s%T<br>", sHUD, "HUD Top InfPosition Other", z, j+1, iInfectorIndex[j], cPlayers[iInfectorIndex[j]].Infects);
+					}else Format(sHUD, sizeof(sHUD), "%s%T<br>", sHUD, "HUD Top InfNone", z, j+1);
+				}
+			}	
+			Event newEMessage = CreateEvent("cs_win_panel_round");
+			newEMessage.SetString("funfact_token", sHUD);
+			newEMessage.FireToClient(z);
+			newEMessage.Cancel();
+		}
+	#if defined SHOP
+	//Give Credits
+	if(GetIngamePlayers() >= g_cConVar.MP_Perk)
+	{
+		for(int j = 0; j < g_cConVar.Defender_TopCount; j++)
+		{
+			if(iDefenderIndex[j] != -1 && IsValidClient(iDefenderIndex[j]) && IsClientInGame(iDefenderIndex[j]) && !IsFakeClient(iDefenderIndex[j]))
+			{
+				int iPlace = j;
+				if(iPlace>3) iPlace=3;
+				if(cDefender.Shop[iPlace] > 0)
+				{
+					CPrintToChat(iDefenderIndex[j], "%t", "Chat Give Credits Defenders", cDefender.Shop[iPlace], j+1);
+					SHOP_SET_CREDITS_FUNC(iDefenderIndex[j], SHOP_GET_CREDITS_FUNC(iDefenderIndex[j])+cDefender.Shop[iPlace]);
+				}
 			}
 		}
-		SetHudTextParams(Config_HUD_Infector_x, Config_HUD_Infector_y, 10.0, Config_HUD_Infector_Color[0], Config_HUD_Infector_Color[1], Config_HUD_Infector_Color[2], Config_HUD_Infector_Color[3], 0, 1.0, 0.02, 0.05);
-		for (int i = 1; i <= MaxClients; i++)
+		if(g_cConVar.Infector_Enable)
 		{
-			if (IsValidClient(i) && IsClientInGame(i) && (IsFakeClient(i) == false))
+			for(int j = 0; j < g_cConVar.Infector_TopCount; j++)
 			{
-				#if defined SHOP
-				if(iPlayers>=g_iMinPlayersPerk && g_iTopNextRound[i]<0)
+				if(iInfectorIndex[j] != -1 && IsValidClient(iInfectorIndex[j]) && IsClientInGame(iInfectorIndex[j]) && !IsFakeClient(iInfectorIndex[j]))
 				{
-					int iPlace=-g_iTopNextRound[i]-1;
+					int iPlace = j;
 					if(iPlace>3) iPlace=3;
-					if(Config_Infector_Shop[iPlace]>0)
+					if(cInfector.Shop[iPlace] > 0)
 					{
-						CPrintToChat(i, "%t", "Chat Give Credits Infectors", Config_Infector_Shop[iPlace], -g_iTopNextRound[i]);
-						SHOP_SET_CREDITS_FUNC(i, SHOP_GET_CREDITS_FUNC(i)+Config_Infector_Shop[iPlace]);
+						CPrintToChat(iInfectorIndex[j], "%t", "Chat Give Credits Infectors", cInfector.Shop[iPlace], j+1);
+						SHOP_SET_CREDITS_FUNC(iInfectorIndex[j], SHOP_GET_CREDITS_FUNC(iInfectorIndex[j])+cInfector.Shop[iPlace]);
 					}
 				}
-				#endif
-				ShowSyncHudText(i, g_hHudInfector, sHUD);
 			}
 		}
 	}
+	#endif
 }
 
 public Action Event_PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	g_bBlockTimer[client] = false;
+	cPlayers[client].BlockTimer = false;
+	if(IsValidClient(client) && IsClientInGame(client))
+	{
+		if(GetClientTeam(client) == CS_TEAM_T) SetEntProp(client, Prop_Data, "m_iDeaths", cPlayers[client].Infects);
+		else if (GetClientTeam(client) == CS_TEAM_CT) SetEntProp(client, Prop_Data, "m_iDeaths", cPlayers[client].Damage/1000);
+	}
 	
 	return Plugin_Continue;
 }
 
 public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadcast)
 {
-	if(!g_bEnable||!g_bShowDamage) return;
+	if(!g_cConVar.Defender_Enable||!g_cConVar.ShowDamage) return;
 	int client  = GetClientOfUserId(GetEventInt(event, "userid"));
 	int attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-	if(IsValidClient(attacker) && IsValidClient(client) && IsClientInGame(attacker))
-		if(!IsFakeClient(attacker) && IsClientInGame(attacker) && IsClientInGame(client) && (attacker != client))
-		{
-			if((GetClientTeam(attacker) == CS_TEAM_CT) && (GetClientTeam(client) == CS_TEAM_T))
-			{
-				g_iPlayerKill[attacker]++;
-			}
-		}
+	if(IsValidClient(attacker) && IsClientInGame(attacker) && IsValidClient(client) && IsClientInGame(client) && !IsFakeClient(attacker) && (attacker != client) && GetClientTeam(attacker) == CS_TEAM_CT && GetClientTeam(client) == CS_TEAM_T)
+		cPlayers[attacker].Kills+=1;
 }
 
 public Action Event_PlayerHurt(Handle event, const char[] name, bool dontBroadcast)
 {
-	if(!g_bEnable) return;
+	if(!g_cConVar.Defender_Enable) return;
 	int client  = GetClientOfUserId(GetEventInt(event, "userid"));
 	int attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-	if(IsValidClient(attacker) && IsValidClient(client))
-		if(!IsFakeClient(attacker) && IsClientInGame(attacker) && (attacker != client))
+	if(IsValidClient(attacker) && IsValidClient(client) && IsClientInGame(attacker) && !IsFakeClient(attacker) && (attacker != client) && GetClientTeam(attacker) == CS_TEAM_CT)
+	{
+		int iDmg = GetEventInt(event, "dmg_health");
+		cPlayers[attacker].Damage += iDmg;
+		SetEntProp(attacker, Prop_Data, "m_iDeaths", cPlayers[attacker].Damage/1000);
+		if(g_cConVar.ShowDamage) CalcDamage(attacker, iDmg);
+		if(g_cConVar.CashDiv > 0.0)
 		{
-			if(GetClientTeam(attacker) == CS_TEAM_CT)
-			{
-				int iDmg = GetEventInt(event, "dmg_health");
-				g_iPlayerDamage[attacker]+= iDmg;
-				SetEntProp(attacker, Prop_Data, "m_iDeaths", g_iPlayerDamage[attacker]/1000);
-				if(g_bShowDamage) CalcDamage(attacker, iDmg);
-				if(g_fCashDiv>0.0)
-				{
-					int iCurrentCash = GetEntData(attacker, g_iCash);
-					int iAddCash = iCurrentCash + RoundFloat(iDmg / g_fCashDiv);
-					if(iAddCash > g_iMaxMoney) iAddCash=g_iMaxMoney;
-					SetEntData(attacker, g_iCash, iAddCash);
-				}
-			}
+			int iAddCash = GetEntData(attacker, g_iCash) + RoundFloat(iDmg / g_cConVar.CashDiv);
+			if(iAddCash > g_cConVar.MaxMoney) iAddCash = g_cConVar.MaxMoney;
+			SetEntData(attacker, g_iCash, iAddCash);
 		}
+	}
 }
 
 void CalcDamage(int attacker, int iDmg)
-{	
-	if (!IsClientInGame(attacker)) return;
+{
+	cPlayers[attacker].CurrentDamage += iDmg;
 	
-	g_iPlayerCurrentDamage[attacker]+= iDmg;
-	
-	if (g_bBlockTimer[attacker]) return;
+	if (cPlayers[attacker].BlockTimer) return;
 	
 	CreateTimer(0.01, ShowDamageHuman, attacker);
-	g_bBlockTimer[attacker] = true;
+	cPlayers[attacker].BlockTimer = true;
 }
 
 public Action ShowDamageHuman(Handle timer, any client)
 {
-	g_bBlockTimer[client] = false;
+	cPlayers[client].BlockTimer = false;
 	if(IsValidClient(client) && IsClientInGame(client))
 	{
-		PrintHintText(client, "%t", "Hint Damage", g_iPlayerCurrentDamage[client], g_iPlayerKill[client], g_iPlayerDamage[client]);
-		g_iPlayerCurrentDamage[client] = 0;
+		PrintHintText(client, "%t", "Hint Damage", cPlayers[client].CurrentDamage, cPlayers[client].Kills, cPlayers[client].Damage);
+		cPlayers[client].CurrentDamage = 0;
 	}
 }
 
 public void GivePerk_TopDefender()
 {
-	if(Cfg_Loaded)
-		for(int i=1;i<=g_iTopCount;i++)
+	if(g_bCfg_Loaded)
+		for(int i = 1; i <= g_cConVar.Defender_TopCount; i++)
 		{
 			for (int client = 1; client <= MaxClients; client++)
 			{
-				if(g_iTopNextRound[client] == i)
+				if(cPlayers[client].TopNextRound == i)
 				{
 					if(IsValidEdict(client) && IsClientInGame(client) && ((GetClientTeam(client) == CS_TEAM_T) || (GetClientTeam(client) == CS_TEAM_CT)))
 					{
@@ -511,16 +561,16 @@ public void GivePerk_TopDefender()
 						int iPlace=i-1;
 						if(iPlace>3) iPlace = 3;
 						//immunity
-						if(iPlace<3) if(Config_Defender_Immunity[iPlace] == true) g_bImmunity[client] = true;
+						if(iPlace < 3 && cDefender.Immunity[iPlace] == true) cPlayers[client].Immunity = true;
 						//speed
-						SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", GetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue")+Config_Defender_Speed[iPlace]);
+						SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", GetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue")+cDefender.Speed[iPlace]);
 						//gravity
-						SetEntityGravity(client, GetEntityGravity(client)-Config_Defender_Gravity[iPlace]);
-						if(Config_Defender_Perk_Type[iPlace]==1) SpriteSet(client, iPlace, true);
-							else if(Config_Defender_Perk_Type[iPlace]==2) TrailSet(client, iPlace, true);
-								else if(Config_Defender_Perk_Type[iPlace]==3) ModelSet(client, iPlace, true);
+						SetEntityGravity(client, GetEntityGravity(client)-cDefender.Gravity[iPlace]);
+						if(cDefender.Perk_Type[iPlace] == 1) SpriteSet(client, iPlace, true);
+							else if(cDefender.Perk_Type[iPlace] == 2) TrailSet(client, iPlace, true);
+								else if(cDefender.Perk_Type[iPlace] == 3) ModelSet(client, iPlace, true);
 					}
-					g_iTopNextRound[client]=0;
+					cPlayers[client].TopNextRound = 0;
 					break;
 				}
 			}
@@ -529,12 +579,12 @@ public void GivePerk_TopDefender()
 
 public void GivePerk_TopInfector()
 {
-	if(Cfg_Loaded)
-		for(int i=1;i<=g_iInfectorTopCount;i++)
+	if(g_bCfg_Loaded)
+		for(int i = 1; i <= g_cConVar.Infector_TopCount; i++)
 		{
 			for (int client = 1; client <= MaxClients; client++)
 			{
-				if(g_iTopNextRound[client] == -i)
+				if(cPlayers[client].TopNextRound == -i)
 				{
 					if(IsValidEdict(client) && IsClientInGame(client) && ((GetClientTeam(client) == CS_TEAM_T) || (GetClientTeam(client) == CS_TEAM_CT)))
 					{
@@ -542,16 +592,16 @@ public void GivePerk_TopInfector()
 						int iPlace=i-1;
 						if(iPlace>3) iPlace = 3;
 						//immunity
-						if(iPlace<3) if(Config_Infector_Immunity[iPlace] == true) g_bImmunity[client] = true;
+						if(iPlace < 3 && cInfector.Immunity[iPlace] == true) cPlayers[client].Immunity = true;
 						//speed
-						SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", GetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue")+Config_Infector_Speed[iPlace]);
+						SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", GetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue")+cInfector.Speed[iPlace]);
 						//gravity
-						SetEntityGravity(client, GetEntityGravity(client)-Config_Infector_Gravity[iPlace]);
-						if(Config_Infector_Perk_Type[iPlace]==1) SpriteSet(client, iPlace, false);
-							else if(Config_Infector_Perk_Type[iPlace]==2) TrailSet(client, iPlace, false);
-								else if(Config_Infector_Perk_Type[iPlace]==3) ModelSet(client, iPlace, false);
+						SetEntityGravity(client, GetEntityGravity(client)-cInfector.Gravity[iPlace]);
+						if(cInfector.Perk_Type[iPlace] == 1) SpriteSet(client, iPlace, false);
+							else if(cInfector.Perk_Type[iPlace] == 2) TrailSet(client, iPlace, false);
+								else if(cInfector.Perk_Type[iPlace] == 3) ModelSet(client, iPlace, false);
 					}
-					g_iTopNextRound[client]=0;
+					cPlayers[client].TopNextRound = 0;
 					break;
 				}
 			}
@@ -568,43 +618,44 @@ public void SpriteSet(int client, int iPlace, bool bDefender)
 		char cColor[11];
 		if(bDefender)
 		{
-			int iSize = GetArraySize(Config_Defender_Perk_List[iPlace]);
+			int iSize = GetArraySize(cDefender.Perk_List[iPlace]);
 			if (!iSize) return;
 
-			GetArrayString(Config_Defender_Perk_List[iPlace], GetRandomInt(0, iSize-1),filename,sizeof(filename));	
-			IntToString(Config_Defender_RenderMode[iPlace], cRenderMode, 3);
-			FormatEx(cColor, sizeof(cColor), "%i %i %i", Config_Defender_Perk_Color[iPlace][0], Config_Defender_Perk_Color[iPlace][1], Config_Defender_Perk_Color[iPlace][2]);
-			IntToString(Config_Defender_Perk_Color[iPlace][3], cAlpha, 4);
+			GetArrayString(cDefender.Perk_List[iPlace], GetRandomInt(0, iSize-1),filename,sizeof(filename));	
+			IntToString(cDefender.RMode[iPlace], cRenderMode, 3);
+			FormatEx(cColor, sizeof(cColor), "%i %i %i", cDefender.Perk_Color_Red[iPlace], cDefender.Perk_Color_Green[iPlace], cDefender.Perk_Color_Blue[iPlace]);
+			IntToString(cDefender.Perk_Color_Alpha[iPlace], cAlpha, 4);
 		}else
 		{
-			int iSize = GetArraySize(Config_Infector_Perk_List[iPlace]);
+			int iSize = GetArraySize(cInfector.Perk_List[iPlace]);
 			if (!iSize) return;
 
-			GetArrayString(Config_Infector_Perk_List[iPlace], GetRandomInt(0, iSize-1),filename,sizeof(filename));	
-			IntToString(Config_Infector_RenderMode[iPlace], cRenderMode, 3);
-			FormatEx(cColor, sizeof(cColor), "%i %i %i", Config_Infector_Perk_Color[iPlace][0], Config_Infector_Perk_Color[iPlace][1], Config_Infector_Perk_Color[iPlace][2]);
-			IntToString(Config_Infector_Perk_Color[iPlace][3], cAlpha, 4);
+			GetArrayString(cInfector.Perk_List[iPlace], GetRandomInt(0, iSize-1),filename,sizeof(filename));	
+			IntToString(cInfector.RMode[iPlace], cRenderMode, 3);
+			FormatEx(cColor, sizeof(cColor), "%i %i %i", cInfector.Perk_Color_Red[iPlace], cInfector.Perk_Color_Green[iPlace], cInfector.Perk_Color_Blue[iPlace]);
+			IntToString(cInfector.Perk_Color_Alpha[iPlace], cAlpha, 4);
 		}
 		float Pos[3];
 		GetClientAbsOrigin(client, Pos);
 		Pos[2] += 95.0;
-		g_iEntityPerk[client] = CreateEntityByName("env_sprite");
-		if (g_iEntityPerk[client] < 1)
+		int iEntity = CreateEntityByName("env_sprite");
+		if (iEntity < 1)
 		{
 			LogError("env_sprite create error!");
 			return;
 		}
-		DispatchKeyValueVector(g_iEntityPerk[client], "origin", Pos);
+		DispatchKeyValueVector(iEntity, "origin", Pos);
 		
-		DispatchKeyValue(g_iEntityPerk[client], "model", filename);
-		DispatchKeyValue(g_iEntityPerk[client], "rendermode", cRenderMode);
-		DispatchKeyValue(g_iEntityPerk[client], "rendercolor", cColor);
-		DispatchKeyValue(g_iEntityPerk[client], "renderamt", cAlpha);
-		DispatchKeyValue(g_iEntityPerk[client], "spawnflags", "1");
-		DispatchKeyValue(g_iEntityPerk[client], "scale", "0.1");
-		DispatchSpawn(g_iEntityPerk[client]);
+		DispatchKeyValue(iEntity, "model", filename);
+		DispatchKeyValue(iEntity, "rendermode", cRenderMode);
+		DispatchKeyValue(iEntity, "rendercolor", cColor);
+		DispatchKeyValue(iEntity, "renderamt", cAlpha);
+		DispatchKeyValue(iEntity, "spawnflags", "1");
+		DispatchKeyValue(iEntity, "scale", "0.1");
+		DispatchSpawn(iEntity);
 		SetVariantString("!activator");
-		AcceptEntityInput(g_iEntityPerk[client], "SetParent", client);
+		AcceptEntityInput(iEntity, "SetParent", client);
+		cPlayers[client].Perk = EntIndexToEntRef(iEntity);
 	}
 }
 
@@ -621,56 +672,57 @@ public void TrailSet(int client, int iPlace, bool bDefender)
 				fWidthEnd;
 		if(bDefender)
 		{
-			int iSize = GetArraySize(Config_Defender_Perk_List[iPlace]);
+			int iSize = GetArraySize(cDefender.Perk_List[iPlace]);
 			if (!iSize) return;
 
-			GetArrayString(Config_Defender_Perk_List[iPlace], GetRandomInt(0, iSize-1),filename,sizeof(filename));	
-			IntToString(Config_Defender_RenderMode[iPlace], cRenderMode, 3);
-			FormatEx(cColor, sizeof(cColor), "%i %i %i", Config_Defender_Perk_Color[iPlace][0], Config_Defender_Perk_Color[iPlace][1], Config_Defender_Perk_Color[iPlace][2]);
-			IntToString(Config_Defender_Perk_Color[iPlace][3], cAlpha, 4);
-			fLifeTime = Config_Defender_Trail_Config[iPlace][0];
-			fWidthStart = Config_Defender_Trail_Config[iPlace][1];
-			fWidthEnd = Config_Defender_Trail_Config[iPlace][2];
+			GetArrayString(cDefender.Perk_List[iPlace], GetRandomInt(0, iSize-1),filename,sizeof(filename));	
+			IntToString(cDefender.RMode[iPlace], cRenderMode, 3);
+			FormatEx(cColor, sizeof(cColor), "%i %i %i", cDefender.Perk_Color_Red[iPlace], cDefender.Perk_Color_Green[iPlace], cDefender.Perk_Color_Blue[iPlace]);
+			IntToString(cDefender.Perk_Color_Alpha[iPlace], cAlpha, 4);
+			fLifeTime = cDefender.Trail_LifeTime[iPlace];
+			fWidthStart = cDefender.Trail_WidthStart[iPlace];
+			fWidthEnd = cDefender.Trail_WidthEnd[iPlace];
 		}else
 		{
-			int iSize = GetArraySize(Config_Infector_Perk_List[iPlace]);
+			int iSize = GetArraySize(cInfector.Perk_List[iPlace]);
 			if (!iSize) return;
 
-			GetArrayString(Config_Infector_Perk_List[iPlace], GetRandomInt(0, iSize-1),filename,sizeof(filename));	
-			IntToString(Config_Infector_RenderMode[iPlace], cRenderMode, 3);
-			FormatEx(cColor, sizeof(cColor), "%i %i %i", Config_Infector_Perk_Color[iPlace][0], Config_Infector_Perk_Color[iPlace][1], Config_Infector_Perk_Color[iPlace][2]);
-			IntToString(Config_Infector_Perk_Color[iPlace][3], cAlpha, 4);
-			fLifeTime = Config_Infector_Trail_Config[iPlace][0];
-			fWidthStart = Config_Infector_Trail_Config[iPlace][1];
-			fWidthEnd = Config_Infector_Trail_Config[iPlace][2];
+			GetArrayString(cInfector.Perk_List[iPlace], GetRandomInt(0, iSize-1),filename,sizeof(filename));	
+			IntToString(cInfector.RMode[iPlace], cRenderMode, 3);
+			FormatEx(cColor, sizeof(cColor), "%i %i %i", cInfector.Perk_Color_Red[iPlace], cInfector.Perk_Color_Green[iPlace], cInfector.Perk_Color_Blue[iPlace]);
+			IntToString(cInfector.Perk_Color_Alpha[iPlace], cAlpha, 4);
+			fLifeTime = cInfector.Trail_LifeTime[iPlace];
+			fWidthStart = cInfector.Trail_WidthStart[iPlace];
+			fWidthEnd = cInfector.Trail_WidthEnd[iPlace];
 		}
 		float Pos[3];
 		GetClientAbsOrigin(client, Pos);
 		Pos[2] += 10.0;
-		g_iEntityPerk[client] = CreateEntityByName("env_spritetrail");
-		if (g_iEntityPerk[client] < 1)
+		int iEntity = CreateEntityByName("env_spritetrail");
+		if (iEntity < 1)
 		{
 			LogError("env_spritetrail create error!");
 			return;
 		}
-		SetEntPropFloat(g_iEntityPerk[client], Prop_Send, "m_flTextureRes", 0.05);
-		DispatchKeyValueVector(g_iEntityPerk[client], "origin", Pos);
+		SetEntPropFloat(iEntity, Prop_Send, "m_flTextureRes", 0.05);
+		DispatchKeyValueVector(iEntity, "origin", Pos);
 		
-		DispatchKeyValue(g_iEntityPerk[client], "spritename", filename);
-		DispatchKeyValue(g_iEntityPerk[client], "rendermode", cRenderMode);
-		DispatchKeyValue(g_iEntityPerk[client], "rendercolor", cColor);
-		DispatchKeyValue(g_iEntityPerk[client], "renderamt", cAlpha);
-		DispatchKeyValueFloat(g_iEntityPerk[client], "lifetime", fLifeTime);
-		DispatchKeyValueFloat(g_iEntityPerk[client], "startwidth", fWidthStart);
-		DispatchKeyValueFloat(g_iEntityPerk[client], "endwidth", fWidthEnd);
-		DispatchSpawn(g_iEntityPerk[client]);
+		DispatchKeyValue(iEntity, "spritename", filename);
+		DispatchKeyValue(iEntity, "rendermode", cRenderMode);
+		DispatchKeyValue(iEntity, "rendercolor", cColor);
+		DispatchKeyValue(iEntity, "renderamt", cAlpha);
+		DispatchKeyValueFloat(iEntity, "lifetime", fLifeTime);
+		DispatchKeyValueFloat(iEntity, "startwidth", fWidthStart);
+		DispatchKeyValueFloat(iEntity, "endwidth", fWidthEnd);
+		DispatchSpawn(iEntity);
 		SetVariantString("!activator");
-		AcceptEntityInput(g_iEntityPerk[client], "SetParent", client);
-		AcceptEntityInput(g_iEntityPerk[client], "ShowSprite");
+		AcceptEntityInput(iEntity, "SetParent", client);
+		AcceptEntityInput(iEntity, "ShowSprite");
 		//fix spritetrail CS GO
 		SetVariantString("OnUser1 !self:SetScale:1:0.5:-1");
-		AcceptEntityInput(g_iEntityPerk[client], "AddOutput");
-		AcceptEntityInput(g_iEntityPerk[client], "FireUser1");
+		AcceptEntityInput(iEntity, "AddOutput");
+		AcceptEntityInput(iEntity, "FireUser1");
+		cPlayers[client].Perk = EntIndexToEntRef(iEntity);
 	}
 }
 
@@ -683,53 +735,54 @@ public void ModelSet(int client, int iPlace, bool bDefender)
 		char cColor[11];
 		if(bDefender)
 		{
-			int iSize = GetArraySize(Config_Defender_Perk_List[iPlace]);
+			int iSize = GetArraySize(cDefender.Perk_List[iPlace]);
 			if (!iSize) return;
 
-			GetArrayString(Config_Defender_Perk_List[iPlace], GetRandomInt(0, iSize-1),filename,sizeof(filename));	
-			IntToString(Config_Defender_RenderMode[iPlace], cRenderMode, 3);
-			FormatEx(cColor, sizeof(cColor), "%i %i %i", Config_Defender_Perk_Color[iPlace][0], Config_Defender_Perk_Color[iPlace][1], Config_Defender_Perk_Color[iPlace][2]);
+			GetArrayString(cDefender.Perk_List[iPlace], GetRandomInt(0, iSize-1),filename,sizeof(filename));	
+			IntToString(cDefender.RMode[iPlace], cRenderMode, 3);
+			FormatEx(cColor, sizeof(cColor), "%i %i %i", cDefender.Perk_Color_Red[iPlace], cDefender.Perk_Color_Green[iPlace], cDefender.Perk_Color_Blue[iPlace]);
 		}else
 		{
-			int iSize = GetArraySize(Config_Infector_Perk_List[iPlace]);
+			int iSize = GetArraySize(cInfector.Perk_List[iPlace]);
 			if (!iSize) return;
 
-			GetArrayString(Config_Infector_Perk_List[iPlace], GetRandomInt(0, iSize-1),filename,sizeof(filename));	
-			IntToString(Config_Infector_RenderMode[iPlace], cRenderMode, 3);
-			FormatEx(cColor, sizeof(cColor), "%i %i %i", Config_Infector_Perk_Color[iPlace][0], Config_Infector_Perk_Color[iPlace][1], Config_Infector_Perk_Color[iPlace][2]);
+			GetArrayString(cInfector.Perk_List[iPlace], GetRandomInt(0, iSize-1),filename,sizeof(filename));	
+			IntToString(cInfector.RMode[iPlace], cRenderMode, 3);
+			FormatEx(cColor, sizeof(cColor), "%i %i %i", cInfector.Perk_Color_Red[iPlace], cInfector.Perk_Color_Green[iPlace], cInfector.Perk_Color_Blue[iPlace]);
 		}
 		float Pos[3];
 		GetClientAbsOrigin(client, Pos);
 		Pos[2] += 85.0;
-		g_iEntityPerk[client] = CreateEntityByName("prop_dynamic");
-		if (g_iEntityPerk[client] < 1)
+		int iEntity = CreateEntityByName("prop_dynamic");
+		if (iEntity < 1)
 		{
 			LogError("prop_dynamic create error!");
 			return;
 		}
-		DispatchKeyValueVector(g_iEntityPerk[client], "origin", Pos);
+		DispatchKeyValueVector(iEntity, "origin", Pos);
 		
-		DispatchKeyValue(g_iEntityPerk[client], "spawnflags", "256");
-		DispatchKeyValue(g_iEntityPerk[client], "solid", "0");
-		DispatchKeyValue(g_iEntityPerk[client], "DisableShadows", "1");
-		DispatchKeyValue(g_iEntityPerk[client], "model", filename);
-		DispatchKeyValue(g_iEntityPerk[client], "rendermode", cRenderMode);
-		DispatchKeyValue(g_iEntityPerk[client], "rendercolor", cColor);
-		DispatchKeyValue(g_iEntityPerk[client], "renderamt", "254");
-		DispatchSpawn(g_iEntityPerk[client]);
+		DispatchKeyValue(iEntity, "spawnflags", "256");
+		DispatchKeyValue(iEntity, "solid", "0");
+		DispatchKeyValue(iEntity, "DisableShadows", "1");
+		DispatchKeyValue(iEntity, "model", filename);
+		DispatchKeyValue(iEntity, "rendermode", cRenderMode);
+		DispatchKeyValue(iEntity, "rendercolor", cColor);
+		DispatchKeyValue(iEntity, "renderamt", "254");
+		DispatchSpawn(iEntity);
 		
 		SetVariantString("!activator");
-		AcceptEntityInput(g_iEntityPerk[client], "SetParent", client);
-		AcceptEntityInput(g_iEntityPerk[client], "TurnOn", g_iEntityPerk[client], g_iEntityPerk[client], 0);
+		AcceptEntityInput(iEntity, "SetParent", client);
+		AcceptEntityInput(iEntity, "TurnOn", iEntity, iEntity, 0);
+		cPlayers[client].Perk = EntIndexToEntRef(iEntity);
 	}
 }
 
 public Action ZR_OnClientInfect(int &client, int &attacker, bool &motherInfect, bool &respawnOverride, bool &respawn)
 {
-	if(!g_bEnable) return Plugin_Continue;
-	if(motherInfect && g_bImmunity[client] && GetRandomInt(0, 100) <= g_iChance)
+	if(!g_cConVar.Defender_Enable) return Plugin_Continue;
+	if(motherInfect && cPlayers[client].Immunity && GetRandomInt(0, 100) <= g_cConVar.Chance)
 	{
-		if(GetIngamePlayers()<g_iMinPlayersImmunity) return Plugin_Continue;
+		if(GetIngamePlayers()<g_cConVar.MP_Immunity ) return Plugin_Continue;
 		++g_iInfectedChance;
 		Handle dPack;
 		CreateDataTimer(g_iInfectedChance * 0.1, Rescued, dPack);
@@ -753,14 +806,14 @@ public int GetIngamePlayers()
 
 public int ZR_OnClientInfected(int client, int attacker, bool motherInfect, bool respawnOverride, bool respawn)
 {
-	if(!g_bEnable) return;
-	if(!motherInfect && IsValidClient(attacker) && IsValidClient(client))
-		if(!IsFakeClient(attacker) && IsClientInGame(attacker) && (attacker != client))
-		{
-			g_iPlayerInfect[attacker]++;
-			SetEntProp(attacker, Prop_Data, "m_iDeaths", g_iPlayerInfect[attacker]);
-			if(g_bShowDamage) PrintHintText(attacker, "%t", "Hint Infect", client, g_iPlayerInfect[attacker]);
-		}
+	if(!g_cConVar.Defender_Enable) return;
+	if(!motherInfect && IsValidClient(attacker) && IsValidClient(client) && !IsFakeClient(attacker) && IsClientInGame(attacker) && (attacker != client))
+	{
+		cPlayers[attacker].Infects += 1;
+		SetEntProp(attacker, Prop_Data, "m_iDeaths", cPlayers[attacker].Infects);
+		if(g_cConVar.ShowDamage) PrintHintText(attacker, "%t", "Hint Infect", client, cPlayers[attacker].Infects);
+		if(IsClientInGame(client)) SetEntProp(client, Prop_Data, "m_iDeaths", cPlayers[client].Infects); 
+	}
 }
 
 public Action Rescued(Handle timer, Handle dPack)
@@ -787,7 +840,7 @@ public int FindNewInfected(int client)
 	int clients[MAXPLAYERS+1];
 	int clientCount;
 	for (int i = 1; i <= MaxClients; i++)
-		if (IsClientInGame(i) && IsPlayerAlive(i) && ZR_IsClientHuman(i) && i != client && (g_bImmunity[i] == false))
+		if (IsClientInGame(i) && IsPlayerAlive(i) && ZR_IsClientHuman(i) && i != client && (cPlayers[i].Immunity == false))
 			clients[clientCount++] = i;
 			
 	return (clientCount == 0) ? 0 : clients[GetRandomInt(0, clientCount-1)];
@@ -795,11 +848,8 @@ public int FindNewInfected(int client)
 
 public void ReloadCfgFile()
 {
-	for(int i=0; i<4;i++)
-	{
-		ClearArray(Config_Defender_Perk_List[i]);
-		ClearArray(Config_Infector_Perk_List[i]);
-	}
+	cDefender.ClearData();
+	cInfector.ClearData();
 	KeyValues KvConfig = CreateKeyValues("TopDefenders_Perk");
 	char ConfigFile[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, ConfigFile, sizeof(ConfigFile), "configs/topdefenders.cfg");
@@ -813,13 +863,6 @@ public void ReloadCfgFile()
 	char cNameKey[4][] = {"First", "Second", "Third", "Other"};
 	
 	KvConfig.Rewind();
-	KvConfig.GetColor4("HUD_TopDefenders_Color", Config_HUD_Defender_Color);
-	Config_HUD_Defender_x = KvConfig.GetFloat("HUD_TopDefenders_x");
-	Config_HUD_Defender_y = KvConfig.GetFloat("HUD_TopDefenders_y");
-	KvConfig.GetColor4("HUD_TopInfectors_Color", Config_HUD_Infector_Color);
-	Config_HUD_Infector_x = KvConfig.GetFloat("HUD_TopInfectors_x");
-	Config_HUD_Infector_y = KvConfig.GetFloat("HUD_TopInfectors_y");
-	KvConfig.Rewind();
 	if(KvConfig.JumpToKey("TopDefenders"))
 	{
 		for(int i=0; i<4 ;i++)
@@ -829,29 +872,34 @@ public void ReloadCfgFile()
 				if(i<3)
 				{
 					int Immunity = KvConfig.GetNum("Immunity_First_Infection");
-					if(Immunity==1) Config_Defender_Immunity[i]=true;
-						else Config_Defender_Immunity[i]=false;
+					if(Immunity==1) cDefender.Immunity[i]=true;
+						else cDefender.Immunity[i]=false;
 				}
-				Config_Defender_Speed[i] = KvConfig.GetFloat("Add_Speed");
-				Config_Defender_Gravity[i] = KvConfig.GetFloat("Subtract_Gravity");
+				cDefender.Speed[i] = KvConfig.GetFloat("Add_Speed");
+				cDefender.Gravity[i] = KvConfig.GetFloat("Subtract_Gravity");
 				#if defined SHOP
-				Config_Defender_Shop[i] = KvConfig.GetNum("Shop_Give_Credits");
+				cDefender.Shop[i] = KvConfig.GetNum("Shop_Give_Credits");
 				#endif
 				char szBuffer[256];
 				KvConfig.GetString("Perk", szBuffer, sizeof(szBuffer));
-				if(StrEqual(szBuffer,"Sprite",false)) Config_Defender_Perk_Type[i] = 1;
-					else if(StrEqual(szBuffer,"Trail",false)) Config_Defender_Perk_Type[i] = 2;
-						else if(StrEqual(szBuffer,"Model",false)) Config_Defender_Perk_Type[i] = 3;
-							else Config_Defender_Perk_Type[i] = 0;
-				if(Config_Defender_Perk_Type[i] != 0)
+				if(StrEqual(szBuffer,"Sprite",false)) cDefender.Perk_Type[i] = 1;
+					else if(StrEqual(szBuffer,"Trail",false)) cDefender.Perk_Type[i] = 2;
+						else if(StrEqual(szBuffer,"Model",false)) cDefender.Perk_Type[i] = 3;
+							else cDefender.Perk_Type[i] = 0;
+				if(cDefender.Perk_Type[i] != 0)
 				{
-					KvConfig.GetColor4("Perk_Color", Config_Defender_Perk_Color[i]);
-					Config_Defender_RenderMode[i] = KvConfig.GetNum("Perk_RenderMode");
-					if(Config_Defender_Perk_Type[i] == 2)
+					int iNewColor[4];
+					KvConfig.GetColor4("Perk_Color", iNewColor);
+					cDefender.Perk_Color_Red[i] = iNewColor[0];
+					cDefender.Perk_Color_Green[i] = iNewColor[1];
+					cDefender.Perk_Color_Blue[i] = iNewColor[2];
+					cDefender.Perk_Color_Alpha[i] = iNewColor[3];
+					cDefender.RMode[i] = KvConfig.GetNum("Perk_RenderMode");
+					if(cDefender.Perk_Type[i] == 2)
 					{
-						Config_Defender_Trail_Config[i][0] = KvConfig.GetFloat("Trail_LifeTime");
-						Config_Defender_Trail_Config[i][1] = KvConfig.GetFloat("Trail_Width_Start");
-						Config_Defender_Trail_Config[i][2] = KvConfig.GetFloat("Trail_Width_End");
+						cDefender.Trail_LifeTime[i] = KvConfig.GetFloat("Trail_LifeTime");
+						cDefender.Trail_WidthStart[i] = KvConfig.GetFloat("Trail_Width_Start");
+						cDefender.Trail_WidthEnd[i] = KvConfig.GetFloat("Trail_Width_End");
 					}
 					if(KvConfig.JumpToKey("Perk_List"))
 					{
@@ -862,7 +910,7 @@ public void ReloadCfgFile()
 							while (sectionExists)
 							{
 								KvConfig.GetString("object", filename, sizeof(filename));
-								PushArrayString(Config_Defender_Perk_List[i], filename);
+								PushArrayString(cDefender.Perk_List[i], filename);
 								PrecacheModel(filename);
 								sectionExists = KvConfig.GotoNextKey();
 							}
@@ -885,29 +933,34 @@ public void ReloadCfgFile()
 				if(i<3)
 				{
 					int Immunity = KvConfig.GetNum("Immunity_First_Infection");
-					if(Immunity==1) Config_Infector_Immunity[i]=true;
-						else Config_Infector_Immunity[i]=false;
+					if(Immunity==1) cInfector.Immunity[i]=true;
+						else cInfector.Immunity[i]=false;
 				}
-				Config_Infector_Speed[i] = KvConfig.GetFloat("Add_Speed");
-				Config_Infector_Gravity[i] = KvConfig.GetFloat("Subtract_Gravity");
+				cInfector.Speed[i] = KvConfig.GetFloat("Add_Speed");
+				cInfector.Gravity[i] = KvConfig.GetFloat("Subtract_Gravity");
 				#if defined SHOP
-				Config_Infector_Shop[i] = KvConfig.GetNum("Shop_Give_Credits");
+				cInfector.Shop[i] = KvConfig.GetNum("Shop_Give_Credits");
 				#endif
 				char szBuffer[256];
 				KvConfig.GetString("Perk", szBuffer, sizeof(szBuffer));
-				if(StrEqual(szBuffer,"Sprite",false)) Config_Infector_Perk_Type[i] = 1;
-					else if(StrEqual(szBuffer,"Trail",false)) Config_Infector_Perk_Type[i] = 2;
-						else if(StrEqual(szBuffer,"Model",false)) Config_Infector_Perk_Type[i] = 3;
-							else Config_Infector_Perk_Type[i] = 0;
-				if(Config_Infector_Perk_Type[i] != 0)
+				if(StrEqual(szBuffer,"Sprite",false)) cInfector.Perk_Type[i] = 1;
+					else if(StrEqual(szBuffer,"Trail",false)) cInfector.Perk_Type[i] = 2;
+						else if(StrEqual(szBuffer,"Model",false)) cInfector.Perk_Type[i] = 3;
+							else cInfector.Perk_Type[i] = 0;
+				if(cInfector.Perk_Type[i] != 0)
 				{
-					KvConfig.GetColor4("Perk_Color", Config_Infector_Perk_Color[i]);
-					Config_Infector_RenderMode[i] = KvConfig.GetNum("Perk_RenderMode");
-					if(Config_Infector_Perk_Type[i] == 2)
+					int iNewInfColor[4];
+					KvConfig.GetColor4("Perk_Color", iNewInfColor);
+					cInfector.Perk_Color_Red[i] = iNewInfColor[0];
+					cInfector.Perk_Color_Green[i] = iNewInfColor[1];
+					cInfector.Perk_Color_Blue[i] = iNewInfColor[2];
+					cInfector.Perk_Color_Alpha[i] = iNewInfColor[3];
+					cInfector.RMode[i] = KvConfig.GetNum("Perk_RenderMode");
+					if(cInfector.Perk_Type[i] == 2)
 					{
-						Config_Infector_Trail_Config[i][0] = KvConfig.GetFloat("Trail_LifeTime");
-						Config_Infector_Trail_Config[i][1] = KvConfig.GetFloat("Trail_Width_Start");
-						Config_Infector_Trail_Config[i][2] = KvConfig.GetFloat("Trail_Width_End");
+						cInfector.Trail_LifeTime[i] = KvConfig.GetFloat("Trail_LifeTime");
+						cInfector.Trail_WidthStart[i] = KvConfig.GetFloat("Trail_Width_Start");
+						cInfector.Trail_WidthEnd[i] = KvConfig.GetFloat("Trail_Width_End");
 					}
 					if(KvConfig.JumpToKey("Perk_List"))
 					{
@@ -918,7 +971,7 @@ public void ReloadCfgFile()
 							while (sectionExists)
 							{
 								KvConfig.GetString("object", filename, sizeof(filename));
-								PushArrayString(Config_Infector_Perk_List[i], filename);
+								PushArrayString(cInfector.Perk_List[i], filename);
 								PrecacheModel(filename);
 								sectionExists = KvConfig.GotoNextKey();
 							}
@@ -934,7 +987,7 @@ public void ReloadCfgFile()
 	
 	CloseHandle(KvConfig);
 	
-	Cfg_Loaded = true;
+	g_bCfg_Loaded = true;
 }
 
 public void AddToDownload()
@@ -965,76 +1018,81 @@ public Action ConfigRefresh(int client, int args)
 public Action ConfigTest_Defenders(int client, int args)
 {
 	ReloadCfgFile();
-	CPrintToChat(client, "{green}[TopDefenders] {default}Config Test");
-	CPrintToChat(client, "{orange}HUD Color: {red}%i {green}%i {blue}%i {white}%i {orange}Position: {purple}%.2f|%.2f", Config_HUD_Defender_Color[0], Config_HUD_Defender_Color[1], Config_HUD_Defender_Color[2], Config_HUD_Defender_Color[3], Config_HUD_Defender_x, Config_HUD_Defender_y);
-	for(int i=0;i<4;i++)
+	if (IsValidClient(client) && IsClientInGame(client) && IsClientConnected(client))
 	{
-		CPrintToChat(client, "{orange}Number: {purple}%i",i+1);
-		if(i<3) CPrintToChat(client, "{orange}Immunity: {purple}%i", Config_Defender_Immunity[i]);
-		CPrintToChat(client, "{orange}Speed: {purple}%.2f {orange}Gravity: {purple}%.2f {orange}Perk Type: {purple}%i", Config_Defender_Speed[i], Config_Defender_Gravity[i], Config_Defender_Perk_Type[i]);
-		#if defined SHOP
-		CPrintToChat(client, "{orange}Shop Credits: {purple}%i", Config_Defender_Shop[i]);
-		#endif
-		if(Config_Defender_Perk_Type[i]!=0)
+		CPrintToChat(client, "{green}[TopDefenders] {default}Config Test");
+		for(int i=0;i<4;i++)
 		{
-			CPrintToChat(client, "{orange}Perk Color: {red}%i {green}%i {blue}%i {white}%i {orange}Perk RenderMode: {purple}%i",Config_Defender_Perk_Color[i][0],Config_Defender_Perk_Color[i][1],Config_Defender_Perk_Color[i][2],Config_Defender_Perk_Color[i][3], Config_Defender_RenderMode[i]);
-			if(Config_Defender_Perk_Type[i]==2)
-				CPrintToChat(client, "{orange}Trail Config: {green}LifeTime-{purple}%.2f,{green}Start-{purple}%.2f,{green}End-{purple}%.2f",Config_Defender_Trail_Config[i][0],Config_Defender_Trail_Config[i][1],Config_Defender_Trail_Config[i][2]);
-			int Perk_List_Size = GetArraySize(Config_Defender_Perk_List[i]);
-			char filename[PLATFORM_MAX_PATH];
-			for(int j=0;j<Perk_List_Size;j++)
+			CPrintToChat(client, "{orange}Number: {purple}%i",i+1);
+			if(i<3) CPrintToChat(client, "{orange}Immunity: {purple}%i", cDefender.Immunity[i]);
+			CPrintToChat(client, "{orange}Speed: {purple}%.2f {orange}Gravity: {purple}%.2f {orange}Perk Type: {purple}%i", cDefender.Speed[i], cDefender.Gravity[i], cDefender.Perk_Type[i]);
+			#if defined SHOP
+			CPrintToChat(client, "{orange}Shop Credits: {purple}%i", cDefender.Shop[i]);
+			#endif
+			if(cDefender.Perk_Type[i]!=0)
 			{
-				GetArrayString(Config_Defender_Perk_List[i], j, filename, sizeof(filename));	
-				CPrintToChat(client, "{orange}Object: {purple}%s", filename);
+				CPrintToChat(client, "{orange}Perk Color: {red}%i {green}%i {blue}%i {white}%i {orange}Perk RenderMode: {purple}%i",cDefender.Perk_Color_Red[i],cDefender.Perk_Color_Green[i],cDefender.Perk_Color_Blue[i],cDefender.Perk_Color_Alpha[i], cDefender.RMode[i]);
+				if(cDefender.Perk_Type[i]==2)
+					CPrintToChat(client, "{orange}Trail Config: {green}LifeTime-{purple}%.2f,{green}Start-{purple}%.2f,{green}End-{purple}%.2f",cDefender.Trail_LifeTime[i],cDefender.Trail_WidthStart[i],cDefender.Trail_WidthEnd[i]);
+				int Perk_List_Size = GetArraySize(cDefender.Perk_List[i]);
+				char filename[PLATFORM_MAX_PATH];
+				for(int j=0;j<Perk_List_Size;j++)
+				{
+					GetArrayString(cDefender.Perk_List[i], j, filename, sizeof(filename));	
+					CPrintToChat(client, "{orange}Object: {purple}%s", filename);
+				}
 			}
+			CPrintToChat(client, "---------------------------------");
 		}
-		CPrintToChat(client, "---------------------------------");
 	}
 }
 
 public Action ConfigTest_Infectors(int client, int args)
 {
 	ReloadCfgFile();
-	CPrintToChat(client, "{red}[TopInfectors] {default}Config Test");
-	CPrintToChat(client, "{orange}HUD Color: {red}%i {green}%i {blue}%i {white}%i {orange}Position: {purple}%.2f|%.2f", Config_HUD_Infector_Color[0], Config_HUD_Infector_Color[1], Config_HUD_Infector_Color[2], Config_HUD_Infector_Color[3], Config_HUD_Infector_x, Config_HUD_Infector_y);
-	for(int i=0;i<4;i++)
+	if (IsValidClient(client) && IsClientInGame(client) && IsClientConnected(client))
 	{
-		CPrintToChat(client, "{orange}Number: {purple}%i",i+1);
-		if(i<3) CPrintToChat(client, "{orange}Immunity: {purple}%i", Config_Infector_Immunity[i]);
-		CPrintToChat(client, "{orange}Speed: {purple}%.2f {orange}Gravity: {purple}%.2f {orange}Perk Type: {purple}%i", Config_Infector_Speed[i], Config_Infector_Gravity[i], Config_Infector_Perk_Type[i]);
-		#if defined SHOP
-		CPrintToChat(client, "{orange}Shop Credits: {purple}%i", Config_Infector_Shop[i]);
-		#endif
-		if(Config_Infector_Perk_Type[i]!=0)
+		CPrintToChat(client, "{red}[TopInfectors] {default}Config Test");
+		for(int i=0;i<4;i++)
 		{
-			CPrintToChat(client, "{orange}Perk Color: {red}%i {green}%i {blue}%i {white}%i {orange}Perk RenderMode: {purple}%i",Config_Infector_Perk_Color[i][0],Config_Infector_Perk_Color[i][1],Config_Infector_Perk_Color[i][2],Config_Infector_Perk_Color[i][3], Config_Infector_RenderMode[i]);
-			if(Config_Infector_Perk_Type[i]==2)
-				CPrintToChat(client, "{orange}Trail Config: {green}LifeTime-{purple}%.2f,{green}Start-{purple}%.2f,{green}End-{purple}%.2f",Config_Infector_Trail_Config[i][0],Config_Infector_Trail_Config[i][1],Config_Infector_Trail_Config[i][2]);
-			int Perk_List_Size = GetArraySize(Config_Infector_Perk_List[i]);
-			char filename[PLATFORM_MAX_PATH];
-			for(int j=0;j<Perk_List_Size;j++)
+			CPrintToChat(client, "{orange}Number: {purple}%i",i+1);
+			if(i<3) CPrintToChat(client, "{orange}Immunity: {purple}%i", cInfector.Immunity[i]);
+			CPrintToChat(client, "{orange}Speed: {purple}%.2f {orange}Gravity: {purple}%.2f {orange}Perk Type: {purple}%i", cInfector.Speed[i], cInfector.Gravity[i], cInfector.Perk_Type[i]);
+			#if defined SHOP
+			CPrintToChat(client, "{orange}Shop Credits: {purple}%i", cInfector.Shop[i]);
+			#endif
+			if(cInfector.Perk_Type[i]!=0)
 			{
-				GetArrayString(Config_Infector_Perk_List[i], j, filename, sizeof(filename));	
-				CPrintToChat(client, "{orange}Object: {purple}%s", filename);
+				CPrintToChat(client, "{orange}Perk Color: {red}%i {green}%i {blue}%i {white}%i {orange}Perk RenderMode: {purple}%i",cInfector.Perk_Color_Red[i],cInfector.Perk_Color_Green[i],cInfector.Perk_Color_Blue[i],cInfector.Perk_Color_Alpha[i], cInfector.RMode[i]);
+				if(cInfector.Perk_Type[i]==2)
+					CPrintToChat(client, "{orange}Trail Config: {green}LifeTime-{purple}%.2f,{green}Start-{purple}%.2f,{green}End-{purple}%.2f",cInfector.Trail_LifeTime[i],cInfector.Trail_WidthStart[i],cInfector.Trail_WidthEnd[i]);
+				int Perk_List_Size = GetArraySize(cInfector.Perk_List[i]);
+				char filename[PLATFORM_MAX_PATH];
+				for(int j=0;j<Perk_List_Size;j++)
+				{
+					GetArrayString(cInfector.Perk_List[i], j, filename, sizeof(filename));	
+					CPrintToChat(client, "{orange}Object: {purple}%s", filename);
+				}
 			}
+			CPrintToChat(client, "---------------------------------");
 		}
-		CPrintToChat(client, "---------------------------------");
 	}
 }
 
 //remove perk on death
 public Action Check_Human_Alive(Handle timer)
 {
-	if(g_bPerk || g_bInfectorPerk)
+	if(g_cConVar.Defender_Perk || g_cConVar.Infector_Perk)
 	{
 		for (int client = 1; client <= MaxClients; client++)
 		{
 			if (IsValidClient(client) && IsClientInGame(client) && ((GetClientTeam(client) < 2) || (IsPlayerAlive(client) == false)))
 			{
-				if(g_iEntityPerk[client] != -1)
+				int iIndex = EntRefToEntIndex(cPlayers[client].Perk);
+				if(iIndex != INVALID_ENT_REFERENCE)
 				{
-					if(IsValidEdict(g_iEntityPerk[client])) AcceptEntityInput(g_iEntityPerk[client], "Kill");//kill perk
-					g_iEntityPerk[client]=-1;
+					AcceptEntityInput(iIndex, "Kill");//kill perk
+					cPlayers[client].Perk = -1;
 				}
 			}
 		}
@@ -1045,15 +1103,16 @@ public Action Check_Human_Alive(Handle timer)
 //command perk remove
 public Action PerkRemove(int client, int args)
 {
-	if(g_bPerk || g_bInfectorPerk)
+	if(g_cConVar.Defender_Perk || g_cConVar.Infector_Perk)
 	{
-		if (IsValidClient(client) && IsClientInGame(client))
+		if (IsValidClient(client) && IsClientInGame(client) && IsClientConnected(client))
 		{
-			if(g_iEntityPerk[client] != -1)
+			int iIndex = EntRefToEntIndex(cPlayers[client].Perk);
+			if(iIndex != INVALID_ENT_REFERENCE)
 			{
 				CPrintToChat(client, "%t", "Perk Remove");
-				if(IsValidEdict(g_iEntityPerk[client])) AcceptEntityInput(g_iEntityPerk[client], "Kill");//kill perk
-				g_iEntityPerk[client]=-1;
+				AcceptEntityInput(iIndex, "Kill");//kill perk
+				cPlayers[client].Perk = -1;
 				SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);//speed
 				SetEntityGravity(client, 1.0);//gravity
 			}else{
