@@ -159,8 +159,8 @@
 	}
 	"Perk Remove"
 	{
-		"en"			"{lightblue}[{green}Top Defenders{lightblue}] {purple}You have removed the perk and the color of the skin"
-		"ru"			"{lightblue}[{green}Топ Дефующих{lightblue}] {purple}У вас удалён перк и цвет скина"
+		"en"			"{lightblue}[{green}Top Defenders{lightblue}] {purple}You have removed the perk"
+		"ru"			"{lightblue}[{green}Топ Дефующих{lightblue}] {purple}У вас удалён перк"
 	}
 	"No Perk"
 	{
