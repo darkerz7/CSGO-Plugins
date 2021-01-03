@@ -33,4 +33,29 @@
 		"en"			"{orange}You cleared the database"
 		"ru"			"{orange}Вы очистили базу данных"
 	}
+	"Auto Retry Wait Cookies"
+	{
+		"en"			"{orange}Wait for the server to load cookies"
+		"ru"			"{orange}Ожидайте, когда сервер подгрузит куки"
+	}
+	"Auto Retry Enabled"
+	{
+		"en"			"{default}You have {green}enabled {default}automatic retry"
+		"ru"			"{default}Вы {green}включили {default}автоматический перезаход"
+	}
+	"Auto Retry Disabled"
+	{
+		"en"			"{default}You have {green}disabled {default}automatic retry"
+		"ru"			"{default}Вы {red}отключили {default}автоматический перезаход"
+	}
+	"Auto Retry Cookie Menu Enabled"
+	{
+		"en"			"AutoRetry [Enabled]"
+		"ru"			"АвтоРеконнект [Включён]"
+	}
+	"Auto Retry Cookie Menu Disabled"
+	{
+		"en"			"AutoRetry [Disabled]"
+		"ru"			"АвтоРеконнект [Отключён]"
+	}
 }

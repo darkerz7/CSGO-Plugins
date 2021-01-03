@@ -3,6 +3,7 @@
 
 #include <sourcemod>
 #include <csgocolors_fix>
+#include <clientprefs>
 
 Database g_DB = null;
 int MainTimer[MAXPLAYERS+1] = 0;
@@ -20,25 +21,33 @@ ConVar	g_hCvar_MapList,
 ArrayList CurrentMapPlayersSteam;
 ArrayList AutoRetryMapList;
 
+Handle	g_hCookie = null;
+
+bool g_bAR[MAXPLAYERS + 1] = {false, ...};
+
 public Plugin myinfo =
 {
 	name = "AutoRetry",
 	author = "DarkerZ[RUS]",
 	description = "AutoRetry After Download Map",
-	version = "1.7",
+	version = "1.8",
 	url = "dark-skill.ru"
 }
 
 public void OnPluginStart()
 {
 	RegConsoleCmd("sm_retryclear", SMRETRYCLEAR);
+	RegConsoleCmd("sm_autoretry", Command_AutoRetry, "[AutoRetry] Disables or enables retry.");
 	LoadTranslations("autoretry.phrases");
 	
 	g_hCvar_MapList		= CreateConVar("autoretry_maplist", "0", "Enable/Disable using maplist.", _, true, 0.0, true, 1.0);
 	g_hCvar_Mode		= CreateConVar("autoretry_mode", "0", "Mode for maplist. 0 - AutoRetry Only map in list. 1 - Everyone else", _, true, 0.0, true, 1.0);
-	g_hCvar_AutoDetect	= CreateConVar("autoretry_autodetect", "0", "Autodetect map with particles. You need to disable the maplist", _, true, 0.0, true, 1.0);
+	g_hCvar_AutoDetect	= CreateConVar("autoretry_autodetect", "1", "Autodetect map with particles. You need to disable the maplist", _, true, 0.0, true, 1.0);
 	
 	RegAdminCmd("sm_autoretry_reloadmaplist", Reload_Maplist, ADMFLAG_RCON);
+	
+	g_hCookie			= RegClientCookie("autoretry", "AutoRetry", CookieAccess_Protected);
+	SetCookieMenuItem(PrefMenu, 0, "Auto Retry");
 	
 	CurrentMapPlayersSteam = new ArrayList(ByteCountToCells(32));
 	AutoRetryMapList = new ArrayList(ByteCountToCells(64));
@@ -212,6 +221,14 @@ public void OnClientDisconnect(int client)
 {
 	MainTimer[client]=0;
 	AutoRetryTimer[client]=-1;
+	g_bAR[client] = false;
+}
+
+public void OnClientCookiesCached(int client)
+{
+	static char sCookieValue[2];
+	GetClientCookie(client, g_hCookie, sCookieValue, sizeof(sCookieValue));
+	g_bAR[client] = StringToInt(sCookieValue) != 0;
 }
 
 public void OnClientPostAdminCheck(int client)
@@ -219,14 +236,33 @@ public void OnClientPostAdminCheck(int client)
 	CheckClient(client);
 }
 
-public void CheckClient(int iClient)
+public Action Timer_Check_Cookies(Handle hTimer, any client)
+{
+	if(IsValidClient(client))
+	{
+		if (!AreClientCookiesCached(client)) return Plugin_Continue;
+		else
+		{
+			CheckClient(client, false);
+			return Plugin_Stop;
+		}
+	}
+	return Plugin_Stop;
+}
+
+void CheckClient(int iClient, bool bFirst = true)
 {
 	if(g_bReady && !g_bIgnoreMap && IsValidClient(iClient))
 	{
-		ReplyToCommand(iClient, "%T %T", "Auto Retry Tag", iClient,"Auto Retry Connected Time", iClient, GetTime()-MainTimer[iClient]);
+		if (bFirst) ReplyToCommand(iClient, "%T %T", "Auto Retry Tag", iClient,"Auto Retry Connected Time", iClient, GetTime()-MainTimer[iClient]);
+		if (!AreClientCookiesCached(iClient))
+		{
+			CreateTimer(2.0, Timer_Check_Cookies, iClient, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+			return;
+		}
 		char steamid[32];
 		GetClientAuthId(iClient, AuthId_Engine, steamid, sizeof(steamid));
-		if (CurrentMapPlayersSteam.FindString(steamid)>-1)
+		if (g_bAR[iClient] || CurrentMapPlayersSteam.FindString(steamid)>-1)
 		{
 			AutoRetryTimer[iClient]=-1;
 		} else
@@ -298,6 +334,66 @@ public Action Reload_Maplist(int iClient, int iArgs)
 	if(IsValidClient(iClient)) CPrintToChat(iClient, "%t %s", "Auto Retry Tag Color", "Reloading maplist...");
 	LogAction(iClient, -1, "\"%L\" Reloaded Maplist", iClient);
 	return Plugin_Handled;
+}
+
+public Action Command_AutoRetry(int client, int args)
+{
+	if(IsValidClient(client))
+	{
+		if(!AreClientCookiesCached(client))
+		{
+			CPrintToChat(client, "%t %t", "Auto Retry Tag Color", "Auto Retry Wait Cookies");
+			return Plugin_Handled;
+		}
+
+		if(g_bAR[client])
+		{
+			g_bAR[client] = false;
+			CPrintToChat(client, "%t %t", "Auto Retry Tag Color", "Auto Retry Enabled");
+		}
+		else
+		{
+			g_bAR[client] = true;
+			CPrintToChat(client, "%t %t", "Auto Retry Tag Color", "Auto Retry Disabled");
+		}
+
+		static char sCookieValue[2];
+		IntToString(g_bAR[client], sCookieValue, sizeof(sCookieValue));
+		SetClientCookie(client, g_hCookie, sCookieValue);
+	}
+	return Plugin_Handled;
+}
+
+public void PrefMenu(int client, CookieMenuAction actions, any info, char[] buffer, int maxlen){
+	if (actions == CookieMenuAction_DisplayOption)
+	{
+		if(g_bAR[client])
+		{
+			Format(buffer, maxlen, "%T", "Auto Retry Cookie Menu Disabled", client);
+		}
+		else
+		{
+			Format(buffer, maxlen, "%T", "Auto Retry Cookie Menu Enabled", client);
+		}
+	}
+
+	if (actions == CookieMenuAction_SelectOption)
+	{
+		if(g_bAR[client])
+		{
+			g_bAR[client] = false;
+			CPrintToChat(client, "%t %t", "Auto Retry Tag Color", "Auto Retry Enabled");
+		}
+		else
+		{
+			g_bAR[client] = true;
+			CPrintToChat(client, "%t %t", "Auto Retry Tag Color", "Auto Retry Disabled");
+		}
+
+		static char sCookieValue[2];
+		IntToString(g_bAR[client], sCookieValue, sizeof(sCookieValue));
+		SetClientCookie(client, g_hCookie, sCookieValue);
+	}
 }
 
 stock bool IsValidClient(int iClient) 
