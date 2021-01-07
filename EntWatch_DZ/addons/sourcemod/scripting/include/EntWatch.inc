@@ -3,6 +3,15 @@
 #endif
 #define _EntWatch_include
 
+enum struct class_NativeClientSettings_Hud
+{
+	bool		Display;
+	int			Color[4];
+	float		Pos_X;
+	float		Pos_Y;
+	bool		Name;
+}
+
 /**
  * Checks if a client is currently banned, if an integer variable is referenced the time of unban will be assigned to it.
  *
@@ -40,6 +49,76 @@ native bool EntWatch_BanClient(int iClient, int iAdmin = 0, int iDuration = 0, c
  * On error/errors:		Invalid client index
  */
 native bool EntWatch_UnbanClient(int iClient, int iAdmin = 0, const char[] sReason = "No Reason");
+
+/**
+ * Gets client HUD settings
+ *
+ * @param iClient		Client index to get
+ * @param cSettings		An instance of the class in which the information will be saved
+
+ * @return				True and client settings on success, false and default settings otherwsie
+ *
+ * On error/errors:		Invalid client index
+ */
+native bool EntWatch_GetHudSettings(int iClient, any cSettings[sizeof(class_NativeClientSettings_Hud)]);
+
+/**
+ * Gets default HUD settings
+ *
+ * @param cDefailt		An instance of the class in which the information will be saved
+
+ * @return				True
+ */
+native bool EntWatch_GetHudDefault(any cDefailt[sizeof(class_NativeClientSettings_Hud)]);
+
+/**
+ * Sets client HUD Display
+ *
+ * @param iClient		Client index to set
+ * @param iDisplay		Parameter to Display. 0 - Disable, otherwsie - Enable
+
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index/Client cookies are not yet loaded
+ */
+native bool EntWatch_SetHudDisplay(int iClient, int iDisplay);
+
+/**
+ * Sets client HUD Name Display
+ *
+ * @param iClient		Client index to set
+ * @param iName			Parameter to Name Display. 0 - Disable, otherwsie - Enable
+
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index/Client cookies are not yet loaded
+ */
+native bool EntWatch_SetHudName(int iClient, int iName);
+
+/**
+ * Sets client HUD Position
+ *
+ * @param iClient		Client index to set
+ * @param fPosX			Parameter to position X
+ * @param fPosY			Parameter to position Y
+
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid Position [0.0-1.0|0.0-1.0]/Invalid client index/Client cookies are not yet loaded
+ */
+native bool EntWatch_SetHudPosition(int iClient, float fPosX, float fPosY);
+
+/**
+ * Sets client HUD Colors
+ *
+ * @param iClient		Client index to set
+ * @param aColors		Parameter to colors[4] - Red, Green, Blue, Alpha
+
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid Colors [0-255|0-255|0-255|0-255]/Invalid Colors Array[4]/Invalid client index/Client cookies are not yet loaded
+ */
+native bool EntWatch_SetHudColors(int iClient, int[] aColors);
 
 /**
  * Checks if an entity is a special item.
