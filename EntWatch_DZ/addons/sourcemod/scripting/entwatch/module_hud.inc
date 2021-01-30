@@ -1,7 +1,7 @@
 #define EW_MODULE_HUD
 
 #define MAXSHOWHUDITEMS 10
-#define MAXSIZESTRINGFORITEM 48
+#define MAXSIZESTRINGFORITEM 44
 #define TIMEROTORHUD 2
 
 //-------------------------------------------------------

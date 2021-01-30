@@ -72,7 +72,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.28",
+	version = "3.DZ.29",
 	url = "dark-skill.ru"
 };
  
@@ -999,8 +999,6 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 									if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
 									#endif
 									
-									waitTime++; //For safety
-									if(waitTime < 1) waitTime = 1;
 									ItemTest.SetDelay(waitTime);
 									ItemTest.Uses++;
 									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
@@ -1032,7 +1030,6 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 									if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
 									#endif
 									
-									if(waitTime < 1) waitTime = 1;
 									ItemTest.SetDelay(waitTime);
 									ItemTest.Uses++;
 									if(ItemTest.Uses >= ItemTest.MaxUses)

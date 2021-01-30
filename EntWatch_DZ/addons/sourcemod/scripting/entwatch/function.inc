@@ -81,6 +81,7 @@ enum struct class_ItemList
 	}
 	void SetDelay(int time)
 	{
+		if(time<1) time = 1;
 		this.Delay = g_fGameTime + time;
 	}
 	float CheckDelay()
