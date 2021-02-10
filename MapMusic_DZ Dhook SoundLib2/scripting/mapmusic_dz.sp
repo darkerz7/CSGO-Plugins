@@ -50,7 +50,7 @@ public Plugin myinfo = {
 	name = "Map Music Control with Dynamic Volume Control",
 	author = "DarkerZ[RUS]",
 	description = "Allows clients to adjust ambient sounds played by the map",
-	version = "1.DZ.8",
+	version = "1.DZ.9",
 	url = "dark-skill.ru"
 };
 
@@ -405,9 +405,18 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 					ItemSample.Playing = false;
 					SaveSample(ItemSample);
 					StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel);
+					DHookSetReturn(hReturn, false);
+					return MRES_Supercede;
 				}
-				DHookSetReturn(hReturn, false);
-				return MRES_Supercede;
+				if(strcmp(sCommand, "Volume", false) == 0)
+				{
+					DHookSetReturn(hReturn, false);
+					return MRES_Supercede;
+				}else
+				{
+					if(ItemSample.EntSource == ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel);
+					else StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
+				}
 			}
 			
 			ItemSample.Playing = true;
@@ -506,7 +515,7 @@ void PlaySample(int iClient, class_Sample ItemSample)
 		else
 		{
 			EmitSoundToClient(iClient, ItemSample.File, ItemSample.EntSource, SNDCHAN_STATIC,
-					SNDLEVEL_NORMAL, SND_CHANGEVOL, fPlayVolume, SNDPITCH_NORMAL, -1,
+					SNDLEVEL_NORMAL, SND_NOFLAGS, fPlayVolume, SNDPITCH_NORMAL, -1,
 					_, _, true);
 		}
 	}
@@ -536,7 +545,7 @@ stock void StopSoundEx(int iClient, const char[] sSample, int iCustomChannel, bo
 			{
 				if(bForAll) StopSound(i, iChannelBuf, sSample);
 				else EmitSoundToClient(i, sSample, iSourceEntity, SNDCHAN_STATIC,
-						 SNDLEVEL_NORMAL, SND_CHANGEVOL, 0.0, SNDPITCH_NORMAL, -1,
+						 SNDLEVEL_NORMAL, SND_STOPLOOPING, 0.0, SNDPITCH_NORMAL, -1,
 						 _, _, true);
 			}
 		}
@@ -544,7 +553,7 @@ stock void StopSoundEx(int iClient, const char[] sSample, int iCustomChannel, bo
 	{
 		if(bForAll) StopSound(iClient, iChannelBuf, sSample);
 		else EmitSoundToClient(iClient, sSample, iSourceEntity, SNDCHAN_STATIC,
-					 SNDLEVEL_NORMAL, SND_CHANGEVOL, 0.0, SNDPITCH_NORMAL, -1,
+					 SNDLEVEL_NORMAL, SND_STOPLOOPING, 0.0, SNDPITCH_NORMAL, -1,
 					 _, _, true);
 	}
 }
