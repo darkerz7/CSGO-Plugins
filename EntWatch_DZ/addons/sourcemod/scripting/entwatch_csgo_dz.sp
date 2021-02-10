@@ -72,7 +72,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.29",
+	version = "3.DZ.30",
 	url = "dark-skill.ru"
 };
  
@@ -496,26 +496,26 @@ stock void LoadConfig()
 			#if defined EW_MODULE_GLOW
 			if(StrEqual(sBuffer_temp,"{green}",false)){NewItem.GlowColor[0]=0;NewItem.GlowColor[1]=255;NewItem.GlowColor[2]=0;}
 			else if(StrEqual(sBuffer_temp,"{default}",false)){NewItem.GlowColor[0]=255;NewItem.GlowColor[1]=255;NewItem.GlowColor[2]=255;}
-			else if(StrEqual(sBuffer_temp,"{darkred}",false)){NewItem.GlowColor[0]=140;NewItem.GlowColor[1]=0;NewItem.GlowColor[2]=0;}
+			else if(StrEqual(sBuffer_temp,"{darkred}",false)){NewItem.GlowColor[0]=175;NewItem.GlowColor[1]=0;NewItem.GlowColor[2]=0;}
 			else if(StrEqual(sBuffer_temp,"{purple}",false)){NewItem.GlowColor[0]=128;NewItem.GlowColor[1]=0;NewItem.GlowColor[2]=128;}
-			else if(StrEqual(sBuffer_temp,"{lightgreen}",false)){NewItem.GlowColor[0]=144;NewItem.GlowColor[1]=238;NewItem.GlowColor[2]=144;}
-			else if(StrEqual(sBuffer_temp,"{lime}",false)){NewItem.GlowColor[0]=199;NewItem.GlowColor[1]=234;NewItem.GlowColor[2]=7;}
-			else if(StrEqual(sBuffer_temp,"{red}",false)){NewItem.GlowColor[0]=255;NewItem.GlowColor[1]=0;NewItem.GlowColor[2]=0;}
+			else if(StrEqual(sBuffer_temp,"{lightgreen}",false)){NewItem.GlowColor[0]=104;NewItem.GlowColor[1]=238;NewItem.GlowColor[2]=104;}
+			else if(StrEqual(sBuffer_temp,"{lime}",false)){NewItem.GlowColor[0]=119;NewItem.GlowColor[1]=234;NewItem.GlowColor[2]=7;}
+			else if(StrEqual(sBuffer_temp,"{red}",false)){NewItem.GlowColor[0]=255;NewItem.GlowColor[1]=30;NewItem.GlowColor[2]=30;}
 			else if(StrEqual(sBuffer_temp,"{grey}",false)){NewItem.GlowColor[0]=128;NewItem.GlowColor[1]=128;NewItem.GlowColor[2]=128;}
 			else if(StrEqual(sBuffer_temp,"{olive}",false)){NewItem.GlowColor[0]=112;NewItem.GlowColor[1]=130;NewItem.GlowColor[2]=56;}
 			else if(StrEqual(sBuffer_temp,"{a}",false)){NewItem.GlowColor[0]=192;NewItem.GlowColor[1]=192;NewItem.GlowColor[2]=192;}
-			else if(StrEqual(sBuffer_temp,"{lightblue}",false)){NewItem.GlowColor[0]=173;NewItem.GlowColor[1]=216;NewItem.GlowColor[2]=230;}
+			else if(StrEqual(sBuffer_temp,"{lightblue}",false)){NewItem.GlowColor[0]=93;NewItem.GlowColor[1]=130;NewItem.GlowColor[2]=255;}
 			else if(StrEqual(sBuffer_temp,"{blue}",false)){NewItem.GlowColor[0]=0;NewItem.GlowColor[1]=0;NewItem.GlowColor[2]=255;}
 			else if(StrEqual(sBuffer_temp,"{d}",false)){NewItem.GlowColor[0]=102;NewItem.GlowColor[1]=153;NewItem.GlowColor[2]=204;}
 			else if(StrEqual(sBuffer_temp,"{pink}",false)){NewItem.GlowColor[0]=255;NewItem.GlowColor[1]=105;NewItem.GlowColor[2]=180;}
-			else if(StrEqual(sBuffer_temp,"{darkorange}",false)){NewItem.GlowColor[0]=255;NewItem.GlowColor[1]=140;NewItem.GlowColor[2]=0;}
-			else if(StrEqual(sBuffer_temp,"{orange}",false)){NewItem.GlowColor[0]=240;NewItem.GlowColor[1]=94;NewItem.GlowColor[2]=35;}
+			else if(StrEqual(sBuffer_temp,"{darkorange}",false)){NewItem.GlowColor[0]=240;NewItem.GlowColor[1]=94;NewItem.GlowColor[2]=35;}
+			else if(StrEqual(sBuffer_temp,"{orange}",false)){NewItem.GlowColor[0]=255;NewItem.GlowColor[1]=140;NewItem.GlowColor[2]=0;}
 			else if(StrEqual(sBuffer_temp,"{white}",false)){NewItem.GlowColor[0]=255;NewItem.GlowColor[1]=255;NewItem.GlowColor[2]=255;}
-			else if(StrEqual(sBuffer_temp,"{yellow}",false)){NewItem.GlowColor[0]=112;NewItem.GlowColor[1]=130;NewItem.GlowColor[2]=56;}
+			else if(StrEqual(sBuffer_temp,"{yellow}",false)){NewItem.GlowColor[0]=199;NewItem.GlowColor[1]=234;NewItem.GlowColor[2]=7;}
 			else if(StrEqual(sBuffer_temp,"{magenta}",false)){NewItem.GlowColor[0]=255;NewItem.GlowColor[1]=105;NewItem.GlowColor[2]=180;}
 			else if(StrEqual(sBuffer_temp,"{silver}",false)){NewItem.GlowColor[0]=192;NewItem.GlowColor[1]=192;NewItem.GlowColor[2]=192;}
 			else if(StrEqual(sBuffer_temp,"{bluegrey}",false)){NewItem.GlowColor[0]=102;NewItem.GlowColor[1]=153;NewItem.GlowColor[2]=204;}
-			else if(StrEqual(sBuffer_temp,"{lightred}",false)){NewItem.GlowColor[0]=255;NewItem.GlowColor[1]=90;NewItem.GlowColor[2]=0;}
+			else if(StrEqual(sBuffer_temp,"{lightred}",false)){NewItem.GlowColor[0]=255;NewItem.GlowColor[1]=90;NewItem.GlowColor[2]=90;}
 			else if(StrEqual(sBuffer_temp,"{cyan}",false)){NewItem.GlowColor[0]=0;NewItem.GlowColor[1]=150;NewItem.GlowColor[2]=220;}
 			else if(StrEqual(sBuffer_temp,"{gray}",false)){NewItem.GlowColor[0]=128;NewItem.GlowColor[1]=128;NewItem.GlowColor[2]=128;}
 			#endif
@@ -759,16 +759,37 @@ public bool RegisterMath(class_ItemList ItemInstance, int iEntity)
 {
 	if (IsValidEntity(ItemInstance.WeaponID))
 	{
-		int hammerID = Entity_GetHammerID(iEntity);
-		if (ItemInstance.EnergyID == hammerID)
+		if (ItemInstance.EnergyID == Entity_GetHammerID(iEntity))
 		{
-			ItemInstance.MathID = iEntity;
-			int max = RoundFloat(GetEntPropFloat(iEntity, Prop_Data, "m_flMax"));
-			int value = GetCounterValue(iEntity);
-			if (ItemInstance.Mode == 6) ItemInstance.MathValue = value;
-			else if (ItemInstance.Mode == 7) ItemInstance.MathValue = (max - value);
-			ItemInstance.MathValueMax = max;
-			return true;
+			char Item_Counter_Targetname[64];
+			Entity_GetTargetName(iEntity, Item_Counter_Targetname, sizeof(Item_Counter_Targetname));
+			int iTLocCounter = FindCharInString(Item_Counter_Targetname, '&', true);
+			if(iTLocCounter == -1)
+			{
+				ItemInstance.MathID = iEntity;
+				int max = RoundFloat(GetEntPropFloat(iEntity, Prop_Data, "m_flMax"));
+				int value = GetCounterValue(iEntity);
+				if (ItemInstance.Mode == 6) ItemInstance.MathValue = value;
+				else if (ItemInstance.Mode == 7) ItemInstance.MathValue = (max - value);
+				ItemInstance.MathValueMax = max;
+				return true;
+			}else
+			{
+				char Item_Weapon_Targetname[64];
+				Entity_GetTargetName(ItemInstance.WeaponID, Item_Weapon_Targetname, sizeof(Item_Weapon_Targetname));
+				int iTLocWeapon = FindCharInString(Item_Weapon_Targetname, '&', true);
+				if(iTLocWeapon == -1) return false;
+				if(strcmp(Item_Counter_Targetname[iTLocCounter+1], Item_Weapon_Targetname[iTLocWeapon+1], false) == 0)
+				{
+					ItemInstance.MathID = iEntity;
+					int max = RoundFloat(GetEntPropFloat(iEntity, Prop_Data, "m_flMax"));
+					int value = GetCounterValue(iEntity);
+					if (ItemInstance.Mode == 6) ItemInstance.MathValue = value;
+					else if (ItemInstance.Mode == 7) ItemInstance.MathValue = (max - value);
+					ItemInstance.MathValueMax = max;
+					return true;
+				}
+			}
 		}
 	}
 	return false;
