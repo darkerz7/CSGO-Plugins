@@ -55,8 +55,6 @@ bool g_bIsAdmin[MAXPLAYERS+1] = {false,...};
 #include "entwatch/module_glow.inc"
 #include "entwatch/module_use_priority.inc"
 #include "entwatch/module_extended_logs.inc"
-
-//WESKER MODULE
 //#include "entwatch/module_clantag.inc"
 
 //#include "entwatch/module_physbox.inc" //Heavy module for the server. Not recommended. Need Collision Hook Ext https://forums.alliedmods.net/showthread.php?t=197815
@@ -72,7 +70,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.30",
+	version = "3.DZ.31",
 	url = "dark-skill.ru"
 };
  
@@ -152,7 +150,6 @@ public void OnPluginStart()
 	EWM_Debug_OnPluginStart();
 	#endif
 	
-	//WESKER MODULE CLANTAG
 	#if defined EW_MODULE_CLANTAG
 	EWM_Clantag_OnPluginStart();
 	#endif
@@ -174,7 +171,7 @@ public void OnPluginStart()
 public void OnPluginEnd()
 {
 	#if defined EW_MODULE_CLANTAG
-	EWM_Clantag_OnPluginEnd();
+	EWM_Clantag_Mass_Reset();
 	#endif
 }
 
@@ -211,7 +208,7 @@ public void OnMapEnd()
 	#endif
 	
 	#if defined EW_MODULE_CLANTAG
-	EWM_Clantag_OnMapEnd();
+	EWM_Clantag_Mass_Reset();
 	#endif
 }
 
@@ -220,7 +217,7 @@ public Action Event_RoundStart(Event hEvent, const char[] sName, bool bDontBroad
 	if(g_bConfigLoaded) CPrintToChatAll("%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Welcome");
 	
 	#if defined EW_MODULE_CLANTAG
-	EWM_Clantag_Event_RoundStart();
+	EWM_Clantag_Mass_Reset();
 	#endif
 }
 
@@ -310,7 +307,7 @@ stock void EWM_Drop_Forward(Handle hEvent)
 						#endif
 						
 						#if defined EW_MODULE_CLANTAG
-						EWM_Clantag_PlayerDeath_Drop(iClient);
+						EWM_Clantag_Reset(iClient);
 						#endif
 					}
 					else
@@ -322,7 +319,7 @@ stock void EWM_Drop_Forward(Handle hEvent)
 							#endif
 							
 							#if defined EW_MODULE_CLANTAG
-							EWM_Clantag_PlayerDeath(iClient);
+							EWM_Clantag_Reset(iClient);
 							#endif
 							AcceptEntityInput(ItemTest.WeaponID, "Kill");
 						}else
@@ -332,7 +329,7 @@ stock void EWM_Drop_Forward(Handle hEvent)
 							#endif
 							
 							#if defined EW_MODULE_CLANTAG
-							EWM_Clantag_PlayerDeath_Drop(iClient);
+							EWM_Clantag_Reset(iClient);
 							#endif
 							
 							SDKHooks_DropWeapon(iClient, ItemTest.WeaponID);
@@ -826,6 +823,9 @@ public void OnEntityDestroyed(int iEntity)
 				g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
 				if(ItemTest.WeaponID == iEntity)
 				{
+					#if defined EW_MODULE_CLANTAG
+					EWM_Clantag_Reset(ItemTest.OwnerID);
+					#endif
 					ItemTest.MathID = INVALID_ENT_REFERENCE;
 					ItemTest.WeaponID = INVALID_ENT_REFERENCE;
 					ItemTest.OwnerID = INVALID_ENT_REFERENCE;
@@ -1218,7 +1218,7 @@ public Action OnWeaponDrop(int iClient, int iWeapon)
 				#endif
 				
 				#if defined EW_MODULE_CLANTAG
-				EWM_Clantag_Drop(iClient);
+				EWM_Clantag_Reset(iClient);
 				#endif
 					
 				break;
@@ -1285,10 +1285,6 @@ public Action OnWeaponEquip(int iClient, int iWeapon)
 				if(ItemTest.Chat) EWM_Chat_PickUp(ItemTest, iClient);
 				#endif
 				
-				#if defined EW_MODULE_CLANTAG
-				if(ItemTest.Hud) EWM_Clantag_PickUp(ItemTest, iClient);
-				#endif
-				
 				#if defined EW_MODULE_OFFLINE_EBAN
 				EWM_OfflineEban_UpdateItemName(iClient, ItemTest.Name);
 				#endif
@@ -1306,7 +1302,7 @@ public Action OnWeaponEquip(int iClient, int iWeapon)
 public Action EW_Command_ReloadConfig(int iClient, int iArgs)
 {	
 	#if defined EW_MODULE_CLANTAG
-	EWM_Clantag_OnReloadConfig();
+	EWM_Clantag_Mass_Reset();
 	#endif
 	
 	CleanData();
