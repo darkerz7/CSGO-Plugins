@@ -24,6 +24,7 @@ enum struct class_Sample
 	float	TimeShtamp;
 	int		EntSource;
 	int		Channel;
+	bool	FromEnt;
 }
 
 ArrayList g_aSample;
@@ -50,7 +51,7 @@ public Plugin myinfo = {
 	name = "Map Music Control with Dynamic Volume Control",
 	author = "DarkerZ[RUS]",
 	description = "Allows clients to adjust ambient sounds played by the map",
-	version = "1.DZ.9",
+	version = "1.DZ.10",
 	url = "dark-skill.ru"
 };
 
@@ -346,9 +347,11 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 		ItemSample.Playing = false;
 		
 		ItemSample.EntSource = iIndexEntity;
+		ItemSample.FromEnt = false;
 		int iFlags = GetEntProp(iEntity, Prop_Data, "m_spawnflags");
 		if(!(iFlags & 1))
 		{
+			ItemSample.FromEnt = true;
 			char sSourceEntName[64];
 			GetEntPropString(iEntity, Prop_Data, "m_sSourceEntName", sSourceEntName, sizeof(sSourceEntName));
 			if(sSourceEntName[0])
@@ -402,20 +405,11 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 			{
 				if(strcmp(sCommand, "ToggleSound", false) == 0)
 				{
+					StopSoundEx(ItemSample);
 					ItemSample.Playing = false;
 					SaveSample(ItemSample);
-					StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel);
 					DHookSetReturn(hReturn, false);
 					return MRES_Supercede;
-				}
-				if(strcmp(sCommand, "Volume", false) == 0)
-				{
-					DHookSetReturn(hReturn, false);
-					return MRES_Supercede;
-				}else
-				{
-					if(ItemSample.EntSource == ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel);
-					else StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
 				}
 			}
 			
@@ -439,24 +433,16 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 		}
 	}else if(strcmp(sCommand, "StopSound", false) == 0 || strcmp(sCommand, "FadeOut", false) == 0 || (strcmp(sCommand, "Volume", false) == 0 && (fVolume < 0.1)))
 	{
+		StopSoundEx(ItemSample);
 		if(!ItemSample.Common && ItemSample.Playing)
 		{
-			if(ItemSample.EntSource == ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel);
-			else StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
 			ItemSample.Playing = false;
 			SaveSample(ItemSample);
-		}else if(ItemSample.EntSource != ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
+		}
 	}else if(strcmp(sCommand, "Kill", false) == 0)
 	{
-		if(!ItemSample.Common)
-		{
-			if(ItemSample.Playing)
-			{
-				if(ItemSample.EntSource == ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel);
-				else StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
-			}
-			RemoveSample(ItemSample);
-		}else if(ItemSample.EntSource != ItemSample.Entity) StopSoundEx(ALL_CLIENTS, ItemSample.File, ItemSample.Channel, false, EntRefToEntIndex(ItemSample.EntSource)); //stoping loop sounds
+		StopSoundEx(ItemSample);
+		if(!ItemSample.Common) RemoveSample(ItemSample);
 	}
 	
 	return MRES_Handled;
@@ -491,7 +477,7 @@ void RemoveSample(class_Sample ItemSample)
 	}
 }
 
-void PlaySample(int iClient, class_Sample ItemSample)
+void PlaySample(int iClient, class_Sample ItemSample, bool bNotAll = true)
 {
 	if(IsClientInGame(iClient))
 	{
@@ -500,10 +486,9 @@ void PlaySample(int iClient, class_Sample ItemSample)
 		float fPlayVolume = (fSampleVolume*float(g_iVolume[iClient])) / 1000.0;
 		if(FloatCompare(fPlayVolume,0.5)>0) fPlayVolume=0.25+(fPlayVolume-0.5)*1.5;
 			else fPlayVolume*=0.5;
-		int iFlags = GetEntProp(EntRefToEntIndex(ItemSample.Entity), Prop_Data, "m_spawnflags");
-		if(iFlags & 1)
+		if(!ItemSample.FromEnt)
 		{
-			if(!ItemSample.Common)
+			if(!ItemSample.Common && bNotAll)
 				EmitSoundToClient(iClient, ItemSample.File, iClient, ItemSample.Channel,
 						 SNDLEVEL_NONE, SND_CHANGEVOL, fPlayVolume, SNDPITCH_NORMAL, -1,
 						 _, _, true);
@@ -530,31 +515,35 @@ void PlaySampleAll(class_Sample ItemSample)
 		g_iChannel++;
 		if(g_iChannel >= SNDCHAN_USER_BASE) g_iChannel = SNDCHAN_USER_BASE - 75;
 	}
-	for(int i = 1; i <= MaxClients; i++) if(!g_bDisabled[i]) PlaySample(i, ItemSample);
+	for(int i = 1; i <= MaxClients; i++) if(!g_bDisabled[i]) PlaySample(i, ItemSample, false);
 }
 
-stock void StopSoundEx(int iClient, const char[] sSample, int iCustomChannel, bool bForAll = true, int iSourceEntity = -1)
+void StopSoundEx(class_Sample ItemSample)
 {
-	int iChannelBuf = iCustomChannel;
+	int iChannelBuf = ItemSample.Channel;
 	if(iChannelBuf == -5) iChannelBuf = SNDCHAN_USER_BASE;
-	if(iClient == ALL_CLIENTS)
+	for(int i = 1; i<= MaxClients; i++)
 	{
-		for(int i = 1; i<= MaxClients; i++)
+		if(IsClientInGame(i))
 		{
-			if(IsClientInGame(i))
+			if(!ItemSample.FromEnt)
 			{
-				if(bForAll) StopSound(i, iChannelBuf, sSample);
-				else EmitSoundToClient(i, sSample, iSourceEntity, SNDCHAN_STATIC,
+				if(!ItemSample.Common)
+				{
+					if(ItemSample.Playing) StopSound(i, iChannelBuf, ItemSample.File);
+				}else
+				{
+					EmitSoundToClient(i, ItemSample.File, i, iChannelBuf,
 						 SNDLEVEL_NORMAL, SND_STOPLOOPING, 0.0, SNDPITCH_NORMAL, -1,
 						 _, _, true);
-			}
-		}
-	}else if(IsClientInGame(iClient))
-	{
-		if(bForAll) StopSound(iClient, iChannelBuf, sSample);
-		else EmitSoundToClient(iClient, sSample, iSourceEntity, SNDCHAN_STATIC,
+				}
+			}else
+			{
+				EmitSoundToClient(i, ItemSample.File, ItemSample.EntSource, SNDCHAN_STATIC,
 					 SNDLEVEL_NORMAL, SND_STOPLOOPING, 0.0, SNDPITCH_NORMAL, -1,
 					 _, _, true);
+			}
+		}
 	}
 }
 
