@@ -8,12 +8,18 @@ public Action OnPlayerRunCmd(int iClient, int &iButtons, int &iImpulse, float[3]
 		{
 			int iCountButtons = 0, iCurCountButton = 0, iMode = 0;
 			int iButton = INVALID_ENT_REFERENCE;
+			bool bHasNotDelay = true;
 			for(int i = 0; i<g_ItemList.Length; i++)
 			{
 				class_ItemList ItemTest;
 				g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
 				if(ItemTest.OwnerID == iClient)
 				{
+					if(ItemTest.CheckDelay() > 0)
+					{
+						bHasNotDelay = false;
+						break;
+					}
 					iCurCountButton = ItemTest.ButtonsArray.Length;
 					iCountButtons+=iCurCountButton;
 					if(iCountButtons > 1) break;
@@ -28,7 +34,7 @@ public Action OnPlayerRunCmd(int iClient, int &iButtons, int &iImpulse, float[3]
 					}
 				}
 			}
-			if(iCountButtons == 1 && iMode!=1 && iMode!=6 && iMode!=7 && IsValidEdict(iButton)) AcceptEntityInput(iButton, "Use", iClient, iClient); 
+			if(bHasNotDelay && iCountButtons == 1 && iMode!=1 && iMode!=6 && iMode!=7 && IsValidEdict(iButton)) AcceptEntityInput(iButton, "Use", iClient, iClient); 
 		}
 	}
 	return Plugin_Continue;

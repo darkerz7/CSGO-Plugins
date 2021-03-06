@@ -70,7 +70,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.31",
+	version = "3.DZ.32",
 	url = "dark-skill.ru"
 };
  
@@ -1061,6 +1061,26 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 									return Plugin_Changed;
 								}
+							case 6,7:
+							{
+								if(ItemTest.CoolDown > 0)
+								{
+									if(ItemTest.CheckCoolDown() <= 0)
+									{
+										#if defined EW_MODULE_ELOGS
+										EWM_ELogs_Use(ItemTest, iActivator);
+										#endif
+										#if defined EW_MODULE_CHAT
+										if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
+										#endif
+										
+										ItemTest.SetDelay(waitTime);
+										ItemTest.SetCoolDown(ItemTest.CoolDown);
+										g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
+									}else return Plugin_Handled;
+								}
+								return Plugin_Changed;
+							}
 							default: return Plugin_Changed;
 						}
 						//~~~~ Is this return needed (?) ~~~~
@@ -1180,6 +1200,25 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 								g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 								return Plugin_Continue;
 							}
+						case 6,7:
+						{
+							if(ItemTest.CoolDown > 0)
+							{
+								if(ItemTest.CheckCoolDown() <= 0)
+								{
+									#if defined EW_MODULE_ELOGS
+									EWM_ELogs_Use(ItemTest, iActivator);
+									#endif
+									#if defined EW_MODULE_CHAT
+									if(ItemTest.Chat || ItemTest.Chat_Uses) EWM_Chat_Use(ItemTest, iActivator);
+									#endif
+									
+									ItemTest.SetCoolDown(ItemTest.CoolDown);
+									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
+								}else return Plugin_Changed;
+							}
+							return Plugin_Continue;
+						}
 						default: return Plugin_Continue;
 					}
 					return Plugin_Changed;

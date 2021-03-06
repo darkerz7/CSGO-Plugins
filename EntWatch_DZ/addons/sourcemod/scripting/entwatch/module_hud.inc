@@ -445,8 +445,15 @@ void EWM_Hud_Construct_String(char[] sResult, int iSizeResult, char[] sResult_wo
 						{
 							if (ItemTest.MathValue > 0)
 							{
-								FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[%d/%d]: %N", ItemTest.ShortName, ItemTest.MathValue, ItemTest.MathValueMax, ItemTest.OwnerID);
-								FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d/%d]", ItemTest.ShortName, ItemTest.MathValue, ItemTest.MathValueMax);
+								if(ItemTest.CoolDown > 0 && ItemTest.CheckCoolDown() > 0)
+								{
+									FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.RoundCoolDown(), ItemTest.OwnerID);
+									FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
+								}else
+								{
+									FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[%d/%d]: %N", ItemTest.ShortName, ItemTest.MathValue, ItemTest.MathValueMax, ItemTest.OwnerID);
+									FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d/%d]", ItemTest.ShortName, ItemTest.MathValue, ItemTest.MathValueMax);
+								}
 							}
 							else
 							{

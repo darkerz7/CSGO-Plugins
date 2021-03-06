@@ -97,7 +97,11 @@ public Action EWM_Clantag_Timer_UpdateClantag(Handle timer, int client)
 						}
 						case 6, 7:
 						{
-							if (ItemTest.MathValue > 0) FormatEx(sClanName, MAXSIZECLANTAG, "%s[%d/%d]:", ItemTest.ShortName, ItemTest.MathValue, ItemTest.MathValueMax);
+							if (ItemTest.MathValue > 0)
+							{
+								if(ItemTest.CoolDown > 0 && ItemTest.CheckCoolDown() > 0) FormatEx(sClanName, MAXSIZECLANTAG, "%s[%d]:", ItemTest.ShortName, ItemTest.RoundCoolDown());
+								else FormatEx(sClanName, MAXSIZECLANTAG, "%s[%d/%d]:", ItemTest.ShortName, ItemTest.MathValue, ItemTest.MathValueMax);
+							}
 							else FormatEx(sClanName, MAXSIZECLANTAG, "%s[E]:", ItemTest.ShortName);
 						}
 						default:
