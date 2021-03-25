@@ -1,0 +1,4 @@
+sm_setcooldown 1
+sm_setmaxuses 1
+sm_addmaxuses 1
+sm_ewsetmode 1
