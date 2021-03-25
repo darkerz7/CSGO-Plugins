@@ -51,7 +51,7 @@ public Plugin myinfo = {
 	name = "Map Music Control with Dynamic Volume Control",
 	author = "DarkerZ[RUS]",
 	description = "Allows clients to adjust ambient sounds played by the map",
-	version = "1.DZ.10_win",
+	version = "1.DZ.11_win",
 	url = "dark-skill.ru"
 };
 
@@ -374,32 +374,10 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 		} else ItemSample.Common = true;
 	}
 	
-	if(strcmp(sCommand, "PlaySound", false) == 0 || strcmp(sCommand, "FadeIn", false) == 0 || (strcmp(sCommand, "Volume", false) == 0 && (fVolume >= 0.1)) || strcmp(sCommand, "ToggleSound", false) == 0)
+	if(strcmp(sCommand, "PlaySound", false) == 0 || strcmp(sCommand, "FadeIn", false) == 0 || strcmp(sCommand, "ToggleSound", false) == 0)
 	{
 		if(!ItemSample.Common)
 		{
-			//Change Volume
-			if(strcmp(sCommand, "Volume", false) == 0 && ItemSample.Volume != fVolume)
-			{
-				ItemSample.Volume = fVolume;
-				if(!ItemSample.Playing)
-				{
-					ItemSample.Playing = true;
-					ItemSample.TimeShtamp = GetGameTime() + ItemSample.SndLength - 1.0;
-					SaveSample(ItemSample);
-					DataPack pack;
-					CreateDataTimer(ItemSample.SndLength, Timer_OnSoundEnd, pack, TIMER_FLAG_NO_MAPCHANGE);
-					pack.WriteCell(ItemSample.Entity);
-					pack.WriteString(ItemSample.File);
-					pack.WriteCell(g_iRoundNum);
-				}else SaveSample(ItemSample);
-				
-				PlaySampleAll(ItemSample);
-				
-				DHookSetReturn(hReturn, false);
-				return MRES_Supercede;
-			}
-			
 			//Already playing
 			if(ItemSample.Playing)
 			{
@@ -416,7 +394,7 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 			ItemSample.Playing = true;
 			ItemSample.TimeShtamp = GetGameTime() + ItemSample.SndLength - 1.0;
 			SaveSample(ItemSample);
-			PlaySampleAll(ItemSample);
+			PlaySampleAll(ItemSample, false);
 			DataPack pack;
 			CreateDataTimer(ItemSample.SndLength, Timer_OnSoundEnd, pack, TIMER_FLAG_NO_MAPCHANGE);
 			pack.WriteCell(ItemSample.Entity);
@@ -427,10 +405,40 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 			return MRES_Supercede;
 		}else
 		{
-			PlaySampleAll(ItemSample);
+			PlaySampleAll(ItemSample, false);
 			DHookSetReturn(hReturn, false);
 			return MRES_Supercede;
 		}
+	}else if(strcmp(sCommand, "Volume", false) == 0 && fVolume >= 0.1)
+	{
+		if(!ItemSample.Common)
+		{
+			if(!ItemSample.Playing)
+			{
+				ItemSample.Volume = fVolume;
+				ItemSample.Playing = true;
+				ItemSample.TimeShtamp = GetGameTime() + ItemSample.SndLength - 1.0;
+				DataPack pack;
+				CreateDataTimer(ItemSample.SndLength, Timer_OnSoundEnd, pack, TIMER_FLAG_NO_MAPCHANGE);
+				pack.WriteCell(ItemSample.Entity);
+				pack.WriteString(ItemSample.File);
+				pack.WriteCell(g_iRoundNum);
+				PlaySampleAll(ItemSample, true);
+				SaveSample(ItemSample);
+			}else if(ItemSample.Volume != fVolume)
+			{
+				//Change Volume
+				ItemSample.Volume = fVolume;
+				PlaySampleAll(ItemSample, true);
+				SaveSample(ItemSample);
+			}
+		}else
+		{
+			ItemSample.Volume = fVolume;
+			PlaySampleAll(ItemSample, true);
+		}
+		DHookSetReturn(hReturn, false);
+		return MRES_Supercede;
 	}else if(strcmp(sCommand, "StopSound", false) == 0 || strcmp(sCommand, "FadeOut", false) == 0 || (strcmp(sCommand, "Volume", false) == 0 && (fVolume < 0.1)))
 	{
 		StopSoundEx(ItemSample);
@@ -439,9 +447,13 @@ public MRESReturn AcceptInput(int iEntity, Handle hReturn, Handle hParams)
 			ItemSample.Playing = false;
 			SaveSample(ItemSample);
 		}
+		if(strcmp(sCommand, "FadeOut", false) == 0)
+		{
+			DHookSetReturn(hReturn, false);
+			return MRES_Supercede;
+		}
 	}else if(strcmp(sCommand, "Kill", false) == 0)
 	{
-		StopSoundEx(ItemSample);
 		if(!ItemSample.Common) RemoveSample(ItemSample);
 	}
 	
@@ -477,7 +489,7 @@ void RemoveSample(class_Sample ItemSample)
 	}
 }
 
-void PlaySample(int iClient, class_Sample ItemSample, bool bNotAll = true)
+void PlaySample(int iClient, class_Sample ItemSample, bool bVolCom = true)
 {
 	if(IsClientInGame(iClient))
 	{
@@ -488,25 +500,33 @@ void PlaySample(int iClient, class_Sample ItemSample, bool bNotAll = true)
 			else fPlayVolume*=0.5;
 		if(!ItemSample.FromEnt)
 		{
-			if(!ItemSample.Common && bNotAll)
+			if(!ItemSample.Common && bVolCom)
 				EmitSoundToClient(iClient, ItemSample.File, iClient, ItemSample.Channel,
-						 SNDLEVEL_NONE, SND_CHANGEVOL, fPlayVolume, SNDPITCH_NORMAL, -1,
+						 SNDLEVEL_NORMAL, SND_CHANGEVOL, fPlayVolume, SNDPITCH_NORMAL, -1,
 						 _, _, true);
 			else
 				EmitSoundToClient(iClient, ItemSample.File, iClient, ItemSample.Channel,
-						 SNDLEVEL_NONE, SND_NOFLAGS, fPlayVolume, SNDPITCH_NORMAL, -1,
+						 SNDLEVEL_NORMAL, SND_NOFLAGS, fPlayVolume, SNDPITCH_NORMAL, -1,
 						 _, _, true);
 		}
 		else
 		{
-			EmitSoundToClient(iClient, ItemSample.File, ItemSample.EntSource, SNDCHAN_STATIC,
-					SNDLEVEL_NORMAL, SND_NOFLAGS, fPlayVolume, SNDPITCH_NORMAL, -1,
-					_, _, true);
+			if(!ItemSample.Common || bVolCom)
+				EmitSoundToClient(iClient, ItemSample.File, ItemSample.EntSource, SNDCHAN_STATIC,
+						SNDLEVEL_NORMAL, SND_CHANGEVOL, fPlayVolume, SNDPITCH_NORMAL, -1,
+						_, _, true);
+			else
+			{
+				StopSoundEx(ItemSample);
+				EmitSoundToClient(iClient, ItemSample.File, ItemSample.EntSource, SNDCHAN_STATIC,
+						SNDLEVEL_NORMAL, SND_NOFLAGS, fPlayVolume, SNDPITCH_NORMAL, -1,
+						_, _, true);
+			}
 		}
 	}
 }
 
-void PlaySampleAll(class_Sample ItemSample)
+void PlaySampleAll(class_Sample ItemSample, bool bVolCom)
 {
 	if(ItemSample.Channel == -5)
 	{
@@ -515,7 +535,7 @@ void PlaySampleAll(class_Sample ItemSample)
 		g_iChannel++;
 		if(g_iChannel >= SNDCHAN_USER_BASE) g_iChannel = SNDCHAN_USER_BASE - 75;
 	}
-	for(int i = 1; i <= MaxClients; i++) if(!g_bDisabled[i]) PlaySample(i, ItemSample, false);
+	for(int i = 1; i <= MaxClients; i++) if(!g_bDisabled[i]) PlaySample(i, ItemSample, bVolCom);
 }
 
 void StopSoundEx(class_Sample ItemSample)
