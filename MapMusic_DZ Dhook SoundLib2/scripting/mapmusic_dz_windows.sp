@@ -51,7 +51,7 @@ public Plugin myinfo = {
 	name = "Map Music Control with Dynamic Volume Control",
 	author = "DarkerZ[RUS]",
 	description = "Allows clients to adjust ambient sounds played by the map",
-	version = "1.DZ.11_win",
+	version = "1.DZ.12_win",
 	url = "dark-skill.ru"
 };
 
@@ -502,11 +502,11 @@ void PlaySample(int iClient, class_Sample ItemSample, bool bVolCom = true)
 		{
 			if(!ItemSample.Common && bVolCom)
 				EmitSoundToClient(iClient, ItemSample.File, iClient, ItemSample.Channel,
-						 SNDLEVEL_NORMAL, SND_CHANGEVOL, fPlayVolume, SNDPITCH_NORMAL, -1,
+						 SNDLEVEL_NONE, SND_CHANGEVOL, fPlayVolume, SNDPITCH_NORMAL, -1,
 						 _, _, true);
 			else
 				EmitSoundToClient(iClient, ItemSample.File, iClient, ItemSample.Channel,
-						 SNDLEVEL_NORMAL, SND_NOFLAGS, fPlayVolume, SNDPITCH_NORMAL, -1,
+						 SNDLEVEL_NONE, SND_NOFLAGS, fPlayVolume, SNDPITCH_NORMAL, -1,
 						 _, _, true);
 		}
 		else
@@ -554,7 +554,7 @@ void StopSoundEx(class_Sample ItemSample)
 				}else
 				{
 					EmitSoundToClient(i, ItemSample.File, i, iChannelBuf,
-						 SNDLEVEL_NORMAL, SND_STOPLOOPING, 0.0, SNDPITCH_NORMAL, -1,
+						 SNDLEVEL_NONE, SND_STOPLOOPING, 0.0, SNDPITCH_NORMAL, -1,
 						 _, _, true);
 				}
 			}else
