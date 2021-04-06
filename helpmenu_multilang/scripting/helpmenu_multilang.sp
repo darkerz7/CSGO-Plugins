@@ -1,4 +1,5 @@
 #pragma semicolon 1
+#pragma newdecls required
 
 #include <sourcemod>
 #include <clientprefs>
@@ -14,16 +15,16 @@ bool g_bDisable[MAXPLAYERS + 1] = {false, ...};
 
 StringMap g_smCommands;
 
-public Plugin:myinfo =
+public Plugin myinfo =
 {
 	name = "Help Menu MultiLanguage",
 	author = "DarkerZ [RUS]",
 	description = "Display a help menu to users",
-	version = "1.0",
+	version = "1.1",
 	url = "dark-skill.ru"
 };
 
-public OnPluginStart()
+public void OnPluginStart()
 {
 	RegConsoleCmd("sm_helpmenu", Command_HelpMenu, "Display the help menu");
 	LoadTranslations("helpmenu_multilang.phrases");
@@ -37,55 +38,55 @@ public OnPluginStart()
 	RegAdminCmd("sm_helpmenu_reload", Reload_cfg, ADMFLAG_ROOT);
 }
 
-public Action Command_HelpMenu(client, args)
+public Action Command_HelpMenu(int client, int args)
 {
 	HelpMenu_Main(client);
 	return Plugin_Handled;
 }
 
-public Action Button_F4_Bind(client, String:command[], args)
+public Action Button_F4_Bind(int client, char[] command, int args)
 {
    HelpMenu_Commands(client);
    return Plugin_Continue;
 }
 
-public Action Reload_cfg(client, args)
+public Action Reload_cfg(int client, int args)
 {
 	CFG_load();
 	CPrintToChat(client, "%t %t", "Help Menu Tag", "Help Menu Config Reload");
 	return Plugin_Handled;
 }
 
-HelpMenu_Main(client)
+void HelpMenu_Main(int client)
 {
-	Handle menu_main = CreateMenu(Handle_HelpMenu_Main);
+	Menu menu_main = CreateMenu(Handle_HelpMenu_Main);
 	
 	char sMenuTranslate[128];
-	Format(sMenuTranslate, sizeof(sMenuTranslate), "%T", "Help Menu Title", client);
+	FormatEx(sMenuTranslate, sizeof(sMenuTranslate), "%T", "Help Menu Title", client);
 	SetMenuTitle(menu_main, sMenuTranslate);
 	
 	char sMenuTranslateBig[MAX_LENGTH_MENU_BIG_TEXT];
 	
-	Format(sMenuTranslateBig, sizeof(sMenuTranslateBig), "%T", "Help Text Main", client);
+	FormatEx(sMenuTranslateBig, sizeof(sMenuTranslateBig), "%T", "Help Text Main", client);
 	Replace_Tags(sMenuTranslateBig);
 	AddMenuItem(menu_main, "main_help", sMenuTranslateBig, ITEMDRAW_DISABLED);
 	
-	Format(sMenuTranslate, sizeof(sMenuTranslate), "%T", g_bDisable[client] ? "Enable Show" : "No Longer Show", client);
+	FormatEx(sMenuTranslate, sizeof(sMenuTranslate), "%T", g_bDisable[client] ? "Enable Show" : "No Longer Show", client);
 	AddMenuItem(menu_main, g_bDisable[client] ? "main_show_off" : "main_show_on",  sMenuTranslate);
 	
-	Format(sMenuTranslate, sizeof(sMenuTranslate), "%T", "Server Commands", client);
+	FormatEx(sMenuTranslate, sizeof(sMenuTranslate), "%T", "Server Commands", client);
 	AddMenuItem(menu_main, "main_command", sMenuTranslate);
 	
-	Format(sMenuTranslate, sizeof(sMenuTranslate), "%T", "Server Rules", client);
+	FormatEx(sMenuTranslate, sizeof(sMenuTranslate), "%T", "Server Rules", client);
 	AddMenuItem(menu_main, "main_rules", sMenuTranslate);
 	
-	Format(sMenuTranslate, sizeof(sMenuTranslate), "%T", "Server Info", client);
+	FormatEx(sMenuTranslate, sizeof(sMenuTranslate), "%T", "Server Info", client);
 	AddMenuItem(menu_main, "main_info", sMenuTranslate);
 	
 	DisplayMenu(menu_main, client, MENU_TIME_FOREVER);
 }
 
-public Handle_HelpMenu_Main(Menu hMenu, MenuAction hAction, int iParam1, int iParam2)
+public int Handle_HelpMenu_Main(Menu hMenu, MenuAction hAction, int iParam1, int iParam2)
 {
 	switch(hAction)
 	{
@@ -120,24 +121,24 @@ public Handle_HelpMenu_Main(Menu hMenu, MenuAction hAction, int iParam1, int iPa
 	}
 }
 
-HelpMenu_Rules(client)
+void HelpMenu_Rules(int client)
 {
-	Handle menu_main = CreateMenu(Handle_HelpMenu_Rules);
+	Menu menu_main = CreateMenu(Handle_HelpMenu_Rules);
 	
 	char sMenuTranslate[128];
-	Format(sMenuTranslate, sizeof(sMenuTranslate), "%T", "Help Menu TRules", client);
+	FormatEx(sMenuTranslate, sizeof(sMenuTranslate), "%T", "Help Menu TRules", client);
 	SetMenuTitle(menu_main, sMenuTranslate);
 	
 	char sMenuTranslateBig[MAX_LENGTH_MENU_BIG_TEXT];
 	
-	Format(sMenuTranslateBig, sizeof(sMenuTranslateBig), "%T", "Help Text Rules", client);
+	FormatEx(sMenuTranslateBig, sizeof(sMenuTranslateBig), "%T", "Help Text Rules", client);
 	Replace_Tags(sMenuTranslateBig);
 	AddMenuItem(menu_main, "rules_help", sMenuTranslateBig, ITEMDRAW_DISABLED);
 	
 	DisplayMenu(menu_main, client, MENU_TIME_FOREVER);
 }
 
-public Handle_HelpMenu_Rules(Menu hMenu, MenuAction hAction, int iParam1, int iParam2)
+public int Handle_HelpMenu_Rules(Menu hMenu, MenuAction hAction, int iParam1, int iParam2)
 {
 	switch(hAction)
 	{
@@ -152,24 +153,24 @@ public Handle_HelpMenu_Rules(Menu hMenu, MenuAction hAction, int iParam1, int iP
 	}
 }
 
-HelpMenu_Info(client)
+void HelpMenu_Info(int client)
 {
-	Handle menu_main = CreateMenu(Handle_HelpMenu_Info);
+	Menu menu_main = CreateMenu(Handle_HelpMenu_Info);
 	
 	char sMenuTranslate[128];
-	Format(sMenuTranslate, sizeof(sMenuTranslate), "%T", "Help Menu TInfo", client);
+	FormatEx(sMenuTranslate, sizeof(sMenuTranslate), "%T", "Help Menu TInfo", client);
 	SetMenuTitle(menu_main, sMenuTranslate);
 	
 	char sMenuTranslateBig[MAX_LENGTH_MENU_BIG_TEXT];
 	
-	Format(sMenuTranslateBig, sizeof(sMenuTranslateBig), "%T", "Help Text Info", client);
+	FormatEx(sMenuTranslateBig, sizeof(sMenuTranslateBig), "%T", "Help Text Info", client);
 	Replace_Tags(sMenuTranslateBig);
 	AddMenuItem(menu_main, "info_help", sMenuTranslateBig, ITEMDRAW_DISABLED);
 	
 	DisplayMenu(menu_main, client, MENU_TIME_FOREVER);
 }
 
-public Handle_HelpMenu_Info(Menu hMenu, MenuAction hAction, int iParam1, int iParam2)
+public int Handle_HelpMenu_Info(Menu hMenu, MenuAction hAction, int iParam1, int iParam2)
 {
 	switch(hAction)
 	{
@@ -184,12 +185,12 @@ public Handle_HelpMenu_Info(Menu hMenu, MenuAction hAction, int iParam1, int iPa
 	}
 }
 
-HelpMenu_Commands(client)
+void HelpMenu_Commands(int client)
 {
-	Handle menu_main = CreateMenu(Handle_HelpMenu_Commands);
+	Menu menu_main = CreateMenu(Handle_HelpMenu_Commands);
 	
 	char sMenuTranslate[128];
-	Format(sMenuTranslate, sizeof(sMenuTranslate), "%T", "Help Menu TCommands", client);
+	FormatEx(sMenuTranslate, sizeof(sMenuTranslate), "%T", "Help Menu TCommands", client);
 	SetMenuTitle(menu_main, sMenuTranslate);
 	
 	char sComms[MAX_LENGTH_COMMAND], sMenuTraslateComms[MAX_LENGTH_TRANSLATE_COMMAND];
@@ -198,14 +199,14 @@ HelpMenu_Commands(client)
 	{
 		g_smCommandsSnapshot.GetKey(i, sComms, sizeof(sComms));
 		g_smCommands.GetString(sComms, sMenuTraslateComms, sizeof(sMenuTraslateComms));
-		Format(sMenuTranslate, sizeof(sMenuTranslate), "%T", sMenuTraslateComms, client);
+		FormatEx(sMenuTranslate, sizeof(sMenuTranslate), "%T", sMenuTraslateComms, client);
 		AddMenuItem(menu_main, sComms, sMenuTranslate);
 	}
 	
 	DisplayMenu(menu_main, client, MENU_TIME_FOREVER);
 }
 
-public Handle_HelpMenu_Commands(Menu hMenu, MenuAction hAction, int iParam1, int iParam2)
+public int Handle_HelpMenu_Commands(Menu hMenu, MenuAction hAction, int iParam1, int iParam2)
 {
 	switch(hAction)
 	{
@@ -230,7 +231,7 @@ public void OnClientPutInServer(int client)
 	CreateTimer(5.0, Timer_HelpMain, client);
 }
 
-public Action Timer_HelpMain(Handle:timer, any:client) {
+public Action Timer_HelpMain(Handle timer, any client) {
 	if (IsClientConnected(client) && IsClientInGame(client) && !IsFakeClient(client))
 		if(g_bDisable[client]==false) HelpMenu_Main(client);
 }
