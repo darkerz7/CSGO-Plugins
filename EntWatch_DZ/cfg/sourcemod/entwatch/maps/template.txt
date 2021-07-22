@@ -22,5 +22,6 @@
 		"trigger"			"0"			//Integer, Sets a trigger that a restrict player cannot activate
 		"pt_spawner"			""			//String, NEW! Allows admins to spawn items. Can break the gameplay of the game on the map. Indicate Point_Template, which spawn the item
 		"physbox"			"false"			//Bool, Need module physbox. May be omitted. If the item has a func_physbox, then teammates can shoot through him. Also the item does not ricochet grenades
+		"use_priority"		"true"		//Bool, Enabled by default. You can disable the forced pressing of the button on a specific item 
 	}
 }

@@ -27,6 +27,7 @@ enum struct class_ItemConfig
 	int			Trigger;
 	char		Spawner[64];
 	bool		PhysBox;
+	bool		UsePriority;
 }
 
 enum struct class_ItemList
@@ -60,6 +61,7 @@ enum struct class_ItemList
 	int			GlowEnt;
 	int			GlowColor[4];
 	bool		PhysBox;
+	bool		UsePriority;
 	
 	//Purpose: Update cached GameTime
 	void UpdateTime()

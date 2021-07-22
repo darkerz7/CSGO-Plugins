@@ -70,7 +70,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.32",
+	version = "3.DZ.33",
 	url = "dark-skill.ru"
 };
  
@@ -574,6 +574,9 @@ stock void LoadConfig()
 			KvGetString(hKeyValues, "physbox", sBuffer_temp, sizeof(sBuffer_temp), "false");
 			NewItem.PhysBox = StrEqual(sBuffer_temp, "true", false);
 			
+			KvGetString(hKeyValues, "use_priority", sBuffer_temp, sizeof(sBuffer_temp), "true");
+			NewItem.UsePriority = StrEqual(sBuffer_temp, "true", false);
+			
 			g_ItemConfig.PushArray(NewItem, sizeof(NewItem));
 		} while (KvGotoNextKey(hKeyValues));
 		g_bConfigLoaded = true;
@@ -712,6 +715,7 @@ public bool RegisterItem(class_ItemConfig ItemConfig, int iEntity, int iHammerID
 		NewItem.GlowEnt = INVALID_ENT_REFERENCE;
 		
 		NewItem.PhysBox = ItemConfig.PhysBox;
+		NewItem.UsePriority = ItemConfig.UsePriority;
 		//PrintToServer("[EW]Item Spawned: %s |%i", NewItem.ShortName, iEntity);
 		g_ItemList.PushArray(NewItem, sizeof(NewItem));
 		
