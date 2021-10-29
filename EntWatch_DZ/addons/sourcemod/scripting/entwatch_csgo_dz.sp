@@ -70,7 +70,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.33",
+	version = "3.DZ.34",
 	url = "dark-skill.ru"
 };
  
@@ -99,6 +99,8 @@ public void OnPluginStart()
 	RegAdminCmd("sm_setmaxuses", EW_Command_Setmaxuses, ADMFLAG_BAN);
 	RegAdminCmd("sm_addmaxuses", EW_Command_Addmaxuses, ADMFLAG_BAN);
 	RegAdminCmd("sm_ewsetmode", EW_Command_Setmode, ADMFLAG_BAN);
+	RegAdminCmd("sm_ewsetname", EW_Command_Setname, ADMFLAG_BAN);
+	RegAdminCmd("sm_ewsetshortname", EW_Command_Setshortname, ADMFLAG_BAN);
 	
 	//Hook CVARs
 	HookConVarChange(g_hCvar_TeamOnly, Cvar_Main_Changed);
@@ -148,6 +150,9 @@ public void OnPluginStart()
 	#endif
 	#if defined EW_MODULE_DEBUG
 	EWM_Debug_OnPluginStart();
+	#endif
+	#if defined EW_MODULE_USE_PRIORITY
+	EWM_Use_Priority_OnPluginStart();
 	#endif
 	
 	#if defined EW_MODULE_CLANTAG
@@ -1521,6 +1526,70 @@ public Action EW_Command_Setmode(int iClient, int iArgs)
 					ItemTest.MaxUses = iMaxUses;
 					g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 				}
+			}
+		}
+
+	return Plugin_Handled;
+}
+
+public Action EW_Command_Setname(int iClient, int iArgs)
+{
+	if (iArgs < 2)
+	{
+		CReplyToCommand(iClient, "%s%t %s%t: sm_ewsetname <hammerid> <newname>", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Usage");
+		return Plugin_Handled;
+	}
+
+	char sHammerID[32], sNewName[32];
+
+	GetCmdArg(1, sHammerID, sizeof(sHammerID));
+	GetCmdArg(2, sNewName, sizeof(sNewName));
+
+	int iHammerID = StringToInt(sHammerID);
+
+	TrimString(sNewName);
+	
+	if (g_bConfigLoaded)
+		for(int i = 0; i<g_ItemList.Length; i++)
+		{
+			class_ItemList ItemTest;
+			g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
+			if(ItemTest.HammerID == iHammerID)
+			{
+				FormatEx(ItemTest.Name, sizeof(ItemTest.Name), "%s", sNewName);
+				g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
+			}
+		}
+
+	return Plugin_Handled;
+}
+
+public Action EW_Command_Setshortname(int iClient, int iArgs)
+{
+	if (iArgs < 2)
+	{
+		CReplyToCommand(iClient, "%s%t %s%t: sm_ewsetshortname <hammerid> <newname>", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Usage");
+		return Plugin_Handled;
+	}
+
+	char sHammerID[32], sNewName[32];
+
+	GetCmdArg(1, sHammerID, sizeof(sHammerID));
+	GetCmdArg(2, sNewName, sizeof(sNewName));
+
+	int iHammerID = StringToInt(sHammerID);
+
+	TrimString(sNewName);
+	
+	if (g_bConfigLoaded)
+		for(int i = 0; i<g_ItemList.Length; i++)
+		{
+			class_ItemList ItemTest;
+			g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
+			if(ItemTest.HammerID == iHammerID)
+			{
+				FormatEx(ItemTest.ShortName, sizeof(ItemTest.ShortName), "%s", sNewName);
+				g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
 			}
 		}
 

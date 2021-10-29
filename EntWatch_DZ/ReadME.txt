@@ -62,12 +62,16 @@ Commands and CVARs for modules:
 	*entwatch_delay_use		<0-60>	- Change delay before use. Default 3
 	*entwatch_scheme		<name>	- The name of the scheme config. Default "classic"
 	*entwatch_blockepick		<0/1>	- Enable/Disable blocking E-pickup. Default 1
+	*entwatch_use_priority		<0/1>	- Enable/Disable forced pressing of the button. Default 1
+
 #Admin CMDs:
 	*sm_ew_reloadconfig					- Allows you to update the configuration
 	*sm_setcooldown <hammerid> <cooldown>			- Allows you to change the item’s cooldown during the game
 	*sm_setmaxuses <hammerid> <maxuses> [<even if over>]	- Allows you to change the maximum use of the item during the game, depending on whether the item was used to the end
 	*sm_addmaxuses <hammerid> [<even if over>]		- Allows you to add 1 charge to the item, depending on whether the item was used to the end
 	*sm_ewsetmode <hammerid> <newmode> <cooldown> <maxuses> [<even if over>]	- Allows you to completely change the item
+	*sm_ewsetname <hammerid> <newname>			- Allows you to change the item’s name(Chat)
+	*sm_ewsetshortname <hammerid> <newshortname>		- Allows you to change the item’s shortname(HUD)
 
 %Module Debug
 #Admin CMDs:
