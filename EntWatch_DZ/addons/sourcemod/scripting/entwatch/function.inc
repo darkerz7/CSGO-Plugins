@@ -62,6 +62,7 @@ enum struct class_ItemList
 	int			GlowColor[4];
 	bool		PhysBox;
 	bool		UsePriority;
+	int			Team;
 	
 	//Purpose: Update cached GameTime
 	void UpdateTime()

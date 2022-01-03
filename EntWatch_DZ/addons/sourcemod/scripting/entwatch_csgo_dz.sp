@@ -70,7 +70,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.34",
+	version = "3.DZ.35",
 	url = "dark-skill.ru"
 };
  
@@ -721,6 +721,7 @@ public bool RegisterItem(class_ItemConfig ItemConfig, int iEntity, int iHammerID
 		
 		NewItem.PhysBox = ItemConfig.PhysBox;
 		NewItem.UsePriority = ItemConfig.UsePriority;
+		NewItem.Team = -1;
 		//PrintToServer("[EW]Item Spawned: %s |%i", NewItem.ShortName, iEntity);
 		g_ItemList.PushArray(NewItem, sizeof(NewItem));
 		
@@ -1319,6 +1320,7 @@ public Action OnWeaponEquip(int iClient, int iWeapon)
 				ItemTest.OwnerID = iClient;
 				ItemTest.UpdateTime();
 				ItemTest.SetDelay(g_iDelayUse);
+				ItemTest.Team = GetClientTeam(iClient);
 				
 				#if defined EW_MODULE_GLOW
 				EWM_Glow_DisableGlow(ItemTest);

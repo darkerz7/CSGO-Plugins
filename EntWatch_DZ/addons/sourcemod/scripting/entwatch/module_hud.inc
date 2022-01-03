@@ -1,8 +1,8 @@
 #define EW_MODULE_HUD
 
 #define MAXSHOWHUDITEMS 10
-#define MAXSIZESTRINGFORITEM 44
-#define TIMEROTORHUD 2
+#define MAXSIZESTRINGFORITEM 40
+#define TIMEROTORHUD 3
 
 //-------------------------------------------------------
 // Purpose: Plugin settings
