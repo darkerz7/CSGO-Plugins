@@ -4,11 +4,17 @@ ConVar	g_hCvar_UsePriority;
 
 bool	g_bUsePriority = true;
 
+bool	g_bUsePriorityClient[MAXPLAYERS+1] = {true,...};
+
+Handle	g_hCookie_UP = null;
+
 stock void EWM_Use_Priority_OnPluginStart()
 {
 	g_hCvar_UsePriority		= CreateConVar("entwatch_use_priority", "1", "Enable/Disable forced pressing of the button.", _, true, 0.0, true, 1.0);
 	g_bUsePriority 			= GetConVarBool(g_hCvar_UsePriority);
 	HookConVarChange(g_hCvar_UsePriority, Cvar_UsePriority_Changed);
+	RegConsoleCmd("sm_usepr", EWM_Use_Priority_Command);
+	g_hCookie_UP			= RegClientCookie("entwatch_up_cookie", "", CookieAccess_Private);
 }
 
 public void Cvar_UsePriority_Changed(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -16,11 +22,28 @@ public void Cvar_UsePriority_Changed(ConVar convar, const char[] oldValue, const
 	g_bUsePriority = GetConVarBool(convar);
 }
 
+stock void EWM_Use_Priority_OnClientCookiesCached(int iClient)
+{
+	char sBuffer_cookie[4];
+	GetClientCookie(iClient, g_hCookie_UP, sBuffer_cookie, sizeof(sBuffer_cookie));
+	if (StrEqual(sBuffer_cookie,""))
+	{
+		SetClientCookie(iClient, g_hCookie_UP, "1");
+		strcopy(sBuffer_cookie, sizeof(sBuffer_cookie), "1");
+	}
+	g_bUsePriorityClient[iClient] = view_as<bool>(StringToInt(sBuffer_cookie));
+}
+
+stock void EWM_Use_Priority_LoadDefaultClientSettings(int iClient)
+{
+	g_bUsePriorityClient[iClient] = true;
+}
+
 public Action OnPlayerRunCmd(int iClient, int &iButtons, int &iImpulse, float[3] aVel, float[3] aAngles, int &iWeapon)
 {
 	if(iButtons & IN_USE)
 	{
-		if (g_bConfigLoaded && g_bUsePriority)
+		if (g_bConfigLoaded && g_bUsePriority && g_bUsePriorityClient[iClient])
 		{
 			int iCountButtons = 0, iCurCountButton = 0, iMode = 0;
 			int iButton = INVALID_ENT_REFERENCE;
@@ -54,4 +77,23 @@ public Action OnPlayerRunCmd(int iClient, int &iButtons, int &iImpulse, float[3]
 		}
 	}
 	return Plugin_Continue;
+}
+
+public Action EWM_Use_Priority_Command(int iClient, int iArgs)
+{
+	if((IsClientConnected(iClient) && IsClientInGame(iClient)))
+	{
+		if(g_bUsePriorityClient[iClient])
+		{
+			g_bUsePriorityClient[iClient] = false;
+			SetClientCookie(iClient, g_hCookie_UP, "0");
+			CPrintToChat(iClient, "%s%t %s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Use Priority", g_SchemeConfig.Color_Disabled, "Disabled");
+		} else
+		{
+			g_bUsePriorityClient[iClient] = true;
+			SetClientCookie(iClient, g_hCookie_UP, "1");
+			CPrintToChat(iClient, "%s%t %s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Use Priority", g_SchemeConfig.Color_Enabled, "Enabled");
+		}
+	}
+	return Plugin_Handled;
 }

@@ -70,7 +70,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.35",
+	version = "3.DZ.36",
 	url = "dark-skill.ru"
 };
  
@@ -359,12 +359,18 @@ public void OnClientPutInServer(int iClient)
 	#if defined EW_MODULE_HUD
 	if(!AreClientCookiesCached(iClient)) EWM_Hud_LoadDefaultClientSettings(iClient);
 	#endif
+	#if defined EW_MODULE_USE_PRIORITY
+	if(!AreClientCookiesCached(iClient)) EWM_Use_Priority_LoadDefaultClientSettings(iClient);
+	#endif
 }
 
 public void OnClientCookiesCached(int iClient)
 {
 	#if defined EW_MODULE_HUD
 	EWM_Hud_OnClientCookiesCached(iClient);
+	#endif
+	#if defined EW_MODULE_USE_PRIORITY
+	EWM_Use_Priority_OnClientCookiesCached(iClient);
 	#endif
 }
 

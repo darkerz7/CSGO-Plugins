@@ -449,4 +449,8 @@
 	{
 		"en" 	"You do not have permission to remove permanent EBans"
 	}
+	"Use Priority"
+	{
+		"en" 	"Force use function"
+	}
 }
