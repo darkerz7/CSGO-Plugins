@@ -102,6 +102,10 @@ Commands and CVARs for modules:
 	*entwatch_glow_spawn_type	<-1 to 3>		- Glow Type after Spawn Items, set -1 to stop glow. Default 0
 	*entwatch_glow_drop_type	<-1 to 3>		- Glow Type after Drop Items, set -1 to stop glow. Default 0
 
+%Module Chat
+#Cvars:
+	*entwatch_adminchat_mode	<0-2>		- Change AdminChat Mode (0 - All Messages, 1 - Only Pickup/Drop Items, 2 - Nothing). Default 0
+
 %Module Hud
 #Cvars:
 	*entwatch_display_enable	<0/1>		- Enable/Disable the display. Default 1

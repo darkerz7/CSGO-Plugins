@@ -70,7 +70,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.36",
+	version = "3.DZ.37",
 	url = "dark-skill.ru"
 };
  
@@ -141,6 +141,9 @@ public void OnPluginStart()
 	#endif
 	#if defined EW_MODULE_MENU
 	EWM_Menu_OnPluginStart();
+	#endif
+	#if defined EW_MODULE_CHAT
+	EWM_Chat_OnPluginStart();
 	#endif
 	#if defined EW_MODULE_HUD
 	EWM_Hud_OnPluginStart();
