@@ -6,7 +6,7 @@ ArrayList g_PhysboxArray;
 
 stock void EWM_Physbox_OnPluginStart()
 {
-	g_PhysboxArray = new ArrayList(512);
+	if(g_PhysboxArray == INVALID_HANDLE) g_PhysboxArray = new ArrayList(512);
 }
 
 stock void EWM_Physbox_Event_RoundEnd()
@@ -21,7 +21,7 @@ stock void EWM_Physbox_CleanData()
 		g_PhysboxArray.Clear();
 		CloseHandle(g_PhysboxArray);
 		g_PhysboxArray = new ArrayList(512);
-	}
+	}else g_PhysboxArray = new ArrayList(512);
 }
 
 stock void EWM_Physbox_OnEntityDestroyed(int iEntity)

@@ -70,17 +70,17 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.38",
+	version = "3.DZ.39",
 	url = "dark-skill.ru"
 };
  
 public void OnPluginStart()
 {
-	g_ItemConfig = new ArrayList(512);
-	g_ItemList = new ArrayList(512);
+	if(g_ItemConfig == INVALID_HANDLE) g_ItemConfig = new ArrayList(512);
+	if(g_ItemList == INVALID_HANDLE) g_ItemList = new ArrayList(512);
 	
 	#if defined EW_MODULE_EBAN
-	g_TriggerArray = new ArrayList(512);
+	if(g_TriggerArray == INVALID_HANDLE) g_TriggerArray = new ArrayList(512);
 	#endif
 	
 	#if defined EW_MODULE_PHYSBOX
@@ -464,7 +464,7 @@ void CleanData()
 		g_ItemList.Clear();
 		CloseHandle(g_ItemList);
 		g_ItemList = new ArrayList(512);
-	}
+	}else g_ItemList = new ArrayList(512);
 	
 	#if defined EW_MODULE_EBAN
 	if(g_TriggerArray != INVALID_HANDLE)
@@ -472,7 +472,7 @@ void CleanData()
 		g_TriggerArray.Clear();
 		CloseHandle(g_TriggerArray);
 		g_TriggerArray = new ArrayList(512);
-	}
+	}else g_TriggerArray = new ArrayList(512);
 	#endif
 	
 	if(g_ItemConfig != INVALID_HANDLE)
@@ -480,7 +480,7 @@ void CleanData()
 		g_ItemConfig.Clear();
 		CloseHandle(g_ItemConfig);
 		g_ItemConfig = new ArrayList(512);
-	}
+	}else g_ItemConfig = new ArrayList(512);
 	
 	#if defined EW_MODULE_PHYSBOX
 	EWM_Physbox_CleanData();
