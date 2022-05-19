@@ -14,6 +14,16 @@ stock void EWM_Physbox_Event_RoundEnd()
 	g_PhysboxArray.Clear();
 }
 
+stock void EWM_Physbox_CleanData()
+{
+	if(g_PhysboxArray != INVALID_HANDLE)
+	{
+		g_PhysboxArray.Clear();
+		CloseHandle(g_PhysboxArray);
+		g_PhysboxArray = new ArrayList(512);
+	}
+}
+
 stock void EWM_Physbox_OnEntityDestroyed(int iEntity)
 {
 	for(int i = 0; i < g_PhysboxArray.Length; i++)
