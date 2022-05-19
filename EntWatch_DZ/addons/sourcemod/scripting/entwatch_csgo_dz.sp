@@ -463,24 +463,24 @@ void CleanData()
 	{
 		g_ItemList.Clear();
 		CloseHandle(g_ItemList);
-		g_ItemList = new ArrayList(512);
-	}else g_ItemList = new ArrayList(512);
+	}
+	g_ItemList = new ArrayList(512);
 	
 	#if defined EW_MODULE_EBAN
 	if(g_TriggerArray != INVALID_HANDLE)
 	{
 		g_TriggerArray.Clear();
 		CloseHandle(g_TriggerArray);
-		g_TriggerArray = new ArrayList(512);
-	}else g_TriggerArray = new ArrayList(512);
+	}
+	g_TriggerArray = new ArrayList(512);
 	#endif
 	
 	if(g_ItemConfig != INVALID_HANDLE)
 	{
 		g_ItemConfig.Clear();
 		CloseHandle(g_ItemConfig);
-		g_ItemConfig = new ArrayList(512);
-	}else g_ItemConfig = new ArrayList(512);
+	}
+	g_ItemConfig = new ArrayList(512);
 	
 	#if defined EW_MODULE_PHYSBOX
 	EWM_Physbox_CleanData();

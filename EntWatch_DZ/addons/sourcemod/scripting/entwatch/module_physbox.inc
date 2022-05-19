@@ -20,8 +20,8 @@ stock void EWM_Physbox_CleanData()
 	{
 		g_PhysboxArray.Clear();
 		CloseHandle(g_PhysboxArray);
-		g_PhysboxArray = new ArrayList(512);
-	}else g_PhysboxArray = new ArrayList(512);
+	}
+	g_PhysboxArray = new ArrayList(512);
 }
 
 stock void EWM_Physbox_OnEntityDestroyed(int iEntity)
