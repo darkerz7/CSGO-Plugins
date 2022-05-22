@@ -460,7 +460,7 @@ public void OnClientDisconnect(int iClient)
 
 void CleanData()
 {
-	if(g_ItemList != INVALID_HANDLE)
+	if(g_ItemList != null)
 	{
 		class_ItemList ItemTest;
 		for(int i = 0; i < g_ItemList.Length; i++)
@@ -474,7 +474,7 @@ void CleanData()
 	g_ItemList = new ArrayList(512);
 	
 	#if defined EW_MODULE_EBAN
-	if(g_TriggerArray != INVALID_HANDLE)
+	if(g_TriggerArray != null)
 	{
 		g_TriggerArray.Clear();
 		CloseHandle(g_TriggerArray);
@@ -482,7 +482,7 @@ void CleanData()
 	g_TriggerArray = new ArrayList(512);
 	#endif
 	
-	if(g_ItemConfig != INVALID_HANDLE)
+	if(g_ItemConfig != null)
 	{
 		g_ItemConfig.Clear();
 		CloseHandle(g_ItemConfig);

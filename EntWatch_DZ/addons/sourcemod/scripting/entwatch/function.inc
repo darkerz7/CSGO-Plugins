@@ -97,7 +97,11 @@ enum struct class_ItemList
 	}
 	void ClearHandles()
 	{
-		if(this.ButtonsArray != INVALID_HANDLE) CloseHandle(this.ButtonsArray);
+		if(this.ButtonsArray != null)
+		{
+			CloseHandle(this.ButtonsArray);
+			this.ButtonsArray = null;
+		}
 	}
 }
 

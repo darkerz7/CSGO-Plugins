@@ -16,7 +16,7 @@ stock void EWM_Physbox_Event_RoundEnd()
 
 stock void EWM_Physbox_CleanData()
 {
-	if(g_PhysboxArray != INVALID_HANDLE)
+	if(g_PhysboxArray != null)
 	{
 		g_PhysboxArray.Clear();
 		CloseHandle(g_PhysboxArray);
