@@ -70,7 +70,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.39",
+	version = "3.DZ.40",
 	url = "dark-skill.ru"
 };
  
@@ -244,6 +244,7 @@ public void Event_RoundEnd(Event hEvent, const char[] sName, bool bDontBroadcast
 				SDKUnhook(CurrentButton, SDKHook_Use, OnButtonUse);
 			}
 			SDKUnhook(ItemTest.WeaponID, SDKHook_SpawnPost, OnItemSpawned);
+			ItemTest.ClearHandles();
 		}
 		#if defined EW_MODULE_EBAN
 		//Unhook Triggers
@@ -461,6 +462,12 @@ void CleanData()
 {
 	if(g_ItemList != INVALID_HANDLE)
 	{
+		class_ItemList ItemTest;
+		for(int i = 0; i < g_ItemList.Length; i++)
+		{
+			g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
+			ItemTest.ClearHandles();
+		}
 		g_ItemList.Clear();
 		CloseHandle(g_ItemList);
 	}

@@ -95,6 +95,10 @@ enum struct class_ItemList
 	{
 		return RoundToCeil(this.Delay - g_fGameTime);
 	}
+	void ClearHandles()
+	{
+		if(this.ButtonsArray != INVALID_HANDLE) CloseHandle(this.ButtonsArray);
+	}
 }
 
 enum struct class_Scheme
