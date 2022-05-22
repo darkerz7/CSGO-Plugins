@@ -516,6 +516,7 @@ public int EWM_Menu_PM_ItemList_Handler(Menu hMenu, MenuAction hAction, int iCli
 			}
 		}
 	}
+	return 0;
 }
 
 #if defined EW_MODULE_EBAN
@@ -541,6 +542,7 @@ public int EWM_Menu_PM_EBanList_Handler(Menu hMenu, MenuAction hAction, int iCli
 			}
 		}
 	}
+	return 0;
 }
 
 public int EWM_Menu_PM_EUnBanList_Handler(Menu hMenu, MenuAction hAction, int iClient, int iParam2)
@@ -565,6 +567,7 @@ public int EWM_Menu_PM_EUnBanList_Handler(Menu hMenu, MenuAction hAction, int iC
 			}
 		}
 	}
+	return 0;
 }
 
 public int EWM_Menu_PM_EBanDuration_Handler(Menu hMenu, MenuAction hAction, int iClient, int iParam2)
@@ -591,6 +594,7 @@ public int EWM_Menu_PM_EBanDuration_Handler(Menu hMenu, MenuAction hAction, int 
 			}
 		}
 	}
+	return 0;
 }
 
 public int EWM_Menu_PM_EBanReason_Handler(Menu hMenu, MenuAction hAction, int iClient, int iParam2)
@@ -618,6 +622,7 @@ public int EWM_Menu_PM_EBanReason_Handler(Menu hMenu, MenuAction hAction, int iC
 			}
 		}
 	}
+	return 0;
 }
 
 public int EWM_Menu_PM_EBanInfo_Handler(Menu hMenu, MenuAction hAction, int iClient, int iParam2)
@@ -642,6 +647,7 @@ public int EWM_Menu_PM_EBanInfo_Handler(Menu hMenu, MenuAction hAction, int iCli
 			}
 		}
 	}
+	return 0;
 }
 #endif
 
@@ -665,7 +671,7 @@ public int EWM_Menu_PM_ItemInfo_Handler(Menu hMenu, MenuAction hAction, int iCli
 				if(!IsValidClient(iTarget))
 				{
 					CPrintToChat(iClient, "%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Player is not valid anymore");
-					return;
+					return 0;
 				}
 				EWM_Menu_PM_EBanDuration(iClient, iTarget);
 			}
@@ -675,6 +681,7 @@ public int EWM_Menu_PM_ItemInfo_Handler(Menu hMenu, MenuAction hAction, int iCli
 			#endif
 		}
 	}
+	return 0;
 }
 
 #if defined EW_MODULE_TRANSFER
@@ -694,11 +701,12 @@ public int EWM_Menu_PM_ItemTransfer_Handler(Menu hMenu, MenuAction hAction, int 
 			if(!IsValidClient(iReceiver))
 			{
 				CPrintToChat(iClient, "%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Receiver is not valid anymore");
-				return;
+				return 0;
 			}
 			EWM_Transfer_Function(iClient, iItemIndex, iReceiver, true);
 		}
 	}
+	return 0;
 }
 #endif
 
@@ -717,6 +725,7 @@ public int EWM_Menu_PM_SpawnItemList_Handler(Menu hMenu, MenuAction hAction, int
 			EWM_Menu_PM_SpawnItemStrip(iClient, iIndexItem);
 		}
 	}
+	return 0;
 }
 
 public int EWM_Menu_PM_SpawnItemStrip_Handler(Menu hMenu, MenuAction hAction, int iClient, int iParam2)
@@ -735,6 +744,7 @@ public int EWM_Menu_PM_SpawnItemStrip_Handler(Menu hMenu, MenuAction hAction, in
 			EWM_Menu_PM_SpawnItemTarget(iClient, iItemIndex, iStrip);
 		}
 	}
+	return 0;
 }
 
 public int EWM_Menu_PM_SpawnItemTarget_Handler(Menu hMenu, MenuAction hAction, int iClient, int iParam2)
@@ -756,5 +766,6 @@ public int EWM_Menu_PM_SpawnItemTarget_Handler(Menu hMenu, MenuAction hAction, i
 			EWM_Spawn_Spawn(iClient, iUserID, iItemIndex, bStrip);
 		}
 	}
+	return 0;
 }
 #endif

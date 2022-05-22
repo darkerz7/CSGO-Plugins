@@ -23,6 +23,7 @@ public Action Command_DebugConfig(int iClient, int iArgs)
 			#endif
 		}
 	}
+	return Plugin_Continue;
 }
 
 public Action Command_DebugArray(int iClient, int iArgs)
@@ -47,6 +48,7 @@ public Action Command_DebugArray(int iClient, int iArgs)
 			#endif
 		}
 	}
+	return Plugin_Continue;
 }
 
 public Action Command_DebugScheme(int iClient, int iArgs)
@@ -58,4 +60,5 @@ public Action Command_DebugScheme(int iClient, int iArgs)
 		CPrintToChat(iClient, "%s[DEBUG] %sColor: R-%i G-%i B-%i A-%i Pos: X-%.4f Y-%.4f",g_SchemeConfig.Color_Tag, g_SchemeConfig.Color_Warning, g_SchemeConfig.Color_HUD[0], g_SchemeConfig.Color_HUD[1], g_SchemeConfig.Color_HUD[2], g_SchemeConfig.Color_HUD[3], g_SchemeConfig.Pos_HUD_X, g_SchemeConfig.Pos_HUD_Y);
 		#endif
 	}
+	return Plugin_Continue;
 }

@@ -220,7 +220,7 @@ public void OnMapEnd()
 	#endif
 }
 
-public Action Event_RoundStart(Event hEvent, const char[] sName, bool bDontBroadcast)
+public void Event_RoundStart(Event hEvent, const char[] sName, bool bDontBroadcast)
 {
 	if(g_bConfigLoaded) CPrintToChatAll("%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Welcome");
 	
@@ -229,7 +229,7 @@ public Action Event_RoundStart(Event hEvent, const char[] sName, bool bDontBroad
 	#endif
 }
 
-public Action Event_RoundEnd(Event hEvent, const char[] sName, bool bDontBroadcast)
+public void Event_RoundEnd(Event hEvent, const char[] sName, bool bDontBroadcast)
 {
 	if(g_bConfigLoaded) 
 	{
@@ -905,7 +905,7 @@ public void OnMathSpawned(int iEntity)
 
 public Action Timer_OnMathSpawned(Handle timer, int iEntity)
 {
-	if(!IsValidEntity(iEntity) || !g_bConfigLoaded) return;
+	if(!IsValidEntity(iEntity) || !g_bConfigLoaded) return Plugin_Stop;
 	
 	for(int i = 0; i < g_ItemList.Length; i++)
 	{
@@ -914,9 +914,10 @@ public Action Timer_OnMathSpawned(Handle timer, int iEntity)
 		if (RegisterMath(ItemTest, iEntity))
 		{
 			g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-			return;
+			return Plugin_Stop;
 		}
 	}
+	return Plugin_Stop;
 }
 
 public void OnButtonSpawned(int iEntity) //Button with parent spawns after weapon entity. With timer button don't register if item spawns with module items_spawn
@@ -952,7 +953,7 @@ public void OnTriggerSpawned(int iEntity)
 
 public Action Timer_OnTriggerSpawned(Handle timer, int iEntity)
 {
-	if(!IsValidEntity(iEntity) || !g_bConfigLoaded) return;
+	if(!IsValidEntity(iEntity) || !g_bConfigLoaded) return Plugin_Stop;
 	
 	int iHammerID = Entity_GetHammerID(iEntity);
 	if(iHammerID>0)
@@ -970,6 +971,7 @@ public Action Timer_OnTriggerSpawned(Handle timer, int iEntity)
 			}
 		}
 	}
+	return Plugin_Stop;
 }
 
 public Action OnTrigger(int iEntity, int iClient)
@@ -1136,7 +1138,7 @@ public Action OnButtonUse(int iButton, int iActivator, int iCaller, UseType uTyp
 //-------------------------------------------------------
 //Purpose: Update item energy from math counter
 //-------------------------------------------------------
-public Action Event_OutValue(const char[] sOutput, int iCaller, int iActivator, float Delay)
+public void Event_OutValue(const char[] sOutput, int iCaller, int iActivator, float Delay)
 {
 	for(int i = 0; i < g_ItemList.Length; i++)
 	{
@@ -1272,7 +1274,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 //-------------------------------------------------------
 //Purpose: Notify when they drop a special weapon
 //-------------------------------------------------------
-public Action OnWeaponDrop(int iClient, int iWeapon)
+public void OnWeaponDrop(int iClient, int iWeapon)
 {
 	if(g_bConfigLoaded && IsValidEdict(iWeapon))
 	{
@@ -1337,7 +1339,7 @@ public Action OnWeaponCanUse(int iClient, int iWeapon)
 //-------------------------------------------------------
 //Purpose: Notify when they pick up a special weapon
 //-------------------------------------------------------
-public Action OnWeaponEquip(int iClient, int iWeapon)
+public void OnWeaponEquip(int iClient, int iWeapon)
 {
 	if(g_bConfigLoaded && IsValidEdict(iWeapon))
 	{

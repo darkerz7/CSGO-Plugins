@@ -186,9 +186,10 @@ public int EWM_Spawn_EdictMenu_Handler(Menu hEdictMenu, MenuAction hAction, int 
 			if(!IsValidClient(iTarget))
 			{
 				CPrintToChat(iClient, "%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Receiver is not valid anymore");
-				return;
+				return 0;
 			}
 			EWM_Spawn_Spawn(iClient, iUserID, iItemIndex, bStrip);
 		}
 	}
+	return 0;
 }
