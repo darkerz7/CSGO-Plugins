@@ -39,7 +39,7 @@ stock void EWM_Use_Priority_LoadDefaultClientSettings(int iClient)
 	g_bUsePriorityClient[iClient] = true;
 }
 
-public Action OnPlayerRunCmd(int iClient, int &iButtons, int &iImpulse, float[3] aVel, float[3] aAngles, int &iWeapon)
+public Action OnPlayerRunCmd(int iClient, int& iButtons, int& iImpulse, float aVel[3], float aAngles[3], int& iWeapon)
 {
 	if(iButtons & IN_USE)
 	{

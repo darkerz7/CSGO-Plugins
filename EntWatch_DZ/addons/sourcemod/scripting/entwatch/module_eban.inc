@@ -791,4 +791,5 @@ public int EWM_Eban_Menu_EBanReason_Handler(Menu hMenu, MenuAction hAction, int 
 				CPrintToChat(iClient, "%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Player is not valid anymore");
 		}
 	}
+	return 0;
 }

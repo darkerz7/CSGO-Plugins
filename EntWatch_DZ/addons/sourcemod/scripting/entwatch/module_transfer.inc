@@ -102,11 +102,12 @@ public int EWM_Transfer_EdictMenu_Handler(Menu hEdictMenu, MenuAction hAction, i
 			if(!IsValidClient(iReceiver))
 			{
 				CPrintToChat(iClient, "%s%t %s%t", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Warning, "Receiver is not valid anymore");
-				return;
+				return 0;
 			}
 			EWM_Transfer_Function(iClient, iItemIndex, iReceiver, true);
 		}
 	}
+	return 0;
 }
 
 public void EWM_Transfer_Function(int iClient, int iItemIndex, int iReceiver, bool bMessageTransfer)

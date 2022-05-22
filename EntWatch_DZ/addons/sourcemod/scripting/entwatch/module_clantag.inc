@@ -13,7 +13,7 @@ stock void EWM_Clantag_OnPluginStart()
 }
 
 //Get Client ClanTag on Connect
-public Action Event_PlayerConnectFull(Event hEvent, const char[] sName, bool bDontBroadcast)
+public void Event_PlayerConnectFull(Event hEvent, const char[] sName, bool bDontBroadcast)
 {
 	int iClient = GetClientOfUserId(GetEventInt(hEvent, "userid"));
 	
