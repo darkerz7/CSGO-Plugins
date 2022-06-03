@@ -7,34 +7,34 @@
 	}
 	"HideT Disabled"
 	{
-		"en"			"{default}Currently {red}disabled"
+		"en"			"{default}Hide command is currently {red}disabled"
 		"ru"			"{default}Сейчас {red}отключено"
 	}
 	"HideT Wait"
 	{
-		"en"			"{orange}Please wait, your settings are retrieved..."
+		"en"			"{orange}Please wait, your settings have not been loaded..."
 		"ru"			"{orange}Пожалуйста подождите пока ваши настройки загрузятся..."
 	}
 	"HideT Client Enable"
 	{
 		"#format"		"{1:d}"
-		"en"			"{default}Hide are now {green}Enabled {default}with distance {lightblue}{1}"
+		"en"			"{default}Hiding teammates within {lightblue}{1} {default}units"
 		"ru"			"{default}Скрытие тиммейтов сейчас {green}Включено {default}на дистанции {lightblue}{1}"
 	}
 	"HideT Client Enable All Map"
 	{
-		"en"			"{default}Hide are now {green}Enabled {default}on {lightblue}All map"
+		"en"			"{default}Hiding teammates across the {lightblue}entire map"
 		"ru"			"{default}Скрытие тиммейтов сейчас {green}Включено {default}на {lightblue}Всей карте"
 	}
 	"HideT Client Wrong"
 	{
 		"#format"		"{1:d}"
-		"en"			"{default}Hide. {red}Wrong input{default}, range {lime}0{default}-{lime}{1}"
+		"en"			"{red}Wrong distance input{default}, range must be between {lime}0{default}-{lime}{1}"
 		"ru"			"{default}Скрытие тиммейтов. {red}Ошибка ввода{default}, Диапозон {lime}0{default}-{lime}{1}"
 	}
 	"HideT Client Disable"
 	{
-		"en"			"{default}Hide are now {red}Disabled"
+		"en"			"{red}Unhidden {default}all teammates"
 		"ru"			"{default}Скрытие тиммейтов сейчас {red}Отключено"
 	}
 	"HideT Cookie Menu"
@@ -44,7 +44,7 @@
 	}
 	"HideT Menu Title"
 	{
-		"en"			"Menu Hide Teammates"
+		"en"			"Hide Teammates Menu"
 		"ru"			"Меню Скрытия союзников"
 	}
 	"HideT Menu Hide"
@@ -61,7 +61,7 @@
 	{
 		"#format"		"{1:d}"
 		
-		"en"			"You can hide allies completely\nor at a certain distance\nUse\"!hide <value>\"\n *-1: Display all\n *0: Hide on All Map\n *from 1 to {1}: Distance"
+		"en"			"You can hide all teammates\nor within a distance\nUse\"!hide <value>\"\n *-1: Unhide\n *0: Hide all allies\n *from 1 to {1}: Distance"
 		"ru"			"Вы можете скрыть союзников полностью\nили на определённой дистанции\nИспользуйте\"!hide <значение>\"\n *-1: Показать всех\n *0: Скрыть на всей карте\n *от 1 до {1}: На определенной дистанции"
 	}
 	"HideT Menu Distance"
@@ -73,7 +73,7 @@
 	}
 	"HideT Menu All Map"
 	{
-		"en"			"Distance: All Map"
+		"en"			"Distance: All Teammates"
 		"ru"			"Дистанция: Вся Карта"
 	}
 }
