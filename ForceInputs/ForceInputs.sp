@@ -1,7 +1,7 @@
 //====================================================================================================
 //
 // Name: ForceInput
-// Author: zaCade + BotoX
+// Author: zaCade + BotoX (Modified by PSE Shufen and Koen to fix crash issues)
 // Description: Allows admins to force inputs on entities. (ent_fire)
 //
 //====================================================================================================
@@ -16,11 +16,11 @@
 //----------------------------------------------------------------------------------------------------
 public Plugin myinfo =
 {
-	name 			= "ForceInput",
-	author 			= "zaCade + BotoX + DarkerZ[RUS]",
-	description 	= "Allows admins to force inputs on entities. (ent_fire)",
-	version 		= "2.1.1a",
-	url 			= ""
+	name            = "ForceInput",
+	author          = "zaCade + BotoX + DarkerZ[RUS] + PSE Shufen + koen",
+	description     = "Allows admins to force inputs on entities. (ent_fire)",
+	version         = "2.1.1b",
+	url             = ""
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -168,39 +168,36 @@ public Action Command_ForceInput(int client, int args)
 	}
 	else
 	{
+		int Wildcard = FindCharInString(sArguments[0], '*');
 		int entity = INVALID_ENT_REFERENCE;
-		while((entity = FindEntityByClassname(entity, "*")) != INVALID_ENT_REFERENCE)
+		
+		while ((entity = FindEntityByClassname(entity, "*")) != INVALID_ENT_REFERENCE)
 		{
-			char sClassname[64],sClassname2[64];
-			char sTargetname[64],sTargetname2[64];
-			char sBuffer[64];
+			char sClassname[64];
+			char sTargetname[64];
 			GetEntPropString(entity, Prop_Data, "m_iClassname", sClassname, sizeof(sClassname));
 			GetEntPropString(entity, Prop_Data, "m_iName", sTargetname, sizeof(sTargetname));
 
-			int iWildcard = 0;
-			if((iWildcard = SplitString(sArguments[0],"*",sBuffer,64))!=-1)
+			if (Wildcard > 0)
 			{
-				strcopy(sClassname2, iWildcard, sClassname);
-				strcopy(sTargetname2, iWildcard, sTargetname);
-			} else 
-			{
-				FormatEx(sBuffer, 64, "%s", sArguments[0]);
-				FormatEx(sClassname2, 64, "%s", sClassname);
-				FormatEx(sTargetname2, 64, "%s", sTargetname);
+				if (strncmp(sClassname, sArguments[0], Wildcard, false) == 0 || strncmp(sTargetname, sArguments[0], Wildcard, false) == 0)
+				{
+					if (sArguments[2][0]) SetVariantString(sArguments[2]);
+					AcceptEntityInput(entity, sArguments[1], client, client);
+					ReplyToCommand(client, "[SM] Input succesfull.");
+				}
 			}
-			if(StrEqual(sClassname2, sBuffer, false)
-				|| StrEqual(sTargetname2, sBuffer, false))
+			else
 			{
-				if(sArguments[2][0])
-					SetVariantString(sArguments[2]);
-
-				AcceptEntityInput(entity, sArguments[1], client, client);
-				ReplyToCommand(client, "[SM] Input successful.");
-				LogAction(client, -1, "\"%L\" used ForceInput on Entity \"%d\"  - \"%s\" - \"%s\": \"%s %s\"", client, entity, sClassname, sTargetname, sArguments[1], sArguments[2]);
+				if (StrEqual(sClassname, sArguments[0], false) || StrEqual(sTargetname, sArguments[0], false))
+				{
+					if (sArguments[2][0]) SetVariantString(sArguments[2]);
+					AcceptEntityInput(entity, sArguments[1], client, client);
+					ReplyToCommand(client, "[SM] Input succesfull.");
+				}
 			}
 		}
 	}
-
 	return Plugin_Handled;
 }
 
