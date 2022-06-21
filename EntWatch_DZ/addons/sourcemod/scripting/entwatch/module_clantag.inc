@@ -21,9 +21,14 @@ public void Event_PlayerConnectFull(Event hEvent, const char[] sName, bool bDont
 }
 
 //Get Client ClanTag on Change
-public void OnClientSettingsChanged(int iClient)
+public void OnClientCommandKeyValues_Post(int iClient, KeyValues kv)
 {
-	if(IsValidClient(iClient)) CS_GetClientClanTag(iClient, g_sClanTag[iClient], MAXSIZECLANTAG);
+	if(IsValidClient(iClient))
+	{
+		char sCommmand[32];
+		if (kv.GetSectionName(sCommmand, sizeof(sCommmand)) && strcmp(sCommmand, "ClanTagChanged", false) == 0)
+			kv.GetString("tag", g_sClanTag[iClient], MAXSIZECLANTAG);
+	}
 }
 
 //Clear stored ClanTag
