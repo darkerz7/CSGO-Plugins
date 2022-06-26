@@ -28,6 +28,13 @@ enum struct class_ItemConfig
 	char		Spawner[64];
 	bool		PhysBox;
 	bool		UsePriority;
+	
+	char		ButtonClass2[32];
+	int 		EnergyID2;
+	int			Mode2;
+	int			MaxUses2;
+	int			CoolDown2;
+	int			ButtonID2;
 }
 
 enum struct class_ItemList
@@ -63,12 +70,23 @@ enum struct class_ItemList
 	bool		PhysBox;
 	bool		UsePriority;
 	int			Team;
+	bool		LockButton;
+	float		WaitTime;
 	
-	//Purpose: Update cached GameTime
-	void UpdateTime()
-	{
-		g_fGameTime = GetGameTime();
-	}
+	char		ButtonClass2[32];
+	int 		EnergyID2;
+	int 		MathID2;
+	int 		MathValue2;
+	int 		MathValueMax2;
+	int			Mode2;
+	int			Uses2;
+	int			MaxUses2;
+	int			CoolDown2;
+	int			ButtonID2;
+	float		CoolDownTime2;
+	bool		LockButton2;
+	float		WaitTime2;
+	
 	//Purpose: Base cooldowns on GameTime rather than Timer
 	void SetCoolDown(int time)
 	{
@@ -82,9 +100,21 @@ enum struct class_ItemList
 	{
 		return RoundToCeil(this.CoolDownTime - g_fGameTime);
 	}
-	void SetDelay(int time)
+	void SetCoolDown2(int time)
 	{
-		if(time<1) time = 1;
+		this.CoolDownTime2 = g_fGameTime + time;
+	}
+	float CheckCoolDown2()
+	{
+		return this.CoolDownTime2 - g_fGameTime;
+	}
+	int RoundCoolDown2()
+	{
+		return RoundToCeil(this.CoolDownTime2 - g_fGameTime);
+	}
+	void SetDelay(float time)
+	{
+		if(time<0.0) time = 0.0;
 		this.Delay = g_fGameTime + time;
 	}
 	float CheckDelay()
@@ -103,6 +133,40 @@ enum struct class_ItemList
 			this.ButtonsArray = null;
 		}
 	}
+	//WaitTime for first button
+	void SetWaitTime(int time)
+	{
+		if(time<1) time = 1;
+		this.WaitTime = g_fGameTime + time;
+	}
+	float CheckWaitTime()
+	{
+		return this.WaitTime - g_fGameTime;
+	}
+	int RoundWaitTime()
+	{
+		return RoundToCeil(this.WaitTime - g_fGameTime);
+	}
+	//WaitTime for second button
+	void SetWaitTime2(int time)
+	{
+		if(time<1) time = 1;
+		this.WaitTime2 = g_fGameTime + time;
+	}
+	float CheckWaitTime2()
+	{
+		return this.WaitTime2 - g_fGameTime;
+	}
+	int RoundWaitTime2()
+	{
+		return RoundToCeil(this.WaitTime2 - g_fGameTime);
+	}
+}
+
+//Purpose: Update cached GameTime
+void UpdateTime()
+{
+	g_fGameTime = GetGameTime();
 }
 
 enum struct class_Scheme

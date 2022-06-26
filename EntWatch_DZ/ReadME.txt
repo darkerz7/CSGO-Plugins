@@ -39,6 +39,8 @@ Features:
 -Allows you to set the channel for the output of the HUD
 -Allows you to completely change the item
 -Allows you to eban a disconnected player
+-Allows you to track 2 buttons
+-Allows to lock item
 
 List of Modules:
 *Chat		- Responsible for displaying chat special messages to players
@@ -59,10 +61,11 @@ Commands and CVARs for modules:
 %Main
 #Cvars:
 	*entwatch_mode_teamonly		<0/1>	- Enable/Disable team only mode. Default 1
-	*entwatch_delay_use		<0-60>	- Change delay before use. Default 3
+	*entwatch_delay_use		<0.0-60.0>	- Change delay before use. Default 3.0
 	*entwatch_scheme		<name>	- The name of the scheme config. Default "classic"
 	*entwatch_blockepick		<0/1>	- Enable/Disable blocking E-pickup. Default 1
 	*entwatch_use_priority		<0/1>	- Enable/Disable forced pressing of the button. Default 1
+	*entwatch_globalblock		<0/1>	- Blocks the pickup of any items by players. Default 0
 
 #Admin CMDs:
 	*sm_ew_reloadconfig					- Allows you to update the configuration
@@ -72,6 +75,13 @@ Commands and CVARs for modules:
 	*sm_ewsetmode <hammerid> <newmode> <cooldown> <maxuses> [<even if over>]	- Allows you to completely change the item
 	*sm_ewsetname <hammerid> <newname>			- Allows you to change the item’s name(Chat)
 	*sm_ewsetshortname <hammerid> <newshortname>		- Allows you to change the item’s shortname(HUD)
+	*sm_setcooldown2 <hammerid> <cooldown>			- Allows you to change the item’s cooldown on second button during the game
+	*sm_setmaxuses2 <hammerid> <maxuses> [<even if over>]	- Allows you to change the maximum use of the item on second button during the game, depending on whether the item was used to the end
+	*sm_addmaxuses2 <hammerid> [<even if over>]		- Allows you to add 1 charge to the item on second button, depending on whether the item was used to the end
+	*sm_ewsetmode2 <hammerid> <newmode> <cooldown> <maxuses> [<even if over>]		- Allows you to completely change the item on second button
+	*sm_ewblock <hammerid> <0/1>		- Allows you to block an item during the game. Similar to the "blockpickup" property
+	*sm_ewlockbutton <hammerid> <0/1>		- Allows to lock item (first button)
+	*sm_ewlockbutton2 <hammerid> <0/1>		- Allows to lock second button of item
 
 %Module Debug
 #Admin CMDs:

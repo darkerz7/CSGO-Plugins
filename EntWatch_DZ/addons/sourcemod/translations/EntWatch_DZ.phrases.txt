@@ -12,6 +12,14 @@
 	{
 		"en" 	"used"
 	}
+	"Use First"
+	{
+		"en" 	"used first ability"
+	}
+	"Use Second"
+	{
+		"en" 	"used second ability"
+	}
 	"Pickup"
 	{
 		"en" 	"has picked up"

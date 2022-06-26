@@ -16,7 +16,7 @@ public void Cvar_Chat_Changed(ConVar convar, const char[] oldValue, const char[]
 		g_iChatASMode = GetConVarInt(convar);
 }
 
-stock void EWM_Chat_Use(class_ItemList ItemTest, int iClient)
+stock void EWM_Chat_Use(class_ItemList ItemTest, int iClient, int iAbility)
 {
 	char sAct_SteamID[32];
 	GetClientAuthId(iClient, AuthId_Steam2, sAct_SteamID, sizeof(sAct_SteamID));
@@ -25,7 +25,11 @@ stock void EWM_Chat_Use(class_ItemList ItemTest, int iClient)
 	for(int iPly = 1; iPly <= MaxClients; iPly++)
 		if(IsClientConnected(iPly) && IsClientInGame(iPly))
 			if(!g_bTeamOnly || (g_bTeamOnly && GetClientTeam(iPly) == ItemTest.Team || !IsPlayerAlive(iPly) || (g_iChatASMode == 0 && g_bIsAdmin[iPly])))
-				CPrintToChat(iPly,"%s%t %s%N %s(%s%s%s) %s%t %s%s", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Name, iClient, g_SchemeConfig.Color_Warning, g_SchemeConfig.Color_SteamID, sAct_SteamID, g_SchemeConfig.Color_Warning, g_SchemeConfig.Color_Use, "Use", ItemTest.Color, ItemTest.Name);
+			{
+				if(iAbility == 0 || ItemTest.Mode2 < 2) CPrintToChat(iPly,"%s%t %s%N %s(%s%s%s) %s%t %s%s", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Name, iClient, g_SchemeConfig.Color_Warning, g_SchemeConfig.Color_SteamID, sAct_SteamID, g_SchemeConfig.Color_Warning, g_SchemeConfig.Color_Use, "Use", ItemTest.Color, ItemTest.Name);
+				else if(iAbility == 1) CPrintToChat(iPly,"%s%t %s%N %s(%s%s%s) %s%t %s%s", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Name, iClient, g_SchemeConfig.Color_Warning, g_SchemeConfig.Color_SteamID, sAct_SteamID, g_SchemeConfig.Color_Warning, g_SchemeConfig.Color_Use, "Use First", ItemTest.Color, ItemTest.Name);
+				else CPrintToChat(iPly,"%s%t %s%N %s(%s%s%s) %s%t %s%s", g_SchemeConfig.Color_Tag, "EW_Tag", g_SchemeConfig.Color_Name, iClient, g_SchemeConfig.Color_Warning, g_SchemeConfig.Color_SteamID, sAct_SteamID, g_SchemeConfig.Color_Warning, g_SchemeConfig.Color_Use, "Use Second", ItemTest.Color, ItemTest.Name);
+			}
 }
 
 stock void EWM_Chat_PickUp(class_ItemList ItemTest, int iClient)

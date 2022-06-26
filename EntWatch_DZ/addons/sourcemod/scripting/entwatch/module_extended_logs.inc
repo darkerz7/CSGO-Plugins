@@ -1,8 +1,10 @@
 #define EW_MODULE_ELOGS
 
-stock void EWM_ELogs_Use(class_ItemList ItemTest, int iClient)
+stock void EWM_ELogs_Use(class_ItemList ItemTest, int iClient, int iAbility)
 {
-	LogAction(iClient, -1, "\"%L\" used item \"%s\"", iClient, ItemTest.Name);
+	if(iAbility == 0) LogAction(iClient, -1, "\"%L\" used item \"%s\"", iClient, ItemTest.Name);
+	else if(iAbility == 1) LogAction(iClient, -1, "\"%L\" used First Ability of item \"%s\"", iClient, ItemTest.Name);
+	else LogAction(iClient, -1, "\"%L\" used Second Ability of item \"%s\"", iClient, ItemTest.Name);
 }
 
 stock void EWM_ELogs_PickUp(class_ItemList ItemTest, int iClient)

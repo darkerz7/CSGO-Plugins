@@ -1,8 +1,10 @@
 #define EW_MODULE_HUD
 
-#define MAXSHOWHUDITEMS 10
+#define MAXSHOWHUDITEMS 12
 #define MAXSIZESTRINGFORITEM 40
 #define TIMEROTORHUD 3
+
+#include <bighud>
 
 //-------------------------------------------------------
 // Purpose: Plugin settings
@@ -196,7 +198,6 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 			g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
 			if(ItemTest.Hud && ItemTest.OwnerID != INVALID_ENT_REFERENCE && IsValidEdict(ItemTest.WeaponID))
 			{
-				ItemTest.UpdateTime();
 				if(GetClientTeam(ItemTest.OwnerID)==3) g_iHItemsArray.Push(i);
 				else if(GetClientTeam(ItemTest.OwnerID)==2) g_iZMItemsArray.Push(i);
 			}
@@ -264,25 +265,26 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 		{
 			for(int i = 1; i <= MaxClients; i++)
 			{
-				if(IsClientInGame(i) && !IsFakeClient(i) && g_CSettings_Hud[i].Display && (!IsVoteInProgress() || !IsClientInVotePool(i)) && GetClientMenu(i) == MenuSource_None)
+				//if(IsClientInGame(i) && !IsFakeClient(i) && g_CSettings_Hud[i].Display && (!IsVoteInProgress() || !IsClientInVotePool(i)) && GetClientMenu(i) == MenuSource_None)
+				if(IsClientInGame(i) && !IsFakeClient(i) && g_CSettings_Hud[i].Display && GetClientMenu(i) == MenuSource_None)
 				{
-					SetHudTextParams(g_CSettings_Hud[i].Pos_X, g_CSettings_Hud[i].Pos_Y, 1.1, g_CSettings_Hud[i].Color[0], g_CSettings_Hud[i].Color[1], g_CSettings_Hud[i].Color[2], g_CSettings_Hud[i].Color[3], 0, 0.0, 0.0, 0.0);
+					BigHud_SetHudTextParams(g_CSettings_Hud[i].Pos_X, g_CSettings_Hud[i].Pos_Y, 1.1, g_CSettings_Hud[i].Color[0], g_CSettings_Hud[i].Color[1], g_CSettings_Hud[i].Color[2], g_CSettings_Hud[i].Color[3], 0, 0.0, 0.0, 0.0);
 					
 					if(g_bAdminsSee && g_bIsAdmin[i])
 					{
 						if(g_CSettings_Hud[i].Name)
 						{
 							#if defined DYNAMIC_CHANNELS
-							ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Admins);
+							BigHud_ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Admins);
 							#else
-							ShowHudText(i, g_iHUDChannel, sMes_Admins);
+							BigHud_ShowHudText(i, g_iHUDChannel, sMes_Admins);
 							#endif
 						}else
 						{
 							#if defined DYNAMIC_CHANNELS
-							ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Admins_woname);
+							BigHud_ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Admins_woname);
 							#else
-							ShowHudText(i, g_iHUDChannel, sMes_Admins_woname);
+							BigHud_ShowHudText(i, g_iHUDChannel, sMes_Admins_woname);
 							#endif
 						}
 					}else if((g_bTeamOnly && GetClientTeam(i)==3) || (g_bZombieNoItemPry && iCountZMItems<=0 && GetClientTeam(i)==2))
@@ -292,16 +294,16 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 							if(g_CSettings_Hud[i].Name)
 							{
 								#if defined DYNAMIC_CHANNELS
-								ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Humans);
+								BigHud_ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Humans);
 								#else
-								ShowHudText(i, g_iHUDChannel, sMes_Humans);
+								BigHud_ShowHudText(i, g_iHUDChannel, sMes_Humans);
 								#endif
 							}else
 							{
 								#if defined DYNAMIC_CHANNELS
-								ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Humans_woname);
+								BigHud_ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Humans_woname);
 								#else
-								ShowHudText(i, g_iHUDChannel, sMes_Humans_woname);
+								BigHud_ShowHudText(i, g_iHUDChannel, sMes_Humans_woname);
 								#endif
 							}
 						}
@@ -312,16 +314,16 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 							if(g_CSettings_Hud[i].Name)
 							{
 								#if defined DYNAMIC_CHANNELS
-								ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Zombies);
+								BigHud_ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Zombies);
 								#else
-								ShowHudText(i, g_iHUDChannel, sMes_Zombies);
+								BigHud_ShowHudText(i, g_iHUDChannel, sMes_Zombies);
 								#endif
 							}else
 							{
 								#if defined DYNAMIC_CHANNELS
-								ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Zombies_woname);
+								BigHud_ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Zombies_woname);
 								#else
-								ShowHudText(i, g_iHUDChannel, sMes_Zombies_woname);
+								BigHud_ShowHudText(i, g_iHUDChannel, sMes_Zombies_woname);
 								#endif
 							}
 						}
@@ -330,16 +332,16 @@ public Action EWM_Hud_Timer_DisplayHUD(Handle timer, int client)
 						if(g_CSettings_Hud[i].Name)
 						{
 							#if defined DYNAMIC_CHANNELS
-							ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Admins);
+							BigHud_ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Admins);
 							#else
-							ShowHudText(i, g_iHUDChannel, sMes_Admins);
+							BigHud_ShowHudText(i, g_iHUDChannel, sMes_Admins);
 							#endif
 						}else
 						{
 							#if defined DYNAMIC_CHANNELS
-							ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Admins_woname);
+							BigHud_ShowHudText(i, GetDynamicChannel(g_iHUDChannel), sMes_Admins_woname);
 							#else
-							ShowHudText(i, g_iHUDChannel, sMes_Admins_woname);
+							BigHud_ShowHudText(i, g_iHUDChannel, sMes_Admins_woname);
 							#endif
 						}
 					}
@@ -372,101 +374,96 @@ void EWM_Hud_Construct_String(char[] sResult, int iSizeResult, char[] sResult_wo
 				else iFixIndex = g_iZMItemsArray.Get(i-iCountHItems); 
 			}
 			g_ItemList.GetArray(iFixIndex, ItemTest, sizeof(ItemTest));
-			if(ItemTest.CheckDelay() > 0)
+			UpdateTime();
+			if(ItemTest.CheckDelay() > 0.0)
 			{
-				FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[-%d]: %N", ItemTest.ShortName, ItemTest.RoundDelay(), ItemTest.OwnerID);
 				FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[-%d]", ItemTest.ShortName, ItemTest.RoundDelay());
+				FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s: %N", sBuf_woname[iIndex], ItemTest.OwnerID);
 			}
 			else
 			{
 				if(g_bDispCooldowns)
 				{
-					switch(ItemTest.Mode)
+					if(ItemTest.LockButton) FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[L]", ItemTest.ShortName);
+					//else if(ItemTest.CheckWaitTime() > 0) FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundWaitTime());
+					else
 					{
-						case 2:
+						switch(ItemTest.Mode)
 						{
-							if (ItemTest.CheckCoolDown() > 0)
+							case 2:
 							{
-								FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.RoundCoolDown(), ItemTest.OwnerID);
-								FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
+								if (ItemTest.CheckCoolDown() > 0) FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
+								else FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[R]", ItemTest.ShortName);
 							}
-							else
+							case 3:
 							{
-								FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[R]: %N", ItemTest.ShortName, ItemTest.OwnerID);
-								FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[R]", ItemTest.ShortName);
+								if (ItemTest.Uses < ItemTest.MaxUses) FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d/%d]", ItemTest.ShortName, ItemTest.Uses, ItemTest.MaxUses);
+								else FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[E]", ItemTest.ShortName);
 							}
-						}
-						case 3:
-						{
-							if (ItemTest.Uses < ItemTest.MaxUses)
+							case 4:
 							{
-								FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[%d/%d]: %N", ItemTest.ShortName, ItemTest.Uses, ItemTest.MaxUses, ItemTest.OwnerID);
-								FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d/%d]", ItemTest.ShortName, ItemTest.Uses, ItemTest.MaxUses);
-							}
-							else
-							{
-								FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[E]: %N", ItemTest.ShortName, ItemTest.OwnerID);
-								FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[E]", ItemTest.ShortName);
-							}
-						}
-						case 4:
-						{
-							if (ItemTest.CheckCoolDown() > 0)
-							{
-								FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.RoundCoolDown(), ItemTest.OwnerID);
-								FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
-							}
-							else
-								if (ItemTest.Uses < ItemTest.MaxUses)
-								{
-									FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[%d/%d]: %N", ItemTest.ShortName, ItemTest.Uses, ItemTest.MaxUses, ItemTest.OwnerID);
-									FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d/%d]", ItemTest.ShortName, ItemTest.Uses, ItemTest.MaxUses);
-								}
+								if (ItemTest.CheckCoolDown() > 0) FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
 								else
+									if (ItemTest.Uses < ItemTest.MaxUses) FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d/%d]", ItemTest.ShortName, ItemTest.Uses, ItemTest.MaxUses);
+									else FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[E]", ItemTest.ShortName);
+							}
+							case 5:
+							{
+								if (ItemTest.CheckCoolDown() > 0) FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
+								else FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d/%d]", ItemTest.ShortName, ItemTest.Uses, ItemTest.MaxUses);
+							}
+							case 6, 7:
+							{
+								if (ItemTest.MathValue > 0)
 								{
-									FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[E]: %N", ItemTest.ShortName, ItemTest.OwnerID);
-									FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[E]", ItemTest.ShortName);
+									if(ItemTest.CoolDown > 0 && ItemTest.CheckCoolDown() > 0) FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
+									else FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d/%d]", ItemTest.ShortName, ItemTest.MathValue, ItemTest.MathValueMax);
 								}
-						}
-						case 5:
-						{
-							if (ItemTest.CheckCoolDown() > 0)
-							{
-								FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.RoundCoolDown(), ItemTest.OwnerID);
-								FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
+								else FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[E]", ItemTest.ShortName);
 							}
-							else
-							{
-								FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[%d/%d]: %N", ItemTest.ShortName, ItemTest.Uses, ItemTest.MaxUses, ItemTest.OwnerID);
-								FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d/%d]", ItemTest.ShortName, ItemTest.Uses, ItemTest.MaxUses);
-							}
-						}
-						case 6, 7:
-						{
-							if (ItemTest.MathValue > 0)
-							{
-								if(ItemTest.CoolDown > 0 && ItemTest.CheckCoolDown() > 0)
-								{
-									FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[%d]: %N", ItemTest.ShortName, ItemTest.RoundCoolDown(), ItemTest.OwnerID);
-									FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", ItemTest.ShortName, ItemTest.RoundCoolDown());
-								}else
-								{
-									FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[%d/%d]: %N", ItemTest.ShortName, ItemTest.MathValue, ItemTest.MathValueMax, ItemTest.OwnerID);
-									FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d/%d]", ItemTest.ShortName, ItemTest.MathValue, ItemTest.MathValueMax);
-								}
-							}
-							else
-							{
-								FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[E]: %N", ItemTest.ShortName, ItemTest.OwnerID);
-								FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[E]", ItemTest.ShortName);
-							}
-						}
-						default:
-						{
-							FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s[+]: %N", ItemTest.ShortName, ItemTest.OwnerID);
-							FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[+]", ItemTest.ShortName);
+							default: FormatEx(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[+]", ItemTest.ShortName);
 						}
 					}
+					if(ItemTest.LockButton2) Format(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[L]", sBuf_woname[iIndex]);
+					else if(ItemTest.CheckWaitTime2() > 0) Format(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", sBuf_woname[iIndex], ItemTest.RoundWaitTime2());
+					else
+					{
+						switch(ItemTest.Mode2)
+						{
+							case 2:
+							{
+								if (ItemTest.CheckCoolDown2() > 0) Format(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", sBuf_woname[iIndex], ItemTest.RoundCoolDown2());
+								else Format(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[R]", sBuf_woname[iIndex]);
+							}
+							case 3:
+							{
+								if (ItemTest.Uses2 < ItemTest.MaxUses2) Format(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d/%d]", sBuf_woname[iIndex], ItemTest.Uses2, ItemTest.MaxUses2);
+								else Format(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[E]", sBuf_woname[iIndex]);
+							}
+							case 4:
+							{
+								if (ItemTest.CheckCoolDown2() > 0) Format(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", sBuf_woname[iIndex], ItemTest.RoundCoolDown2());
+								else
+									if (ItemTest.Uses < ItemTest.MaxUses) Format(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d/%d]", sBuf_woname[iIndex], ItemTest.Uses2, ItemTest.MaxUses2);
+									else Format(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[E]", sBuf_woname[iIndex]);
+							}
+							case 5:
+							{
+								if (ItemTest.CheckCoolDown2() > 0) Format(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", sBuf_woname[iIndex], ItemTest.RoundCoolDown2());
+								else Format(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d/%d]", sBuf_woname[iIndex], ItemTest.Uses2, ItemTest.MaxUses2);
+							}
+							case 6, 7:
+							{
+								if (ItemTest.MathValue2 > 0)
+								{
+									if(ItemTest.CoolDown2 > 0 && ItemTest.CheckCoolDown2() > 0) Format(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d]", sBuf_woname[iIndex], ItemTest.RoundCoolDown2());
+									else Format(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[%d/%d]", sBuf_woname[iIndex], ItemTest.MathValue2, ItemTest.MathValueMax2);
+								}
+								else Format(sBuf_woname[iIndex], sizeof(sBuf_woname[]), "%s[E]", sBuf_woname[iIndex]);
+							}
+					}
+					}
+					FormatEx(sBuf[iIndex], sizeof(sBuf[]), "%s: %N", sBuf_woname[iIndex], ItemTest.OwnerID);
 				}
 				else
 				{

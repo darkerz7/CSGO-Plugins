@@ -390,7 +390,7 @@ void EWM_Menu_PM_ItemTransfer(int iClient, int iItemIndex)
 	bool bNotFound = true;
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if(!IsClientInGame(i) || IsFakeClient(i) || i == ItemTest.OwnerID) continue;
+		if(!IsClientInGame(i) || i == ItemTest.OwnerID) continue;
 		#if defined EW_MODULE_EBAN
 		if(g_EbanClients[i].Banned) continue;
 		#endif
@@ -468,7 +468,7 @@ void EWM_Menu_PM_SpawnItemTarget(int iClient, int iItemIndex, int iStrip)
 	bool bNotFound = true;
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if(!IsValidClient(i) || IsFakeClient(i) || !IsClientConnected(i)) continue;
+		if(!IsValidClient(i) || !IsClientConnected(i)) continue;
 		if(GetClientTeam(i) != 2 && GetClientTeam(i) != 3) continue;
 		#if defined EW_MODULE_EBAN
 		if(g_EbanClients[i].Banned) continue;

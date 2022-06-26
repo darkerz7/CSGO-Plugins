@@ -68,12 +68,18 @@ public Action EWM_Clantag_Timer_UpdateClantag(Handle timer, int client)
 			g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
 			if(ItemTest.Hud && ItemTest.OwnerID != INVALID_ENT_REFERENCE && IsValidEdict(ItemTest.WeaponID))
 			{
-				ItemTest.UpdateTime();
+				UpdateTime();
 				char sClanName[MAXSIZECLANTAG];
 				
-				if(ItemTest.CheckDelay() > 0)
+				if(ItemTest.CheckDelay() > 0.0)
 				{
 					FormatEx(sClanName, MAXSIZECLANTAG, "%s[-%d]:", ItemTest.ShortName, ItemTest.RoundDelay());
+				}else if(ItemTest.LockButton)
+				{
+					FormatEx(sClanName, MAXSIZECLANTAG, "%s[L]:", ItemTest.ShortName);
+				}else if(ItemTest.CheckWaitTime() > 0)
+				{
+					FormatEx(sClanName, MAXSIZECLANTAG, "%s[%d]:", ItemTest.ShortName, ItemTest.RoundWaitTime());
 				}else
 				{
 					switch(ItemTest.Mode)
