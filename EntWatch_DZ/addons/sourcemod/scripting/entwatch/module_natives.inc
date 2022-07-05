@@ -21,6 +21,14 @@ public APLRes AskPluginLoad2(Handle hThis, bool bLate, char[] sError, int iErr_m
 	#endif
 	CreateNative("EntWatch_IsSpecialItem", EWM_Natives_Native_IsSpecialItem);
 	CreateNative("EntWatch_HasSpecialItem", EWM_Natives_Native_HasSpecialItem);
+	#if defined EW_MODULE_HIGHLIGHT
+	CreateNative("EntWatch_SetHLWeapon", EWM_Natives_Native_SetHLWeapon);
+	CreateNative("EntWatch_SetHLPlayer", EWM_Natives_Native_SetHLPlayer);
+	CreateNative("EntWatch_SetHLWeaponOne", EWM_Natives_Native_SetHLWeaponOne);
+	CreateNative("EntWatch_SetHLPlayerOne", EWM_Natives_Native_SetHLPlayerOne);
+	CreateNative("EntWatch_RemoveHLWeaponOne", EWM_Natives_Native_RemoveHLWeaponOne);
+	CreateNative("EntWatch_RemoveHLPlayerOne", EWM_Natives_Native_RemoveHLPlayerOne);
+	#endif
 
 	RegPluginLibrary("EntWatch");
 
@@ -264,6 +272,96 @@ public int EWM_Natives_Native_GetHudDefault(Handle hPlugin, int iArgC)
 	cDefault.Name = true;
 	
 	SetNativeArray(1, cDefault, sizeof(cDefault));
+	return true;
+}
+#endif
+
+#if defined EW_MODULE_HIGHLIGHT
+public int EWM_Natives_Native_SetHLWeapon(Handle hPlugin, int iArgC)
+{
+	if (!g_bConfigLoaded) return false;
+	int iCount = GetNativeCell(1);
+	int iClients[MAXPLAYERS+1] = {-1,...};
+	GetNativeArray(2,iClients,iCount);
+	for(int i = 0; i < iCount; i++)
+	{
+		if (!IsValidClient(iClients[i]))
+		{
+			ThrowNativeError(SP_ERROR_PARAM, "Invalid iClient Num:%d", i);
+			return false;
+		}
+	}
+	for(int i = 0; i < iCount; i++) g_bHL_Privilege_Weapon[iClients[i]] = true;
+	return true;
+}
+
+public int EWM_Natives_Native_SetHLPlayer(Handle hPlugin, int iArgC)
+{
+	if (!g_bConfigLoaded) return false;
+	int iCount = GetNativeCell(1);
+	int iClients[MAXPLAYERS+1] = {-1,...};
+	GetNativeArray(2,iClients,iCount);
+	for(int i = 0; i < iCount; i++)
+	{
+		if (!IsValidClient(iClients[i]))
+		{
+			ThrowNativeError(SP_ERROR_PARAM, "Invalid iClient Num:%d", i);
+			return false;
+		}
+	}
+	for(int i = 0; i < iCount; i++) g_bHL_Privilege_Player[iClients[i]] = true;
+	return true;
+}
+
+public int EWM_Natives_Native_SetHLWeaponOne(Handle hPlugin, int iArgC)
+{
+	if (!g_bConfigLoaded) return false;
+	int iClient = GetNativeCell(1);
+	if (!IsValidClient(iClient))
+	{
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid iClient");
+		return false;
+	}
+	g_bHL_Privilege_Weapon[iClient] = true;
+	return true;
+}
+
+public int EWM_Natives_Native_SetHLPlayerOne(Handle hPlugin, int iArgC)
+{
+	if (!g_bConfigLoaded) return false;
+	int iClient = GetNativeCell(1);
+	if (!IsValidClient(iClient))
+	{
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid iClient");
+		return false;
+	}
+	g_bHL_Privilege_Player[iClient] = true;
+	return true;
+}
+
+public int EWM_Natives_Native_RemoveHLWeaponOne(Handle hPlugin, int iArgC)
+{
+	if (!g_bConfigLoaded) return false;
+	int iClient = GetNativeCell(1);
+	if (!IsValidClient(iClient))
+	{
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid iClient");
+		return false;
+	}
+	g_bHL_Privilege_Weapon[iClient] = false;
+	return true;
+}
+
+public int EWM_Natives_Native_RemoveHLPlayerOne(Handle hPlugin, int iArgC)
+{
+	if (!g_bConfigLoaded) return false;
+	int iClient = GetNativeCell(1);
+	if (!IsValidClient(iClient))
+	{
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid iClient");
+		return false;
+	}
+	g_bHL_Privilege_Player[iClient] = false;
 	return true;
 }
 #endif

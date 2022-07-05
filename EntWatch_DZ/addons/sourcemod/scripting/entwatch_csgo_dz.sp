@@ -50,11 +50,12 @@ bool g_bIsAdmin[MAXPLAYERS+1] = {false,...};
 #include "entwatch/module_forwards.inc" //For the include EntWatch.inc to work correctly, use with module_eban
 #include "entwatch/module_eban.inc"
 #include "entwatch/module_offline_eban.inc" // Need module_eban. Experimental
+#include "entwatch/module_highlight.inc"
 #include "entwatch/module_natives.inc" //For the include EntWatch.inc to work correctly, use with module_eban
 #include "entwatch/module_transfer.inc"
 #include "entwatch/module_spawn_item.inc"
 #include "entwatch/module_menu.inc"
-#include "entwatch/module_glow.inc"
+//#include "entwatch/module_glow.inc" //change to HighLight
 #include "entwatch/module_use_priority.inc"
 #include "entwatch/module_extended_logs.inc"
 //#include "entwatch/module_clantag.inc"
@@ -70,7 +71,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.41",
+	version = "3.DZ.42",
 	url = "dark-skill.ru"
 };
  
@@ -162,6 +163,9 @@ public void OnPluginStart()
 	#if defined EW_MODULE_GLOW
 	EWM_Glow_OnPluginStart();
 	#endif
+	#if defined EW_MODULE_HIGHLIGHT
+	EWM_HLight_OnPluginStart();
+	#endif
 	#if defined EW_MODULE_DEBUG
 	EWM_Debug_OnPluginStart();
 	#endif
@@ -217,6 +221,9 @@ public void OnMapStart()
 	#if defined EW_MODULE_GLOW
 	EWM_Glow_OnMapStart();
 	#endif
+	#if defined EW_MODULE_HIGHLIGHT
+	EWM_HLight_OnMapStart();
+	#endif
 	#if defined EW_MODULE_HUD
 	EWM_Hud_OnMapStart();
 	#endif
@@ -226,6 +233,9 @@ public void OnMapEnd()
 {
 	#if defined EW_MODULE_GLOW
 	EWM_Glow_OnMapEnd();
+	#endif
+	#if defined EW_MODULE_HIGHLIGHT
+	EWM_HLight_OnMapEnd();
 	#endif
 	
 	#if defined EW_MODULE_CLANTAG
@@ -239,6 +249,9 @@ public void Event_RoundStart(Event hEvent, const char[] sName, bool bDontBroadca
 	
 	#if defined EW_MODULE_CLANTAG
 	EWM_Clantag_Mass_Reset();
+	#endif
+	#if defined EW_MODULE_HIGHLIGHT
+	EWM_HLight_RoundStart();
 	#endif
 }
 
@@ -309,6 +322,11 @@ stock void EWM_Drop_Forward(Handle hEvent)
 				
 				#if defined EW_MODULE_GLOW
 				EWM_Glow_GlowWeapon(ItemTest, i, false);
+				#endif
+				
+				#if defined EW_MODULE_HIGHLIGHT
+				EWM_HLight_PRemove(iClient);
+				EWM_HLight_Set(ItemTest);
 				#endif
 				
 				#if defined EW_MODULE_ELOGS
@@ -444,6 +462,10 @@ public void OnClientDisconnect(int iClient)
 				#if defined EW_MODULE_GLOW
 				EWM_Glow_GlowWeapon(ItemTest, i, false);
 				#endif
+				
+				#if defined EW_MODULE_HIGHLIGHT
+				EWM_HLight_Set(ItemTest);
+				#endif
 			}
 		}
 	}
@@ -460,6 +482,9 @@ public void OnClientDisconnect(int iClient)
 	#endif
 	#if defined EW_MODULE_CLANTAG
 	EWM_Clantag_OnClientDisconnect(iClient);
+	#endif
+	#if defined EW_MODULE_HIGHLIGHT
+	EWM_HLight_OnClientPrivilegeReset(iClient);
 	#endif
 	//SDKHooks automatically handles unhooking on disconnect
 	/*SDKUnhook(iClient, SDKHook_WeaponDropPost, OnWeaponDrop);
@@ -539,7 +564,7 @@ stock void LoadConfig()
 			NewItem.GlowColor[2]=255;
 			NewItem.GlowColor[3]=200;
 			
-			#if defined EW_MODULE_GLOW
+			#if defined EW_MODULE_GLOW || defined EW_MODULE_HIGHLIGHT
 			if(StrEqual(sBuffer_temp,"{green}",false)){NewItem.GlowColor[0]=0;NewItem.GlowColor[1]=255;NewItem.GlowColor[2]=0;}
 			else if(StrEqual(sBuffer_temp,"{default}",false)){NewItem.GlowColor[0]=255;NewItem.GlowColor[1]=255;NewItem.GlowColor[2]=255;}
 			else if(StrEqual(sBuffer_temp,"{darkred}",false)){NewItem.GlowColor[0]=175;NewItem.GlowColor[1]=0;NewItem.GlowColor[2]=0;}
@@ -1606,6 +1631,11 @@ public void OnWeaponDrop(int iClient, int iWeapon)
 				EWM_Glow_GlowWeapon(ItemTest, i, false);
 				#endif
 				
+				#if defined EW_MODULE_HIGHLIGHT
+				EWM_HLight_PRemove(iClient);
+				EWM_HLight_Set(ItemTest);
+				#endif
+				
 				#if defined EW_MODULE_ELOGS
 				EWM_ELogs_Drop(ItemTest, iClient);
 				#endif
@@ -1670,6 +1700,11 @@ public void OnWeaponEquip(int iClient, int iWeapon)
 				
 				#if defined EW_MODULE_GLOW
 				EWM_Glow_DisableGlow(ItemTest);
+				#endif
+				
+				#if defined EW_MODULE_HIGHLIGHT
+				EWM_HLight_WRemove(ItemTest.WeaponID);
+				EWM_HLight_Set(ItemTest);
 				#endif
 				
 				g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));

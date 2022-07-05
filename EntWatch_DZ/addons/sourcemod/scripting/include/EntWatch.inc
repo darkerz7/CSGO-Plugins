@@ -137,6 +137,74 @@ native bool EntWatch_IsSpecialItem(int iEntity);
 native bool EntWatch_HasSpecialItem(int iClient);
 
 /**
+ * Sets the HighLighting Weapons privilege for an array of clients.
+ *
+ * @param iCount		Count of clients in the array
+ * @param iClients		Array of clients for which to set the HighLighting Weapons privilege
+ *
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index
+ */
+native bool EntWatch_SetHLWeapon(int iCount, int[] iClients);
+
+/**
+ * Sets the HighLighting Players privilege for an array of clients.
+ *
+ * @param iCount		Count of clients in the array
+ * @param iClients		Array of clients for which to set the HighLighting Players privilege
+ *
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index
+ */
+native bool EntWatch_SetHLPlayer(int iCount, int[] iClients);
+
+/**
+ * Sets the HighLighting Weapons privilege for client.
+ *
+ * @param iClient		Client for which to set the HighLighting Weapons privilege
+ *
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index
+ */
+native bool EntWatch_SetHLWeaponOne(int iClient);
+
+/**
+ * Sets the HighLighting Players privilege for client.
+ *
+ * @param iClient		Client for which to set the HighLighting Players privilege
+ *
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index
+ */
+native bool EntWatch_SetHLPlayerOne(int iClient);
+
+/**
+ * Remove the HighLighting Weapons privilege for client.
+ *
+ * @param iClient		Client for which to remove the HighLighting Weapons privilege
+ *
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index
+ */
+native bool EntWatch_RemoveHLWeaponOne(int iClient);
+
+/**
+ * Remove the HighLighting Players privilege for client.
+ *
+ * @param iClient		Client for which to remove the HighLighting Players privilege
+ *
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index
+ */
+native bool EntWatch_RemoveHLPlayerOne(int iClient);
+
+/**
  * Called when a client is e-banned by any means
  *
  * @param iAdmin		Admin index that issued the ban
@@ -157,6 +225,20 @@ forward void EntWatch_OnClientBanned(int iAdmin, int iDuration, int iClient, con
  * @return				None
  */
 forward void EntWatch_OnClientUnbanned(int iAdmin, int iClient, const char[] sReason);
+
+/**
+ * Сalled when the EntWatch is ready to accept requests for privileges for HighLight Weapon
+ *
+ * @return				None
+ */
+forward void EntWatch_OnHLWeaponReady();
+
+/**
+ * Сalled when the EntWatch is ready to accept requests for privileges for HighLight Player
+ *
+ * @return				None
+ */
+forward void EntWatch_OnHLPlayerReady();
 
 public SharedPlugin __pl_EntWatch =
 {

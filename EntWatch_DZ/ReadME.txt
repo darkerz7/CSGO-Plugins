@@ -112,6 +112,15 @@ Commands and CVARs for modules:
 	*entwatch_glow_spawn_type	<-1 to 3>		- Glow Type after Spawn Items, set -1 to stop glow. Default 0
 	*entwatch_glow_drop_type	<-1 to 3>		- Glow Type after Drop Items, set -1 to stop glow. Default 0
 
+%Module HighLight
+#Cvars:
+	*entwatch_hl_wtype		<0 to 6>		- Type of HighLighting of items. 0 - Disable, 1 - All, 2 - Team, 3 - Privilege All, 4 - Privilege Team, 5 - Admin and Privilege All, 6 - Admin and Privilege Team. Default 1
+	*entwatch_hl_wcolor		<0/1>			- Color of HighLighting of items. 0 - Color from Item, 1 - Rainbow. Default 0
+	*entwatch_hl_ptype		<0 to 6>		- Type of HighLighting of players that own the item. 0 - Disable, 1 - All, 2 - Team, 3 - Privilege All, 4 - Privilege Team, 5 - Admin and Privilege All, 6 - Admin and Privilege Team. Default 0
+	*entwatch_hl_pcolor		<0/1>			- Color of HighLighting of players that own the item. 0 - Color from Item, 1 - Rainbow. Default 0
+	*sv_highlight_distance		<integer>		- Distance of HighLighting. Default 500
+	*sv_highlight_duration		<float>			- Duration of HighLighting. Default 3.5 
+
 %Module Chat
 #Cvars:
 	*entwatch_adminchat_mode	<0-2>		- Change AdminChat Mode (0 - All Messages, 1 - Only Pickup/Drop Items, 2 - Nothing). Default 0
