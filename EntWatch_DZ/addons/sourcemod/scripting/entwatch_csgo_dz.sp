@@ -1012,7 +1012,7 @@ public void OnItemSpawned(int iEntity)
 public void OnMathSpawned(int iEntity)
 {
 	//In case the math entity spawns just before the weapon entity (?)
-	CreateTimer(0.5, Timer_OnMathSpawned, iEntity);
+	CreateTimer(1.5, Timer_OnMathSpawned, iEntity);
 	
 }
 
