@@ -1,4 +1,4 @@
-Installation:
+# Installation:
 1. Open with Notepad addons/sourcemod/scripting/entwatch_csgo_dz.sp and comment out or uncomment the corresponding modules
 2. Compile plugin.
 3. Unzip everything into the appropriate folders.
@@ -19,7 +19,7 @@ Installation:
 	*If you want to use mysql, manually create a new database
 6. Restart Server
 
-Features:
+# Features:
 -New Syntax
 -Removed some options from the config
 -The plugin uses a ArrayList and not an array
@@ -42,7 +42,7 @@ Features:
 -Allows you to track 2 buttons
 -Allows to lock item
 
-List of Modules:
+# List of Modules:
 *Chat		- Responsible for displaying chat special messages to players
 *Debug		- Helps to view the list of plugin variables
 *Eban		- Allows you to prevent players from pickuping items
@@ -57,9 +57,9 @@ List of Modules:
 *Use Priority	- Responsible for the use of items regardless of the crowd or camera position.
 *Offline Eban	- Responsible for Eban a disconnected player
 
-Commands and CVARs for modules:
-%Main
-#Cvars:
+# Commands and CVARs for modules:
+## Main
+### Cvars:
 	*entwatch_mode_teamonly		<0/1>	- Enable/Disable team only mode. Default 1
 	*entwatch_delay_use		<0.0-60.0>	- Change delay before use. Default 3.0
 	*entwatch_scheme		<name>	- The name of the scheme config. Default "classic"
@@ -67,7 +67,7 @@ Commands and CVARs for modules:
 	*entwatch_use_priority		<0/1>	- Enable/Disable forced pressing of the button. Default 1
 	*entwatch_globalblock		<0/1>	- Blocks the pickup of any items by players. Default 0
 
-#Admin CMDs:
+### Admin CMDs:
 	*sm_ew_reloadconfig					- Allows you to update the configuration
 	*sm_setcooldown <hammerid> <cooldown>			- Allows you to change the item’s cooldown during the game
 	*sm_setmaxuses <hammerid> <maxuses> [<even if over>]	- Allows you to change the maximum use of the item during the game, depending on whether the item was used to the end
@@ -83,37 +83,37 @@ Commands and CVARs for modules:
 	*sm_ewlockbutton <hammerid> <0/1>		- Allows to lock item (first button)
 	*sm_ewlockbutton2 <hammerid> <0/1>		- Allows to lock second button of item
 
-%Module Debug
-#Admin CMDs:
+## Module Debug
+### Admin CMDs:
 	*sm_ewdebugconfig	- Allows you to view a list of configuration items
 	*sm_ewdebugarray	- Allows you to view a list of items
 	*sm_ewdebugscheme	- Allows you to view the configuration of the scheme
 
-%Module Eban
-#Cvars:
+## Module Eban
+### Cvars:
 	*entwatch_bantime		<0-43200>	- Default ban time. 0 - Permanent. Default 0
 	*entwatch_banreason		<reason>	- Default ban reason. Default "Trolling"
 	*entwatch_keep_expired_ban	<0/1>		- Enable/Disable keep expired bans. Default 1
 	*entwatch_use_reason_menu	<0/1>	- Enable/Disable menu if the admin has not indicated a reason
-#Admin CMDs:
+### Admin CMDs:
 	*sm_eban <target> [<duration>] [<reason>]	- Allows you to restrict the player to pick up items
 	*sm_eunban <target> [<reason>]			- Allows you to unrestrict the player to pick up items
 	*sm_ebanlist					- Displays a list of Ebanned players
-#Client CMDs:
+## Client CMDs:
 	*sm_status [<target(only admins)>]		- Allows you to check player status
-#Ovverride Admin Access:
+## Ovverride Admin Access:
 	*sm_eban_perm					- Allows admins to issue and remove a permanent EBan
 	*sm_eban_long					- Allows admins to issue a EBan for more than 12 hours
 
-%Module Glow
-#Cvars:
+## Module Glow
+### Cvars:
 	*entwatch_glow			<0/1>		- Enable/Disable the glow Global. Default 1
 	*entwatch_glow_spawn		<0/1>		- Enable/Disable the glow after Spawn Items. Default 1
 	*entwatch_glow_spawn_type	<-1 to 3>		- Glow Type after Spawn Items, set -1 to stop glow. Default 0
 	*entwatch_glow_drop_type	<-1 to 3>		- Glow Type after Drop Items, set -1 to stop glow. Default 0
 
-%Module HighLight
-#Cvars:
+## Module HighLight
+### Cvars:
 	*entwatch_hl_wtype		<0 to 6>		- Type of HighLighting of items. 0 - Disable, 1 - All, 2 - Team, 3 - Privilege All, 4 - Privilege Team, 5 - Admin and Privilege All, 6 - Admin and Privilege Team. Default 1
 	*entwatch_hl_wcolor		<0/1>			- Color of HighLighting of items. 0 - Color from Item, 1 - Rainbow. Default 0
 	*entwatch_hl_ptype		<0 to 6>		- Type of HighLighting of players that own the item. 0 - Disable, 1 - All, 2 - Team, 3 - Privilege All, 4 - Privilege Team, 5 - Admin and Privilege All, 6 - Admin and Privilege Team. Default 0
@@ -121,33 +121,69 @@ Commands and CVARs for modules:
 	*sv_highlight_distance		<integer>		- Distance of HighLighting. Default 500
 	*sv_highlight_duration		<float>			- Duration of HighLighting. Default 3.5 
 
-%Module Chat
-#Cvars:
+## Module Chat
+### Cvars:
 	*entwatch_adminchat_mode	<0-2>		- Change AdminChat Mode (0 - All Messages, 1 - Only Pickup/Drop Items, 2 - Nothing). Default 0
 
-%Module Hud
-#Cvars:
+## Module Hud
+### Cvars:
 	*entwatch_display_enable	<0/1>		- Enable/Disable the display. Default 1
 	*entwatch_display_cooldowns	<0/1>		- Show/Hide the cooldowns on the display. Default 1
 	*entwatch_admins_see		<0/1>		- Enable/Disable admins see everything Items. Default 1
 	*entwatch_hud_channel		<0-5>		- Change HUD Channel/Group Dynamic channel. Default 5
 	*entwatch_zm_noitem_pry		<0/1>		- Enable/Disable zm pry human Items if zms without items Default 0
-#Client CMDs:
+### Client CMDs:
 	*sm_hud				- Switches the player’s display of the HUD
 	*sm_hudname			- Switches the display of player names in HUD
 	*sm_hudpos <x> <y>		- Allows you to set the position of the HUD
 	*sm_hudcolor <R> <G> <B> <A>	- Allows you to set the color of the HUD
 
-%Module Spawn Item
-#Admin CMDs:
+## Module Spawn Item
+### Admin CMDs:
 	*sm_espawnitem <receiver> <itemname> [<strip 0/1>] - Allows admin to spawn item
 
-%Module Transfer
-#Admin CMDs:
+## Module Transfer
+### Admin CMDs:
 	*sm_etransfer <owner>/$<itemname> <receiver>	- Allows admin to transfer item
 
-%Module Offline Eban
-#Cvars:
+## Module Offline Eban
+### Cvars:
 	*entwatch_offline_clear_time	<1/240>		- Time during which data is stored. Default 30
-#Admin CMDs:
+### Admin CMDs:
 	*sm_eoban	- Allows admin eban disconnected player
+
+# Migration
+## 3.DZ.20 to 3.DZ.21
+
+You need to run the following queries:
+
+### MYSQL
+```sql
+ALTER TABLE `EntWatch_Old_Eban` MODIFY COLUMN `id` int(10) unsigned NOT NULL auto_increment;
+```
+
+### SQLITE
+```sql
+ALTER TABLE `EntWatch_Old_Eban` RENAME TO `EntWatch_tmp`;
+CREATE TABLE IF NOT EXISTS `EntWatch_Old_Eban`(	`id` INTEGER PRIMARY KEY AUTOINCREMENT, `client_name` varchar(32) NOT NULL, `client_steamid` varchar(64) NOT NULL, `admin_name` varchar(32) NOT NULL, `admin_steamid` varchar(64) NOT NULL, `server` varchar(64), `duration` INTEGER NOT NULL, `timestamp_issued` INTEGER NOT NULL, `reason` varchar(64), `reason_unban` varchar(64), `admin_name_unban` varchar(32), `admin_steamid_unban` varchar(64), `timestamp_unban` INTEGER);
+INSERT INTO `EntWatch_Old_Eban` SELECT * FROM `EntWatch_tmp`;
+DROP TABLE `EntWatch_tmp`;
+```
+
+# Recommended bspconvar whitelist
+
+```
+sm_setcooldown 1
+sm_setmaxuses 1
+sm_addmaxuses 1
+sm_ewsetmode 1
+sm_ewsetname 1
+sm_ewsetshortname 1
+sm_setcooldown2 1
+sm_setmaxuses2 1
+sm_addmaxuses2 1
+sm_ewsetmode2 1
+sm_ewblock 1
+sm_ewlockbutton 1
+sm_ewlockbutton2 1
+```
