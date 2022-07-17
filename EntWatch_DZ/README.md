@@ -49,7 +49,8 @@ Debug | Helps to view the list of plugin variables
 Eban | Allows you to prevent players from pickuping items
 Extended logs | Logging all actions. Example pickup or use item and etc.
 Forwards | Forwards to communicate with other plugins
-Glow | Responsible for highlighting special items on the map
+Glow (Deprecated) | Responsible for highlighting special items on the map
+Highlight | Reworked glow system for weapons with more configurable options
 Hud | Responsible for displaying a list of items in the HUD
 Menu | Responsible for the Admin Menu of the Entwatch
 Natives | Natives to communicate with other plugins
@@ -71,8 +72,7 @@ Cvar | Paramters | Description
 `entwatch_use_priority` | `<0/1>` | Enable/Disable forced pressing of the button. (Default 1)
 `entwatch_globalblock` | `<0/1>`	| Blocks the pickup of any items by players. (Default 0)
 
-### Admin Commands:
-Command | Description
+Admin Command | Description
 --- | ---
 `sm_ew_reloadconfig` | Allows you to update the configuration
 `sm_setcooldown <hammerid> <cooldown>` | Allows you to change the item’s cooldown during the game
@@ -90,8 +90,7 @@ Command | Description
 `sm_ewlockbutton2 <hammerid> <0/1>` | Allows to lock second button of item
 
 ## Module Debug
-### Admin Commands:
-Command | Description
+Admin Command | Description
 --- | ---
 `sm_ewdebugconfig` | Allows you to view a list of configuration items
 `sm_ewdebugarray` | Allows you to view a list of items
@@ -106,22 +105,20 @@ Cvar | Parameters | Description
 `entwatch_keep_expired_ban` | <0/1> | Enable/Disable keep expired bans. (Default 1)
 `entwatch_use_reason_menu` | <0/1> | Enable/Disable menu if the admin has not indicated a reason
 
-### Admin Commands:
-Command | Description
+Admin Command | Description
 --- | ---
 `sm_eban <target> [<duration>] [<reason>]` | Allows you to restrict the player to pick up items
 `sm_eunban <target> [<reason>]` | Allows you to unrestrict the player to pick up items
 `sm_ebanlist` | Displays a list of Ebanned players
 
-## Client Commands:
-Command | Description
---- | ---
-`sm_status [<target (admin only)>]` | Allows you to check player status
-## Ovverride Admin Access:
-Command | Description
+Overide Admin Command | Description
 --- | ---
 `sm_eban_perm` | Allows admins to issue and remove a permanent EBan
 `sm_eban_long` | Allows admins to issue a EBan for more than 12 hours
+
+Client Command | Description
+--- | ---
+`sm_status [<target (admin only)>]` | Allows you to check player status
 
 ## Module Glow (Deprecated)
 ### Cvars:
@@ -159,8 +156,7 @@ Cvar | Parameters | Description
 `entwatch_hud_channel` | <0-5> | Change HUD Channel/Group Dynamic channel. (Default 5)
 `entwatch_zm_noitem_pry` | <0/1> | Enable/Disable zm pry human Items if zms without items. (Default 0)
 
-### Client Commands:
-Command | Description
+Client Command | Description
 --- | ---
 `sm_hud` | Switches the player’s display of the HUD
 `sm_hudname` | Switches the display of player names in HUD
@@ -168,14 +164,12 @@ Command | Description
 `sm_hudcolor <R> <G> <B> <A>` |  Allows you to set the color of the HUD
 
 ## Module Spawn Item
-### Admin Commands:
-Command | Description
+Admin Command | Description
 --- | ---
 `sm_espawnitem <receiver> <itemname> [<strip 0/1>]` | Allows admin to spawn item
 
 ## Module Transfer
-### Admin Commands:
-Command | Description
+Admin Command | Description
 --- | ---
 `sm_etransfer <owner>/$<itemname> <receiver>` | Allows admin to transfer item
 
@@ -184,8 +178,8 @@ Command | Description
 Cvar | Parameter | Description
 --- | --- | ---
 `entwatch_offline_clear_time` | <1/240> | Time during which data is stored. (Default 30)
-### Admin Commands:
-Command | Description
+
+Admin Command | Description
 --- | ---
 `sm_eoban` | Allows admin eban disconnected player
 
