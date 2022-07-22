@@ -155,11 +155,11 @@ stock void EWM_Hud_OnClientCookiesCached(int iClient)
 		ExplodeString(sBuffer_cookie, "/", Explode_HudPosition, 2, 32);
 		
 		float Pos_validate = StringToFloat(Explode_HudPosition[0]);
-		if(Pos_validate >= 0.0 && Pos_validate <= 1.0) g_CSettings_Hud[iClient].Pos_X = Pos_validate;
+		if((Pos_validate >= 0.0 && Pos_validate <= 1.0) || Pos_validate == -1.0) g_CSettings_Hud[iClient].Pos_X = Pos_validate;
 			else g_CSettings_Hud[iClient].Pos_X = g_SchemeConfig.Pos_HUD_X;
 			
 		Pos_validate = StringToFloat(Explode_HudPosition[1]);
-		if(Pos_validate >= 0.0 && Pos_validate <= 1.0) g_CSettings_Hud[iClient].Pos_Y = Pos_validate;
+		if((Pos_validate >= 0.0 && Pos_validate <= 1.0) || Pos_validate == =1.0) g_CSettings_Hud[iClient].Pos_Y = Pos_validate;
 			else g_CSettings_Hud[iClient].Pos_Y = g_SchemeConfig.Pos_HUD_Y;
 	}
 }
@@ -552,7 +552,7 @@ public Action EWM_Hud_Command_Hudpos(int iClient, int iArgs)
 		GetCmdArg(2, sBuffer, sizeof(sBuffer));
 		HudPosY_validate = StringToFloat(sBuffer);
 		
-		if(HudPosX_validate >= 0.0 && HudPosY_validate >= 0.0 && HudPosX_validate <= 1.0 && HudPosY_validate <= 1.0)
+		if(((HudPosX_validate >= 0.0 && HudPosX_validate <= 1.0) || HudPosX_validate == -1.0) && ((HudPosY_validate >= 0.0 && HudPosY_validate <= 1.0) || HudPosY_validate == -1.0))
 		{
 			g_CSettings_Hud[iClient].Pos_X = HudPosX_validate;
 			g_CSettings_Hud[iClient].Pos_Y = HudPosY_validate;
