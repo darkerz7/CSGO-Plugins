@@ -159,7 +159,7 @@ stock void EWM_Hud_OnClientCookiesCached(int iClient)
 			else g_CSettings_Hud[iClient].Pos_X = g_SchemeConfig.Pos_HUD_X;
 			
 		Pos_validate = StringToFloat(Explode_HudPosition[1]);
-		if((Pos_validate >= 0.0 && Pos_validate <= 1.0) || Pos_validate == =1.0) g_CSettings_Hud[iClient].Pos_Y = Pos_validate;
+		if((Pos_validate >= 0.0 && Pos_validate <= 1.0) || Pos_validate == -1.0) g_CSettings_Hud[iClient].Pos_Y = Pos_validate;
 			else g_CSettings_Hud[iClient].Pos_Y = g_SchemeConfig.Pos_HUD_Y;
 	}
 }
