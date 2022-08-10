@@ -14,11 +14,11 @@
 	}
 	"Use First"
 	{
-		"en" 	"used first ability"
+		"en" 	"used the first ability of"
 	}
 	"Use Second"
 	{
-		"en" 	"used second ability"
+		"en" 	"used the second ability of"
 	}
 	"Pickup"
 	{
