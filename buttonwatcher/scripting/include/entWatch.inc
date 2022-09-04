@@ -1,136 +1,249 @@
-#if defined _entWatch_include
+#if defined _EntWatch_include
   #endinput
 #endif
-#define _entWatch_include
+#define _EntWatch_include
+
+enum struct class_NativeClientSettings_Hud
+{
+	bool		Display;
+	int			Color[4];
+	float		Pos_X;
+	float		Pos_Y;
+	bool		Name;
+}
 
 /**
  * Checks if a client is currently banned, if an integer variable is referenced the time of unban will be assigned to it.
  *
- * @param client		Client index to check for ban
- * @param iTimeStamp	Pass an integer variable by reference and it will contain the UNIX timestamp when the player will be unbanned
+ * @param iClient		Client index to check for ban
+ * @param iTimeStamp	Pass an integer variable by reference and it will contain the UNIX timestamp when the player will be unbanned/ when a player was banned if ban = Permamently/Temporary
+ * @param iDuration		Duration of the ban -1 - Temporary, 0 - Permamently, Positive value - time in minutes
+ * @param sReason		The reason why the player was banned
  * @return				True if user is banned, false otherwise
  *
- * On error/errors:		Invalid client index/client is not in game or client cookies are not yet loaded
+ * On error/errors:		Invalid client index
  */
-native bool:entWatch_IsClientBanned(client, &iTimeStamp);
+native bool EntWatch_IsClientBanned(int iClient, int &iTimeStamp, int &iDuration, char[] sReason);
 
 /**
  * Bans a client from using special items.
  *
- * @param client		Client index to ban
- * @param IsTemporary	If the ban should be temporary pass true here
- * @param iLength		Length of ban in minutes, pass 0 here for a permanent ban
+ * @param iClient		Client index to ban
+ * @param iAdmin		Admin index which ban (if IsValidClient - Client, else Console)
+ * @param iDuration		Duration of the ban -1 - Temporary, 0 - Permamently, Positive value - time in minutes
+ * @param sReason		The reason why the player will be banned
  * @return				True on success, false otherwsie
  *
- * On error/errors:		Invalid client index/client is not in game or client cookies are not yet loaded
+ * On error/errors:		Invalid client index
  */
-native bool:entWatch_BanClient(client, bool:bIsTemporary=false, iLength=0);
+native bool EntWatch_BanClient(int iClient, int iAdmin = 0, int iDuration = 0, const char[] sReason = "No Reason");
 
 /**
  * Unbans a previously ebanned Client.
  *
- * @param client		Client index to unban
+ * @param iClient		Client index to unban
+ * @param iAdmin		Admin index which ban (if IsValidClient - Client, else Console)
+ * @param sReason		The reason why the player will be unbanned
  * @return				True on success, false otherwsie
  *
- * On error/errors:		Invalid client index/client is not in game or client cookies are not yet loaded
+ * On error/errors:		Invalid client index
  */
-native bool:entWatch_UnbanClient(client);
+native bool EntWatch_UnbanClient(int iClient, int iAdmin = 0, const char[] sReason = "No Reason");
+
+/**
+ * Gets client HUD settings
+ *
+ * @param iClient		Client index to get
+ * @param cSettings		An instance of the class in which the information will be saved
+
+ * @return				True and client settings on success, false and default settings otherwsie
+ *
+ * On error/errors:		Invalid client index
+ */
+native bool EntWatch_GetHudSettings(int iClient, any cSettings[sizeof(class_NativeClientSettings_Hud)]);
+
+/**
+ * Gets default HUD settings
+ *
+ * @param cDefailt		An instance of the class in which the information will be saved
+
+ * @return				True
+ */
+native bool EntWatch_GetHudDefault(any cDefailt[sizeof(class_NativeClientSettings_Hud)]);
+
+/**
+ * Sets client HUD Display
+ *
+ * @param iClient		Client index to set
+ * @param iDisplay		Parameter to Display. 0 - Disable, otherwsie - Enable
+
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index/Client cookies are not yet loaded
+ */
+native bool EntWatch_SetHudDisplay(int iClient, int iDisplay);
+
+/**
+ * Sets client HUD Name Display
+ *
+ * @param iClient		Client index to set
+ * @param iName			Parameter to Name Display. 0 - Disable, otherwsie - Enable
+
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index/Client cookies are not yet loaded
+ */
+native bool EntWatch_SetHudName(int iClient, int iName);
+
+/**
+ * Sets client HUD Position
+ *
+ * @param iClient		Client index to set
+ * @param fPosX			Parameter to position X
+ * @param fPosY			Parameter to position Y
+
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid Position [0.0-1.0|0.0-1.0]/Invalid client index/Client cookies are not yet loaded
+ */
+native bool EntWatch_SetHudPosition(int iClient, float fPosX, float fPosY);
+
+/**
+ * Sets client HUD Colors
+ *
+ * @param iClient		Client index to set
+ * @param aColors		Parameter to colors[4] - Red, Green, Blue, Alpha
+
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid Colors [0-255|0-255|0-255|0-255]/Invalid Colors Array[4]/Invalid client index/Client cookies are not yet loaded
+ */
+native bool EntWatch_SetHudColors(int iClient, int[] aColors);
 
 /**
  * Checks if an entity is a special item.
  *
- * @param entity		Entity index to check
+ * @param iEntity		Entity index to check
  * @return				True if entity is a special item, false otherwsie
  */
-native bool:entWatch_IsSpecialItem(entity);
+native bool EntWatch_IsSpecialItem(int iEntity);
 
 /**
  * Checks if a client has a special item.
  *
- * @param client		Client index to check
+ * @param iClient		Client index to check
  * @return				True if client has a special item, false otherwsie
  */
-native bool:entWatch_HasSpecialItem(client);
+native bool EntWatch_HasSpecialItem(int iClient);
+
+/**
+ * Sets the HighLighting Weapons privilege for an array of clients.
+ *
+ * @param iCount		Count of clients in the array
+ * @param iClients		Array of clients for which to set the HighLighting Weapons privilege
+ *
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index
+ */
+native bool EntWatch_SetHLWeapon(int iCount, int[] iClients);
+
+/**
+ * Sets the HighLighting Players privilege for an array of clients.
+ *
+ * @param iCount		Count of clients in the array
+ * @param iClients		Array of clients for which to set the HighLighting Players privilege
+ *
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index
+ */
+native bool EntWatch_SetHLPlayer(int iCount, int[] iClients);
+
+/**
+ * Sets the HighLighting Weapons privilege for client.
+ *
+ * @param iClient		Client for which to set the HighLighting Weapons privilege
+ *
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index
+ */
+native bool EntWatch_SetHLWeaponOne(int iClient);
+
+/**
+ * Sets the HighLighting Players privilege for client.
+ *
+ * @param iClient		Client for which to set the HighLighting Players privilege
+ *
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index
+ */
+native bool EntWatch_SetHLPlayerOne(int iClient);
+
+/**
+ * Remove the HighLighting Weapons privilege for client.
+ *
+ * @param iClient		Client for which to remove the HighLighting Weapons privilege
+ *
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index
+ */
+native bool EntWatch_RemoveHLWeaponOne(int iClient);
+
+/**
+ * Remove the HighLighting Players privilege for client.
+ *
+ * @param iClient		Client for which to remove the HighLighting Players privilege
+ *
+ * @return				True on success, false otherwsie
+ *
+ * On error/errors:		Invalid client index
+ */
+native bool EntWatch_RemoveHLPlayerOne(int iClient);
 
 /**
  * Called when a client is e-banned by any means
  *
- * @param admin			Admin index that issued the ban
- * @param iLength		Length of the ban in UNIX time
- * @param client		Client index that was banned
+ * @param iAdmin		Admin index that issued the ban
+ * @param iDuration		Duration of the ban
+ * @param iClient		Client index that was banned
+ * @param sReason		The reason why the player was banned
  *
  * @return				None
  */
-forward entWatch_OnClientBanned(admin, iLenght, client);
+forward void EntWatch_OnClientBanned(int iAdmin, int iDuration, int iClient, const char[] sReason);
 
 /**
  * Called when a client is e-unbanned by any means
  *
- * @param admin			Admin index that removed the ban
- * @param client		Client index that was unbanned
+ * @param iAdmin		Admin index that removed the ban
+ * @param iClient		Client index that was unbanned
+ * @param sReason		The reason why the player was unbanned
  * @return				None
  */
-forward entWatch_OnClientUnbanned(admin, client);
+forward void EntWatch_OnClientUnbanned(int iAdmin, int iClient, const char[] sReason);
 
-//----------------------------------------------------------------------------------------------------
-// Purpose: SMLib
-//----------------------------------------------------------------------------------------------------
-stock Entity_GetTargetName(entity, String:buffer[], size)
+/**
+ * Сalled when the EntWatch is ready to accept requests for privileges for HighLight Weapon
+ *
+ * @return				None
+ */
+forward void EntWatch_OnHLWeaponReady();
+
+/**
+ * Сalled when the EntWatch is ready to accept requests for privileges for HighLight Player
+ *
+ * @return				None
+ */
+forward void EntWatch_OnHLPlayerReady();
+
+public SharedPlugin __pl_EntWatch =
 {
-	return GetEntPropString(entity, Prop_Data, "m_iName", buffer, size);
-}
-
-//----------------------------------------------------------------------------------------------------
-// Purpose: SMLib
-//----------------------------------------------------------------------------------------------------
-stock Entity_GetParentName(entity, String:buffer[], size)
-{
-	return GetEntPropString(entity, Prop_Data, "m_iParent", buffer, size);
-}
-
-//----------------------------------------------------------------------------------------------------
-// Purpose: SMLib
-//----------------------------------------------------------------------------------------------------
-stock Entity_GetHammerID(entity)
-{
-	return GetEntProp(entity, Prop_Data, "m_iHammerID");
-}
-
-//----------------------------------------------------------------------------------------------------
-// Purpose: SMLib
-//----------------------------------------------------------------------------------------------------
-stock Entity_GetClassName(entity, String:buffer[], size)
-{
-	GetEntPropString(entity, Prop_Data, "m_iClassname", buffer, size);
-
-	if (buffer[0] == '\0') {
-		return false;
-	}
-
-	return true;
-}
-
-//----------------------------------------------------------------------------------------------------
-// Purpose: SMLib
-//----------------------------------------------------------------------------------------------------
-stock Entity_GetEntityFromHammerID(hammerID)
-{
-	for (new i = 0; i < 4096; i++)
-	{
-		if (IsValidEntity(i) && Entity_GetHammerID(i) == hammerID)
-		{
-			if (IsValidEntity(i))
-				return i;
-		}
-	}
-
-	return -1;
-}
-
-public SharedPlugin:__pl_entWatch =
-{
-	name = "entWatch",
-	file = "entWatch.smx",
+	name = "EntWatch",
+	file = "entwatch_csgo_dz.smx",
 #if defined REQUIRE_PLUGIN
 	required = 1
 #else
@@ -139,12 +252,12 @@ public SharedPlugin:__pl_entWatch =
 };
 
 #if !defined REQUIRE_PLUGIN
-public __pl_entWatch_SetNTVOptional()
+public __pl_EntWatch_SetNTVOptional()
 {
-	MarkNativeAsOptional("entWatch_IsClientBanned");
-	MarkNativeAsOptional("entWatch_BanClient");
-	MarkNativeAsOptional("entWatch_UnbanClient");
-	MarkNativeAsOptional("entWatch_IsSpecialItem");
-	MarkNativeAsOptional("entWatch_HasSpecialItem");
+	MarkNativeAsOptional("EntWatch_IsClientBanned");
+	MarkNativeAsOptional("EntWatch_BanClient");
+	MarkNativeAsOptional("EntWatch_UnbanClient");
+	MarkNativeAsOptional("EntWatch_IsSpecialItem");
+	MarkNativeAsOptional("EntWatch_HasSpecialItem");
 }
 #endif
