@@ -71,7 +71,7 @@ public Plugin myinfo =
 	name = "EntWatch",
 	author = "DarkerZ[RUS]",
 	description = "Notify players about entity interactions.",
-	version = "3.DZ.42",
+	version = "3.DZ.43",
 	url = "dark-skill.ru"
 };
  
@@ -1405,29 +1405,25 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 			class_ItemList ItemTest;
 			g_ItemList.GetArray(i, ItemTest, sizeof(ItemTest));
 			
-			int iAbility = -1;
-			if(ItemTest.ButtonID == -5)
+			if(IsValidEdict(ItemTest.WeaponID) && ItemTest.OwnerID==iActivator)
 			{
-				if(ItemTest.LockButton) return Plugin_Handled;
-				iAbility = 1;
-			}
-			else if(ItemTest.ButtonID2 == -5)
-			{
-				if(ItemTest.LockButton2) return Plugin_Handled;
-				iAbility = 2;
-			}
-			
-			if(ItemTest.ButtonID2 == INVALID_ENT_REFERENCE) iAbility = 0;
-
-			if(iAbility > -1 && IsValidEdict(ItemTest.WeaponID))
-			{
-				
-				if(ItemTest.OwnerID==iActivator)
+				int iAbility = -1;
+				if(ItemTest.ButtonID == -5)
+				{
+					if(ItemTest.LockButton) continue;
+					iAbility = 1;
+				}
+				else if(ItemTest.ButtonID2 == -5)
+				{
+					if(ItemTest.LockButton2) continue;
+					iAbility = 2;
+				}
+				if(iAbility == 1 && ItemTest.ButtonID2 == INVALID_ENT_REFERENCE) iAbility = 0;
+				if(iAbility > -1)
 				{
 					if(!(StrEqual(ItemTest.FilterName,""))) DispatchKeyValue(iActivator, "targetname", ItemTest.FilterName);
 					UpdateTime();
-					if(ItemTest.CheckDelay() > 0.0) return Plugin_Handled;
-					
+					if(ItemTest.CheckDelay() > 0.0) continue;
 					if(iAbility != 2)
 					{
 						switch (ItemTest.Mode)
@@ -1444,7 +1440,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 									
 									ItemTest.SetCoolDown(ItemTest.CoolDown);
 									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-									return Plugin_Continue;
+									continue;
 								}
 							case 3:
 								if(ItemTest.Uses < ItemTest.MaxUses)
@@ -1458,7 +1454,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 									
 									ItemTest.Uses++;
 									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-									return Plugin_Continue;
+									continue;
 								}
 							case 4:
 								if(ItemTest.Uses < ItemTest.MaxUses && ItemTest.CheckCoolDown() <= 0)
@@ -1473,7 +1469,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 									ItemTest.SetCoolDown(ItemTest.CoolDown);
 									ItemTest.Uses++;
 									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-									return Plugin_Continue;
+									continue;
 								}
 							case 5:
 								if(ItemTest.CheckCoolDown() <= 0)
@@ -1492,7 +1488,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 										ItemTest.Uses = 0;
 									}
 									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-									return Plugin_Continue;
+									continue;
 								}
 							case 6,7:
 							{
@@ -1509,11 +1505,11 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 										
 										ItemTest.SetCoolDown(ItemTest.CoolDown);
 										g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-									}else return Plugin_Changed;
+									}else continue;
 								}
-								return Plugin_Continue;
+								continue;
 							}
-							default: return Plugin_Continue;
+							default: continue;
 						}
 					}else
 					{
@@ -1531,7 +1527,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 									
 									ItemTest.SetCoolDown2(ItemTest.CoolDown2);
 									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-									return Plugin_Continue;
+									continue;
 								}
 							case 3:
 								if(ItemTest.Uses2 < ItemTest.MaxUses2)
@@ -1545,7 +1541,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 									
 									ItemTest.Uses2++;
 									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-									return Plugin_Continue;
+									continue;
 								}
 							case 4:
 								if(ItemTest.Uses2 < ItemTest.MaxUses2 && ItemTest.CheckCoolDown2() <= 0)
@@ -1560,7 +1556,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 									ItemTest.SetCoolDown2(ItemTest.CoolDown2);
 									ItemTest.Uses2++;
 									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-									return Plugin_Continue;
+									continue;
 								}
 							case 5:
 								if(ItemTest.CheckCoolDown2() <= 0)
@@ -1579,7 +1575,7 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 										ItemTest.Uses2 = 0;
 									}
 									g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-									return Plugin_Continue;
+									continue;
 								}
 							case 6,7:
 							{
@@ -1596,14 +1592,13 @@ public Action Event_GameUI_RightClick(const char[] sOutput, int iCaller, int iAc
 										
 										ItemTest.SetCoolDown2(ItemTest.CoolDown2);
 										g_ItemList.SetArray(i, ItemTest, sizeof(ItemTest));
-									}else return Plugin_Changed;
+									}else continue;
 								}
-								return Plugin_Continue;
+								continue;
 							}
-							default: return Plugin_Continue;
+							default: continue;
 						}
 					}
-					return Plugin_Changed;
 				}
 			}
 		}
