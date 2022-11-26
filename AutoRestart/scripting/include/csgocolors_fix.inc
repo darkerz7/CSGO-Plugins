@@ -2,7 +2,7 @@
  *                                                                           *
  *                Colored Chat Functions for CS:GO                           *
  * Author: exvel, Editor: Popoklopsi, Powerlord, Zipcore, Bara, DarkerZ[RUS] *
- *                           Version: 2.0.1fix                               *
+ *                           Version: 2.0.1fix2                              *
  *                                                                           *
  *****************************************************************************/
 
@@ -544,6 +544,7 @@ public Action CEvent_MapStart(Event event, const char[] name, bool dontBroadcast
 {
 	for(int i = 1; i <= MaxClients; i++)
 		CSkipList[i] = false;
+	return Plugin_Continue;
 }
 
 /**

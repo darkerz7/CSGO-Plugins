@@ -1,4 +1,5 @@
 #pragma semicolon 1
+#pragma newdecls required
 
 #include <csgocolors_fix>
 
@@ -14,15 +15,17 @@ int 	g_iTimeLeft = -1;
 
 int 	g_iLastCheck = 0;
 
-public Plugin:myinfo = {
+public Plugin myinfo =
+{
 	name = "AutoRestart",
 	author = "DarkerZ [RUS]",
 	description = "Restarts servers once a day.",
-	version = "1.0",
+	version = "1.1",
 	url = "dark-skill.ru",
 }
 
-public OnPluginStart() {
+public void OnPluginStart()
+{
 	LoadTranslations("autorestart.phrases");
 	RegAdminCmd("sm_forcerestart", Command_FRestart, ADMFLAG_ROOT);
 	
@@ -60,16 +63,16 @@ public void Cvar_Wait(ConVar convar, const char[] oldValue, const char[] newValu
 	g_iWait = GetConVarInt(convar);
 }
 
-public Action CheckRestart(Handle:timer, any:ignore)
+public Action CheckRestart(Handle hTimer, any ignore)
 {
 	if(!g_bEnabled)
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	if(g_iTimeLeft>-1)
 	{
-		return;
+		return Plugin_Continue;
 	}
 	
 	char time[8];
@@ -97,25 +100,26 @@ public Action CheckRestart(Handle:timer, any:ignore)
 	}
 	
 	g_iLastCheck = current_time;
+	return Plugin_Continue;
 }
 
-public void Restart_Time(int wTime)
+public void Restart_Time(int iWTime)
 {
-	if(wTime<0)
+	if(iWTime<0)
 	{
 		return;
-	} else if(wTime==0)
+	} else if(iWTime==0)
 	{
 		g_iTimeLeft=10;
 		CreateTimer(1.0, Timer_Restart, _, TIMER_REPEAT);
-	} else if(wTime>0)
+	} else if(iWTime>0)
 	{
-		g_iTimeLeft=wTime*60;
+		g_iTimeLeft=iWTime*60;
 		CreateTimer(1.0, Timer_Restart, _, TIMER_REPEAT);
 	}
 }
 
-public Action Timer_Restart(Handle:timer, any:ignore)
+public Action Timer_Restart(Handle hTimer, any ignore)
 {
 	if (g_iTimeLeft >= 0)
 	{
@@ -152,25 +156,25 @@ public void Restart_Announce()
 	}
 }
 
-public void Restart_Announce_Messages(int wTime, bool wMin)
+public void Restart_Announce_Messages(int iWTime, bool bWMin)
 {
 	for(int client = 1; client <= MaxClients; client++)
 	{
 		if(IsClientInGame(client) && !IsFakeClient(client))
 		{
 			char message[255];
-			if(wMin)
+			if(bWMin)
 			{
-				Format(message, 255, "%T %T", "Auto Restart Tag", client, "Auto Restart Wait Min", client, wTime);
-				CPrintToChat(client, "%t %t", "Auto Restart Tag Color", "Auto Restart Wait Min Color", wTime);
+				Format(message, 255, "%T %T", "Auto Restart Tag", client, "Auto Restart Wait Min", client, iWTime);
+				CPrintToChat(client, "%t %t", "Auto Restart Tag Color", "Auto Restart Wait Min Color", iWTime);
 			} else 
 			{
-				Format(message, 255, "%T %T", "Auto Restart Tag", client, "Auto Restart Wait Sec", client, wTime);
-				CPrintToChat(client, "%t %t", "Auto Restart Tag Color", "Auto Restart Wait Sec Color", wTime);
+				Format(message, 255, "%T %T", "Auto Restart Tag", client, "Auto Restart Wait Sec", client, iWTime);
+				CPrintToChat(client, "%t %t", "Auto Restart Tag Color", "Auto Restart Wait Sec Color", iWTime);
 			}
 			ReplyToCommand(client, message);
 			Handle hHudText = CreateHudSynchronizer();
-			if(wMin)
+			if(bWMin)
 			{
 				SetHudTextParams(-1.0, 0.15, 3.0, 100, 100, 255, 255, 1, 1.0, 0.1, 0.1);
 			} else 
