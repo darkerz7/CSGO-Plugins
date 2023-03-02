@@ -1,7 +1,0 @@
-"Sprite"
-{
-	"$basetexture" "topdefenders_perk/biohazard"
-	"$spriteorientation" "oriented"
-	"$spriteorigin" "[0.50 0.50]"
-	"$alphatest" "1"
-}
